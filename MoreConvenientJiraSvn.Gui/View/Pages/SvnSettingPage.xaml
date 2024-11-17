@@ -1,0 +1,93 @@
+﻿<Page
+    x:Class="MoreConvenientJiraSvn.Gui.View.Pages.SvnSettingPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:control="clr-namespace:MoreConvenientJiraSvn.Gui.View.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:MoreConvenientJiraSvn.Gui.View.Pages"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:model="clr-namespace:MoreConvenientJiraSvn.Gui.ViewModel"
+    x:Name="Page"
+    d:DataContext="{d:DesignInstance Type=model:SvnSettingViewModel}"
+    d:DesignHeight="520"
+    d:DesignWidth="900"
+    mc:Ignorable="d">
+
+    <ScrollViewer>
+        <StackPanel Margin="10">
+            <!--Base setting-->
+            <Expander Header="基础设置">
+                <StackPanel Orientation="Vertical">
+                    <control:ConfigLine
+                        Margin="8"
+                        ConfigName="用户名称"
+                        Foreground="Black">
+                        <TextBox
+                            Foreground="Black"
+                            KeyUp="TextBox_KeyUp"
+                            Style="{StaticResource CustomMaterialTextBoxStyle}"
+                            Text="{Binding Config.UserName,UpdateSourceTrigger=PropertyChanged}" />
+                    </control:ConfigLine>
+                    <control:ConfigLine
+                        Margin="8"
+                        ConfigName="用户密码"
+                        ShowConfigDescriptionCommand="">
+                        <TextBox
+                            Foreground="Black"
+                            KeyUp="TextBox_KeyUp"
+                            Style="{StaticResource CustomMaterialTextBoxStyle}"
+                            Text="{Binding Config.UserPassword,UpdateSourceTrigger=PropertyChanged}" />
+                    </control:ConfigLine>
+                </StackPanel>
+            </Expander>
+
+            <!--Common path-->
+            <Expander
+                HorizontalAlignment="Stretch"
+                Header="常用地址"
+                IsExpanded="True">
+                <DockPanel>
+                    <DataGrid
+                        x:Name="AddressDataGrid"
+                        AutoGenerateColumns="False"
+                        CanUserAddRows="True"
+                        ItemsSource="{Binding Paths}">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn
+                                Width="2*"
+                                Binding="{Binding Path, UpdateSourceTrigger=PropertyChanged}"
+                                Header="地址" />
+                            <DataGridTextColumn
+                                Width="*"
+                                Binding="{Binding PathName, UpdateSourceTrigger=PropertyChanged}"
+                                Header="名称" />
+                            <DataGridTextColumn
+                                Width="*"
+                                Binding="{Binding LocalPath, UpdateSourceTrigger=PropertyChanged}"
+                                Header="本地地址" />
+                            <DataGridTemplateColumn Width="*" Header="操作">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <DockPanel>
+                                            <Button
+                                                Margin="4"
+                                                Command="{Binding DataContext.UpdatePathCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                CommandParameter="{Binding}"
+                                                Content="保存" />
+                                            <Button
+                                                Margin="4"
+                                                Command="{Binding DataContext.DeletePathCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                CommandParameter="{Binding}"
+                                                Content="删除" />
+                                        </DockPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
+            </Expander>
+
+        </StackPanel>
+    </ScrollViewer>
+</Page>

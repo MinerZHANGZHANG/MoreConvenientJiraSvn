@@ -1,0 +1,47 @@
+﻿<Window
+    x:Class="MoreConvenientJiraSvn.Gui.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:MoreConvenientJiraSvn.Gui"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:model="clr-namespace:MoreConvenientJiraSvn.Gui.ViewModel"
+    Title="更方便的Jira和Svn"
+    Width="900"
+    Height="600"
+    d:DataContext="{d:DesignInstance Type=model:MainWindowViewModel}"
+    WindowStyle="ThreeDBorderWindow"
+    mc:Ignorable="d">
+    <StackPanel>
+        <TabControl
+            Height="600"
+            materialDesign:ColorZoneAssist.Mode="PrimaryLight"
+            Style="{StaticResource MaterialDesignFilledTabControl}">
+            <TabItem Header="首页">
+                <Frame
+                    Height="520"
+                    NavigationUIVisibility="Hidden"
+                    Source="/View/Pages/IndexPage.xaml" />
+            </TabItem>
+            <TabItem Header="Jira设置">
+                <Frame
+                    Height="520"
+                    NavigationUIVisibility="Hidden"
+                    Source="/View/Pages/JiraSettingPage.xaml" />
+            </TabItem>
+            <TabItem Header="Svn设置">
+                <Frame
+                    Height="520"
+                    NavigationUIVisibility="Hidden"
+                    Source="/View/Pages/SvnSettingPage.xaml" />
+            </TabItem>
+            <TabItem Header="插件设置">
+                <Frame
+                    Height="520"
+                    NavigationUIVisibility="Hidden"
+                    Source="/View/Pages/PluginSettingPage.xaml" />
+            </TabItem>
+        </TabControl>
+    </StackPanel>
+</Window>

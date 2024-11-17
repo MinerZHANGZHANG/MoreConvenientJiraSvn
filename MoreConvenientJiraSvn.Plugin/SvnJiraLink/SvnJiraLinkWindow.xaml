@@ -1,0 +1,70 @@
+﻿<Window
+    x:Class="MoreConvenientJiraSvn.Plugin.SvnJiraLink.SvnJiraLinkWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:control="clr-namespace:MoreConvenientJiraSvn.Plugin"
+    xmlns:convert="clr-namespace:MoreConvenientJiraSvn.Plugin.Convert"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:MoreConvenientJiraSvn.Plugin.SvnJiraLink"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="Svn关联Jira"
+    Width="1280"
+    Height="720"
+    d:DataContext="{d:DesignInstance Type=local:SvnJiraLinkViewModel}"
+    Style="{StaticResource MaterialDesignWindow}"
+    mc:Ignorable="d">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <materialDesign:BundledTheme
+                    BaseTheme="Light"
+                    PrimaryColor="DeepPurple"
+                    SecondaryColor="Lime" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+            <Style BasedOn="{StaticResource MaterialDesignBody1TextBlock}" TargetType="TextBlock">
+                <Setter Property="Margin" Value="2" />
+            </Style>
+            <Style x:Key="StackPanelStyle" TargetType="Border">
+                <Setter Property="BorderThickness" Value="2" />
+                <Setter Property="BorderBrush" Value="Gray" />
+                <Setter Property="Margin" Value="6" />
+                <Setter Property="Padding" Value="6" />
+            </Style>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="720" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <DockPanel
+            Grid.Row="0"
+            Grid.Column="0"
+            Margin="16">
+            <Button Command="{Binding QuerySvnLogCommand}" Content="查找Log" />
+            <DataGrid AutoGenerateColumns="True" ItemsSource="{Binding SvnLogs}" />
+        </DockPanel>
+
+        <Grid
+            Grid.Row="0"
+            Grid.Column="1"
+            Margin="16">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+        </Grid>
+
+
+
+
+    </Grid>
+</Window>

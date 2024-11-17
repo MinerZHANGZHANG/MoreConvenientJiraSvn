@@ -1,0 +1,285 @@
+﻿<Window
+    x:Class="MoreConvenientJiraSvn.Plugin.Jira2LocalDir.Jira2LocalDirWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:control="clr-namespace:MoreConvenientJiraSvn.Plugin"
+    xmlns:convert="clr-namespace:MoreConvenientJiraSvn.Plugin.Convert"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:MoreConvenientJiraSvn.Plugin.Jira2LocalDir"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="Jira本地化"
+    Width="1280"
+    Height="720"
+    d:DataContext="{d:DesignInstance Type=local:Jira2LocalDirViewModel}"
+    Style="{StaticResource MaterialDesignWindow}"
+    mc:Ignorable="d">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <materialDesign:BundledTheme
+                    BaseTheme="Light"
+                    PrimaryColor="DeepPurple"
+                    SecondaryColor="Lime" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+            <Style BasedOn="{StaticResource MaterialDesignBody1TextBlock}" TargetType="TextBlock">
+                <Setter Property="Margin" Value="2" />
+            </Style>
+            <Style x:Key="StackPanelStyle" TargetType="Border">
+                <Setter Property="BorderThickness" Value="2" />
+                <Setter Property="BorderBrush" Value="Gray" />
+                <Setter Property="Margin" Value="6" />
+                <Setter Property="Padding" Value="6" />
+            </Style>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="720" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!--Left jira title-->
+        <DockPanel
+            Grid.Row="0"
+            Grid.Column="0"
+            Margin="16">
+            
+            <!--Jira search bar-->
+            <DockPanel
+                Grid.Row="0"
+                HorizontalAlignment="Stretch"
+                DockPanel.Dock="Top">
+                <ComboBox
+                    x:Name="SelectTypeComboBox"
+                    MinWidth="64"
+                    DockPanel.Dock="Left"
+                    ItemsSource="{Binding JiraQueryTypes}"
+                    SelectedItem="{Binding SelectedJiraQueryType}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Converter={x:Static convert:JiraSelectTypeToStringConverter.Instance}}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+                <Grid MinWidth="256" HorizontalAlignment="Stretch">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <ComboBox
+                        Width="240"
+                        ItemsSource="{Binding JiraFilters}"
+                        SelectedItem="{Binding SelectedFilter}"
+                        Visibility="{Binding IsUseTextToSearch, Converter={x:Static convert:InverseBooleanToVisibilityConverter.Instance}}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Name}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+
+                    <TextBox
+                        Width="240"
+                        Text="{Binding JiraQueryText}"
+                        Visibility="{Binding IsUseTextToSearch, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                </Grid>
+                <Button
+                    x:Name="JiraSearchButton"
+                    MinWidth="128"
+                    HorizontalAlignment="Right"
+                    Command="{Binding QueryJiraInfoCommand}"
+                    Content="搜索"
+                    DockPanel.Dock="Right"
+                    Style="{StaticResource MaterialDesignRaisedSecondaryDarkButton}" />
+            </DockPanel>
+
+            <!--Jira list-->
+            <DataGrid
+                AutoGenerateColumns="False"
+                CanUserAddRows="False"
+                Foreground="Black"
+                GridLinesVisibility="Horizontal"
+                HorizontalGridLinesBrush="Gray"
+                HorizontalScrollBarVisibility="Auto"
+                IsReadOnly="True"
+                ItemsSource="{Binding JiraInfoList}"
+                ScrollViewer.HorizontalScrollBarVisibility="Visible"
+                ScrollViewer.VerticalScrollBarVisibility="Visible"
+                SelectedItem="{Binding SelectedJiraInfo}"
+                SelectionChanged="DataGrid_SelectionChanged"
+                SelectionMode="Extended"
+                SelectionUnit="FullRow"
+                VerticalScrollBarVisibility="Auto">
+                <DataGrid.Columns>
+                    <DataGridTextColumn
+                        Width="*"
+                        Binding="{Binding JiraId}"
+                        Header="编号" />
+                    <DataGridTextColumn
+                        Width="3*"
+                        Binding="{Binding Summary}"
+                        Header="主题" />
+                    <DataGridTextColumn
+                        Width="1*"
+                        Binding="{Binding IssueTypeName}"
+                        Header="类型" />
+                    <DataGridTextColumn
+                        Width="1.5*"
+                        Binding="{Binding FixVersionNameText}"
+                        Header="修复版本" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </DockPanel>
+
+        <!--Right jira detail-->
+        <Grid
+            Grid.Row="0"
+            Grid.Column="1"
+            Margin="16">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <ScrollViewer
+                Grid.Row="0"
+                HorizontalScrollBarVisibility="Disabled"
+                VerticalScrollBarVisibility="Auto">
+                <DockPanel>
+                    <!--Common setting-->
+                    <Expander
+                        Margin="6"
+                        DockPanel.Dock="Top"
+                        Header="公共设置">
+                        <StackPanel>
+                            <control:ConfigLine Margin="8" ConfigName="默认地址">
+                                <DockPanel>
+                                    <TextBox
+                                        MinWidth="160"
+                                        HorizontalAlignment="Left"
+                                        DockPanel.Dock="Left"
+                                        IsReadOnly="True"
+                                        Style="{StaticResource MaterialDesignTextBox}"
+                                        Text="{Binding LocalJiraSetting.ParentDir}" />
+                                    <Button
+                                        Width="60"
+                                        HorizontalAlignment="Right"
+                                        Command="{Binding SetLocalDirForJiraInfoCommand}"
+                                        Content="选择"
+                                        DockPanel.Dock="Right" />
+                                </DockPanel>
+                            </control:ConfigLine>
+                            <control:ConfigLine Margin="8" ConfigName="注释时的用户名">
+                                <DockPanel>
+                                    <TextBox
+                                        MinWidth="160"
+                                        HorizontalAlignment="Left"
+                                        DockPanel.Dock="Left"
+                                        IsReadOnly="False"
+                                        Text="{Binding LocalJiraSetting.UserName}" />
+                                    <Button
+                                        Width="60"
+                                        HorizontalAlignment="Right"
+                                        Command="{Binding SetUserNameForJiraInfoCommand}"
+                                        Content="设置"
+                                        DockPanel.Dock="Right" />
+                                </DockPanel>
+                            </control:ConfigLine>
+                        </StackPanel>
+
+                    </Expander>
+                    
+                    <!--Local Operation-->
+                    <Expander
+                        Margin="6"
+                        DockPanel.Dock="Top"
+                        Header="本地存档"
+                        IsExpanded="True">
+                        <WrapPanel>
+                            <TextBlock Text="{Binding SelectedJiraLocalInfo.LocalDir}" />
+                            <Button Command="{Binding UseSelectedToCreateLocalJiraCommand}" Content="{Binding LocalJiraOperationText}" />
+                            <Button Command="{Binding CopyCommitTextCommand}" Content="复制提交信息" />
+                            <Button Command="{Binding CopyAnnotationTextCommand}" Content="复制注释信息" />
+                        </WrapPanel>
+                    </Expander>
+                    
+                    <!--Jira info-->
+                    <Expander
+                        Margin="6"
+                        Header="Jira信息"
+                        IsExpanded="True">
+                        <WrapPanel>
+                            <Border Style="{StaticResource StackPanelStyle}">
+                                <StackPanel>
+                                    <TextBlock FontWeight="Bold" Text="Jira ID:" />
+                                    <TextBlock Text="{Binding SelectedJiraInfo.JiraId}" />
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource StackPanelStyle}">
+                                <StackPanel>
+                                    <TextBlock FontWeight="Bold" Text="Summary:" />
+                                    <TextBlock Text="{Binding SelectedJiraInfo.Summary}" TextWrapping="Wrap" />
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource StackPanelStyle}">
+                                <StackPanel>
+                                    <TextBlock FontWeight="Bold" Text="Status:" />
+                                    <TextBlock Text="{Binding SelectedJiraInfo.StatusName}" />
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource StackPanelStyle}">
+                                <StackPanel>
+                                    <TextBlock FontWeight="Bold" Text="Priority:" />
+                                    <TextBlock Text="{Binding SelectedJiraInfo.PriorityName}" />
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource StackPanelStyle}">
+                                <StackPanel>
+                                    <TextBlock FontWeight="Bold" Text="Creator:" />
+                                    <TextBlock Text="{Binding SelectedJiraInfo.CreatorName}" />
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource StackPanelStyle}">
+                                <StackPanel>
+                                    <TextBlock FontWeight="Bold" Text="Issue Type:" />
+                                    <TextBlock Text="{Binding SelectedJiraInfo.IssueTypeName}" />
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource StackPanelStyle}">
+                                <StackPanel>
+                                    <TextBlock FontWeight="Bold" Text="Fix Versions:" />
+                                    <TextBlock Text="{Binding SelectedJiraInfo.FixVersionNameText}" TextWrapping="Wrap" />
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource StackPanelStyle}">
+                                <StackPanel>
+                                    <TextBlock FontWeight="Bold" Text="Resolution:" />
+                                    <TextBlock Text="{Binding SelectedJiraInfo.ResolutionName}" />
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource StackPanelStyle}">
+                                <StackPanel>
+                                    <TextBlock FontWeight="Bold" Text="Developer Leader:" />
+                                    <TextBlock Text="{Binding SelectedJiraInfo.DeveloperLeaderName}" />
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource StackPanelStyle}">
+                                <StackPanel>
+                                    <TextBlock FontWeight="Bold" Text="Developers:" />
+                                    <TextBlock Text="{Binding SelectedJiraInfo.DeveloperNamesString}" TextWrapping="Wrap" />
+                                </StackPanel>
+                            </Border>
+                        </WrapPanel>
+                    </Expander>
+                </DockPanel>
+            </ScrollViewer>
+        </Grid>
+
+    </Grid>
+</Window>

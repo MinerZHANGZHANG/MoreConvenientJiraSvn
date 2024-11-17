@@ -1,0 +1,50 @@
+﻿<UserControl
+    x:Class="MoreConvenientJiraSvn.Gui.View.Controls.PluginCard"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:MoreConvenientJiraSvn.Gui.View.Controls"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    x:Name="PluginCardControl"
+    d:DesignHeight="160"
+    d:DesignWidth="300"
+    mc:Ignorable="d">
+    <materialDesign:Card>
+        <Border
+            Padding="10"
+            Background="White"
+            CornerRadius="8">
+            <StackPanel>
+                <DockPanel Height="30">
+                    <TextBlock
+                        Margin="0,0,16,0"
+                        FontSize="24"
+                        Text="{Binding PluginName, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                    <TextBlock
+                        VerticalAlignment="Bottom"
+                        FontSize="16"
+                        Foreground="Gray"
+                        Text="{Binding PluginVersion, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                    <materialDesign:SplitButton
+                        Margin="16,0,0,0"
+                        HorizontalAlignment="Right"
+                        Command="{Binding InstallCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                        Content="安装">
+                        <materialDesign:SplitButton.PopupContent>
+                            <Button Command="{Binding UnInstallCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" Content="卸载" />
+                        </materialDesign:SplitButton.PopupContent>
+                    </materialDesign:SplitButton>
+                </DockPanel>
+
+                <StackPanel Margin="8" Orientation="Horizontal">
+                    <Image
+                        Width="40"
+                        Height="40"
+                        Source="{Binding PluginImageSource, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                    <TextBlock Margin="16,0,0,0" Text="{Binding PluginDescription, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                </StackPanel>
+            </StackPanel>
+        </Border>
+    </materialDesign:Card>
+</UserControl>
