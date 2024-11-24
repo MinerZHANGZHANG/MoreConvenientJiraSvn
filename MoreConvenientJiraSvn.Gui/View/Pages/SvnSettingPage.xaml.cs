@@ -1,4 +1,6 @@
-﻿using MoreConvenientJiraSvn.Gui.ViewModel;
+﻿using MoreConvenientJiraSvn.Core.Model;
+using MoreConvenientJiraSvn.Core.Utils;
+using MoreConvenientJiraSvn.Gui.ViewModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -30,5 +32,10 @@ namespace MoreConvenientJiraSvn.Gui.View.Pages
         {
             viewModel.UpdateConfig();
         }
+    }
+
+    public static class EnumResource
+    {
+        public static IEnumerable<EnumDescription> SvnPathTypes => EnumHelper.GetEnumDescriptions<SvnPathType>();
     }
 }

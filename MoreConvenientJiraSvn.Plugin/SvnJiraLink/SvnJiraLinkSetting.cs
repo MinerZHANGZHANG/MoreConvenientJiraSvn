@@ -5,10 +5,11 @@ namespace MoreConvenientJiraSvn.Plugin.SvnJiraLink
     public record SvnJiraLinkSetting
     {
         /// <summary>
-        /// Global setting, id is zeri
+        /// Global setting
         /// </summary>
         [BsonId]
         public ObjectId Id { get; set; } = ObjectId.Empty;
 
     }
+
 }

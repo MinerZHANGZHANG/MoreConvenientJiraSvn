@@ -8,6 +8,7 @@ namespace MoreConvenientJiraSvn.Core.Model
         [BsonId]
         public ObjectId Id { get; set; } = ObjectId.NewObjectId();
         public string JiraId { get; set; } = string.Empty;
+        [BsonIgnore]
         public string? JsonResult
         {
             get

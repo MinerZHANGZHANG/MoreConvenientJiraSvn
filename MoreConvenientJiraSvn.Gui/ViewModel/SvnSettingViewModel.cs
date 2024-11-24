@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using MoreConvenientJiraSvn.Core.Model;
 using MoreConvenientJiraSvn.Core.Service;
+using MoreConvenientJiraSvn.Core.Utils;
 using System.Collections.ObjectModel;
 using System.Windows;
 
@@ -17,6 +18,7 @@ namespace MoreConvenientJiraSvn.Gui.ViewModel
         [ObservableProperty]
         private ObservableCollection<SvnPath> _paths;
 
+        public List<EnumDescription> SvnPathTypes { get; set; } = EnumHelper.GetEnumDescriptions<SvnPathType>();
 
         public SvnSettingViewModel(SvnService svnService)
         {
@@ -49,7 +51,7 @@ namespace MoreConvenientJiraSvn.Gui.ViewModel
                 }
 
                 _svnService.InsertOrUpdateSinglePath(path);
-                MessageBox.Show($"新增{path.Path}成功!");
+                MessageBox.Show($"保存{path.Path}成功!");
             }
 
         }

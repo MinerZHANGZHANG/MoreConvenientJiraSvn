@@ -15,7 +15,7 @@
 
     <ScrollViewer>
         <StackPanel Margin="10">
-            <!--Base setting-->
+            <!--  Base setting  -->
             <Expander Header="基础设置">
                 <StackPanel Orientation="Vertical">
                     <control:ConfigLine
@@ -26,7 +26,7 @@
                             Foreground="Black"
                             KeyUp="TextBox_KeyUp"
                             Style="{StaticResource CustomMaterialTextBoxStyle}"
-                            Text="{Binding Config.UserName,UpdateSourceTrigger=PropertyChanged}" />
+                            Text="{Binding Config.UserName, UpdateSourceTrigger=PropertyChanged}" />
                     </control:ConfigLine>
                     <control:ConfigLine
                         Margin="8"
@@ -36,12 +36,24 @@
                             Foreground="Black"
                             KeyUp="TextBox_KeyUp"
                             Style="{StaticResource CustomMaterialTextBoxStyle}"
-                            Text="{Binding Config.UserPassword,UpdateSourceTrigger=PropertyChanged}" />
+                            Text="{Binding Config.UserPassword, UpdateSourceTrigger=PropertyChanged}" />
+                    </control:ConfigLine>
+                    <control:ConfigLine
+                        Margin="8"
+                        ConfigName="自动下载log频率"
+                        ShowConfigDescriptionCommand="">
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox
+                                Content="每日更新"
+                                Foreground="Black"
+                                IsChecked="{Binding Config.IsAutoUpdateLogDaily, UpdateSourceTrigger=PropertyChanged}" />
+                        </StackPanel>
+
                     </control:ConfigLine>
                 </StackPanel>
             </Expander>
 
-            <!--Common path-->
+            <!--  Common path  -->
             <Expander
                 HorizontalAlignment="Stretch"
                 Header="常用地址"
@@ -51,6 +63,7 @@
                         x:Name="AddressDataGrid"
                         AutoGenerateColumns="False"
                         CanUserAddRows="True"
+                        Foreground="Black"
                         ItemsSource="{Binding Paths}">
                         <DataGrid.Columns>
                             <DataGridTextColumn
@@ -61,10 +74,17 @@
                                 Width="*"
                                 Binding="{Binding PathName, UpdateSourceTrigger=PropertyChanged}"
                                 Header="名称" />
-                            <DataGridTextColumn
+                            <!--<DataGridTextColumn
                                 Width="*"
                                 Binding="{Binding LocalPath, UpdateSourceTrigger=PropertyChanged}"
-                                Header="本地地址" />
+                                Header="本地地址" />-->
+                            <DataGridComboBoxColumn
+                                Width="*"
+                                DisplayMemberPath="Description"
+                                Header="路径类型"
+                                ItemsSource="{x:Static local:EnumResource.SvnPathTypes}"
+                                SelectedValueBinding="{Binding SvnPathType, UpdateSourceTrigger=PropertyChanged}"
+                                SelectedValuePath="Value" />
                             <DataGridTemplateColumn Width="*" Header="操作">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>

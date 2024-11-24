@@ -4,6 +4,7 @@ using LiteDB;
 using Microsoft.Extensions.DependencyInjection;
 using MoreConvenientJiraSvn.Core.Model;
 using MoreConvenientJiraSvn.Core.Service;
+using System.Collections.ObjectModel;
 
 namespace MoreConvenientJiraSvn.Plugin.SvnJiraLink;
 
@@ -23,12 +24,13 @@ public partial class SvnJiraLinkViewModel(ServiceProvider serviceProvider) : Obs
 
     [ObservableProperty]
     private List<SvnPath> _svnPaths = [];
+    [ObservableProperty]
+    private SvnPath? _selectedPath;
 
     [ObservableProperty]
-    private List<SvnLog> _svnLogs = [];
+    private List<SvnLog> _selectedSvnLogs = [];
 
     #endregion
-
 
     public void InitViewModel()
     {
@@ -36,17 +38,37 @@ public partial class SvnJiraLinkViewModel(ServiceProvider serviceProvider) : Obs
         SvnPaths = _svnService.Paths;
     }
 
-    [RelayCommand]
-    public async Task QuerySvnLog()
+    public void RefreshSvnLog()
     {
-        if (SvnPaths.Count > 0)
+        if (SelectedPath != null)
         {
+            SelectedSvnLogs = _dataService.SelectByExpression<SvnLog>(Query.EQ(nameof(SvnLog.SvnPath), SelectedPath.Path)).ToList();
+        }
+    }
+
+    [RelayCommand]
+    public async Task GetLatestSvnLog()
+    {
+        if (SelectedPath != null)
+        {
+            DateTime begTime = DateTime.Now.AddYears(-20);
+            if (SelectedSvnLogs.Count != 0)
+            {
+                begTime = SelectedSvnLogs.Select(log => log.DateTime).Max();
+            }
+            List<SvnLog> addition = [];
             await Task.Run(() =>
             {
-                SvnLogs = _svnService.GetSvnLogs(SvnPaths.First().Path, null, null);
+                bool isHaveJiraId = SelectedPath.SvnPathType == SvnPathType.Code || SelectedPath.SvnPathType == SvnPathType.Document;
+                
+                addition = _svnService.GetSvnLogs(SelectedPath.Path, begTime, DateTime.Now, isNeedExtractJiraId: isHaveJiraId);
             });
+            if (addition != null)
+            {
+                _dataService.InsertOrUpdateMany(addition);
+                SelectedSvnLogs = [.. SelectedSvnLogs, .. addition];
+            }
         }
-
     }
 
 }

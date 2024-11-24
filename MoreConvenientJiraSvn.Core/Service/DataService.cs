@@ -30,6 +30,12 @@ namespace MoreConvenientJiraSvn.Core.Service
             return result;
         }
 
+        public IEnumerable<T> SelectByExpression<T>(BsonExpression expression) where T : class
+        {
+            var result = _db.GetCollection<T>().Find(expression);
+            return result??[];
+        }
+
         public T? SelectByObjectId<T>(ObjectId id) where T : class
         {
             var result = _db.GetCollection<T>().FindById(id);

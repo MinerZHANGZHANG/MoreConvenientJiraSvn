@@ -1,4 +1,5 @@
 ﻿using LiteDB;
+using System.ComponentModel;
 
 namespace MoreConvenientJiraSvn.Core.Model
 {
@@ -6,7 +7,7 @@ namespace MoreConvenientJiraSvn.Core.Model
     {
         [BsonId]
         public ObjectId Id { get; set; } = ObjectId.NewObjectId();
-        public required string SvnUrl { get; set; }
+        public required string SvnPath { get; set; }
         public required long Revision { get; set; }
         public required string Operation { get; set; }
         public required string Author { get; set; }
@@ -14,6 +15,9 @@ namespace MoreConvenientJiraSvn.Core.Model
         public string? Message { get; set; }
         public required List<string> ChangedUrls { get; set; }
 
-
+        // special property
+        public string? IssueJiraId { get; set; }
+        public string? SubIssueJiraId { get; set; }
     }
+
 }

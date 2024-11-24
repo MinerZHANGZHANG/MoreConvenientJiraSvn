@@ -1,5 +1,6 @@
 ﻿using LiteDB;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using MoreConvenientJiraSvn.Core.Service;
 using MoreConvenientJiraSvn.Gui.Properties;
 using MoreConvenientJiraSvn.Gui.ViewModel;
@@ -25,6 +26,8 @@ namespace MoreConvenientJiraSvn.Gui
             services.AddSingleton<SvnService>();
             services.AddSingleton<JiraService>();
 
+            services.AddHostedService<DownloadSvnLogHostService>();
+
             services.AddTransient<MainWindowViewModel>();
             services.AddTransient<JiraSettingViewModel>();
             services.AddTransient<SvnSettingViewModel>();
@@ -38,11 +41,27 @@ namespace MoreConvenientJiraSvn.Gui
             ViewModelsManager.InitService(_services);
 
             this.Exit += App_Exit;
+            this.Startup += App_Startup;
         }
 
-        private void App_Exit(object sender, ExitEventArgs e)
+        private async void App_Startup(object sender, StartupEventArgs e)
         {
-            _services.GetService<SvnService>()?.Dispose();
+            var hostServices = _services.GetServices<IHostedService>();
+            foreach (var service in hostServices)
+            {
+                await service.StartAsync(CancellationToken.None);
+            }
+        }
+
+        private async void App_Exit(object sender, ExitEventArgs e)
+        {
+            var hostServices = _services.GetServices<IHostedService>();
+            foreach (var service in hostServices)
+            {
+                await service.StopAsync(CancellationToken.None);
+            }
+
+            await _services.DisposeAsync();
         }
     }
 

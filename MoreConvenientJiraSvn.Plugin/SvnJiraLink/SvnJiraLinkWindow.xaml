@@ -45,14 +45,45 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
+        <!--  Left svn paths  -->
         <DockPanel
             Grid.Row="0"
             Grid.Column="0"
             Margin="16">
-            <Button Command="{Binding QuerySvnLogCommand}" Content="查找Log" />
-            <DataGrid AutoGenerateColumns="True" ItemsSource="{Binding SvnLogs}" />
+            <DataGrid
+                AutoGenerateColumns="False"
+                CanUserAddRows="False"
+                Foreground="Black"
+                GridLinesVisibility="Horizontal"
+                HorizontalGridLinesBrush="Gray"
+                HorizontalScrollBarVisibility="Auto"
+                IsReadOnly="True"
+                ItemsSource="{Binding SvnPaths}"
+                ScrollViewer.HorizontalScrollBarVisibility="Visible"
+                ScrollViewer.VerticalScrollBarVisibility="Visible"
+                SelectedItem="{Binding SelectedPath}"
+                SelectionChanged="DataGrid_SelectionChanged"
+                SelectionMode="Extended"
+                SelectionUnit="FullRow"
+                VerticalScrollBarVisibility="Auto">
+                <DataGrid.Columns>
+                    <DataGridTextColumn
+                        Width="1*"
+                        Binding="{Binding PathName}"
+                        Header="名称" />
+                    <DataGridTextColumn
+                        Width="3*"
+                        Binding="{Binding Path}"
+                        Header="路径" />
+                    <DataGridTextColumn
+                        Width="1*"
+                        Binding="{Binding SvnPathType}"
+                        Header="类型" />
+                </DataGrid.Columns>
+            </DataGrid>
         </DockPanel>
 
+        <!--  Right path detail  -->
         <Grid
             Grid.Row="0"
             Grid.Column="1"
@@ -61,6 +92,56 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
+            <Expander
+                Grid.Row="0"
+                Header="路径信息"
+                IsExpanded="True">
+                <Button Command="{Binding GetLatestSvnLogCommand}" Content="刷新Log" />
+            </Expander>
+            <Expander
+                Grid.Row="1"
+                Header="Log情况"
+                IsExpanded="True">
+                <DataGrid
+                    AutoGenerateColumns="False"
+                    CanUserAddRows="False"
+                    Foreground="Black"
+                    GridLinesVisibility="Horizontal"
+                    HorizontalGridLinesBrush="Gray"
+                    HorizontalScrollBarVisibility="Auto"
+                    IsReadOnly="True"
+                    ItemsSource="{Binding SelectedSvnLogs}"
+                    ScrollViewer.HorizontalScrollBarVisibility="Visible"
+                    ScrollViewer.VerticalScrollBarVisibility="Visible"
+                    SelectionMode="Extended"
+                    SelectionUnit="FullRow"
+                    VerticalScrollBarVisibility="Auto">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn
+                            Width="1*"
+                            Binding="{Binding Revision}"
+                            Header="版本" />
+                        <DataGridTextColumn
+                            Width="1*"
+                            Binding="{Binding Operation}"
+                            Header="操作类型" />
+                        <DataGridTextColumn
+                            Width="1*"
+                            Binding="{Binding Author}"
+                            Header="作者" />
+                        <DataGridTextColumn
+                            Width="1*"
+                            Binding="{Binding DateTime}"
+                            Header="更新日期" />
+                        <DataGridTextColumn
+                            Width="3*"
+                            Binding="{Binding Message}"
+                            Header="信息" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Expander>
+
+
         </Grid>
 
 
