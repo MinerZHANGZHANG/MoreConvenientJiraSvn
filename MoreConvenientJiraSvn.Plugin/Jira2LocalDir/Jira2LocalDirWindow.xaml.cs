@@ -26,5 +26,10 @@ namespace MoreConvenientJiraSvn.Plugin.Jira2LocalDir
         {
             this._viewModel.RefreshLocalJiraInfo();
         }
+
+        private void ComboBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            this._viewModel.RefreshSelectPathSvnLog();
+        }
     }
 }

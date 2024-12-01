@@ -18,6 +18,7 @@ public partial class Jira2LocalDirViewModel(ServiceProvider serviceProvider) : O
 {
     #region Service
     private readonly JiraService _jiraService = serviceProvider.GetRequiredService<JiraService>();
+    private readonly SvnService _svnService = serviceProvider.GetRequiredService<SvnService>();
     private readonly DataService _dataService = serviceProvider.GetRequiredService<DataService>();
     private readonly SettingService _settingService = serviceProvider.GetRequiredService<SettingService>();
 
@@ -66,6 +67,54 @@ public partial class Jira2LocalDirViewModel(ServiceProvider serviceProvider) : O
     [NotifyPropertyChangedFor(nameof(LocalJiraOperationText))]
     private LocalJiraInfo? _selectedJiraLocalInfo;
 
+    // Local Svn log
+
+    [ObservableProperty]
+    private List<SvnPath> _svnPaths = [];
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CanQueryNextLog))]
+    [NotifyPropertyChangedFor(nameof(CanQueryPrevLog))]
+    [NotifyCanExecuteChangedFor(nameof(DownloadNextSvnLogByAmountCommand))]
+    [NotifyCanExecuteChangedFor(nameof(DownloadPrevSvnLogByAmountCommand))]
+    [NotifyCanExecuteChangedFor(nameof(DownloadNextSvnLogByDateCommand))]
+    [NotifyCanExecuteChangedFor(nameof(DownloadPrevSvnLogByDateCommand))]
+    private SvnPath? _selectedSvnPath;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasSvnLog))]
+    [NotifyPropertyChangedFor(nameof(CanQueryNextLog))]
+    [NotifyCanExecuteChangedFor(nameof(DownloadNextSvnLogByAmountCommand))]
+    [NotifyCanExecuteChangedFor(nameof(DownloadNextSvnLogByDateCommand))]
+    private List<SvnLog> _selectedJiraSvnLogs = [];
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(SvnLogVersionRangeText))]
+    [NotifyPropertyChangedFor(nameof(SvnLogTimeRangeText))]
+    private SvnLog? _newestSvnLog;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(SvnLogVersionRangeText))]
+    [NotifyPropertyChangedFor(nameof(SvnLogTimeRangeText))]
+    private SvnLog? _oldestSvnLog;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CanQueryNextLog))]
+    [NotifyPropertyChangedFor(nameof(CanQueryPrevLog))]
+    [NotifyCanExecuteChangedFor(nameof(DownloadNextSvnLogByAmountCommand))]
+    [NotifyCanExecuteChangedFor(nameof(DownloadPrevSvnLogByAmountCommand))]
+    [NotifyCanExecuteChangedFor(nameof(DownloadNextSvnLogByDateCommand))]
+    [NotifyCanExecuteChangedFor(nameof(DownloadPrevSvnLogByDateCommand))]
+    private bool _isNotQuerySvnLoging = true;
+
+    public bool HasSvnLog => SelectedJiraSvnLogs.Count > 0;
+
+    public bool CanQueryPrevLog => IsNotQuerySvnLoging && SelectedSvnPath != null;
+    public bool CanQueryNextLog => IsNotQuerySvnLoging && SelectedSvnPath != null && HasSvnLog;
+
+    public string SvnLogVersionRangeText => $"版本:{OldestSvnLog?.Revision.ToString() ?? "无"} -> {NewestSvnLog?.Revision.ToString() ?? "无"}";
+    public string SvnLogTimeRangeText => $"日期:{OldestSvnLog?.DateTime.ToString("yy-MM-dd HH:mm") ?? "无"} -> {NewestSvnLog?.DateTime.ToString("yy-MM-dd HH:mm") ?? "无"}";
+
     public string LocalJiraOperationText => string.IsNullOrEmpty(SelectedJiraLocalInfo?.LocalDir) ? "新建Jira文件夹" : "打开Jira文件夹";
 
     #endregion
@@ -74,6 +123,10 @@ public partial class Jira2LocalDirViewModel(ServiceProvider serviceProvider) : O
     {
         JiraFilters = await _jiraService.GetCurrentUserFavouriteFilterAsync();
         LocalJiraSetting = _settingService.GetSingleSettingFromDatabase<LocalJiraSetting>() ?? new();
+
+        SvnPaths = _svnService.Paths;
+        SelectedSvnPath = SvnPaths.FirstOrDefault();
+
     }
 
     #region Command
@@ -116,6 +169,19 @@ public partial class Jira2LocalDirViewModel(ServiceProvider serviceProvider) : O
         }
 
         SelectedJiraLocalInfo = _dataService.SelectOneByExpression<LocalJiraInfo>(BsonExpression.Create($"JiraId = \"{SelectedJiraInfo.JiraId}\""));
+    }
+
+    public void RefreshSelectPathSvnLog()
+    {
+        if (SelectedJiraInfo == null || SelectedSvnPath == null)
+        {
+            return;
+        }
+
+        SelectedJiraSvnLogs = [.. _jiraService.GetSvnLogByJiraIdLocal(SelectedJiraInfo.JiraId, SelectedSvnPath.Path).OrderByDescending(log => log.DateTime)];
+
+        NewestSvnLog = SelectedJiraSvnLogs?.FirstOrDefault();
+        OldestSvnLog = SelectedJiraSvnLogs?.LastOrDefault();
     }
 
     [RelayCommand(CanExecute = nameof(HasJiraBeSelected))]
@@ -293,6 +359,128 @@ public partial class Jira2LocalDirViewModel(ServiceProvider serviceProvider) : O
         }
         _settingService.InsertOrUpdateSettingIntoDatabase(LocalJiraSetting);
     }
+
+    // Need cut down code lines
+    [RelayCommand(CanExecute = nameof(CanQueryPrevLog))]
+    public async Task DownloadPrevSvnLogByDate(object parameter)
+    {
+        if (SelectedJiraInfo == null || SelectedSvnPath == null
+            || !int.TryParse(parameter.ToString(), out int days))
+        {
+            return;
+        }
+
+        IsNotQuerySvnLoging = false;
+        await Task.Run(() =>
+        {
+            if (OldestSvnLog != null)
+            {
+                _svnService.GetSvnLogs(SelectedSvnPath.Path,
+                    OldestSvnLog.DateTime.AddDays(-days),
+                    OldestSvnLog.DateTime,
+                    300,
+                    SelectedSvnPath.IsNeedExtractJiraId);
+            }
+            else
+            {
+                _svnService.GetSvnLogs(SelectedSvnPath.Path,
+                    DateTime.Now.AddDays(-days),
+                    DateTime.Now,
+                    300,
+                    SelectedSvnPath.IsNeedExtractJiraId);
+            }
+
+        });
+        IsNotQuerySvnLoging = true;
+        RefreshSelectPathSvnLog();
+    }
+
+    [RelayCommand(CanExecute = nameof(CanQueryNextLog))]
+    public async Task DownloadNextSvnLogByDate(object parameter)
+    {
+        if (SelectedJiraInfo == null || SelectedSvnPath == null
+            || NewestSvnLog == null
+            || !int.TryParse(parameter.ToString(), out int days))
+        {
+            return;
+        }
+
+        IsNotQuerySvnLoging = false;
+        await Task.Run(() =>
+        {
+            if (NewestSvnLog != null)
+            {
+                _svnService.GetSvnLogs(SelectedSvnPath.Path,
+                    NewestSvnLog.DateTime,
+                    NewestSvnLog.DateTime.AddDays(days),
+                    300,
+                    SelectedSvnPath.IsNeedExtractJiraId);
+            }
+        });
+        IsNotQuerySvnLoging = true;
+        RefreshSelectPathSvnLog();
+    }
+
+    [RelayCommand(CanExecute = nameof(CanQueryPrevLog))]
+    public async Task DownloadPrevSvnLogByAmount(object parameter)
+    {
+        if (SelectedJiraInfo == null || SelectedSvnPath == null
+            || !int.TryParse(parameter.ToString(), out int amount))
+        {
+            return;
+        }
+
+        IsNotQuerySvnLoging = false;
+        await Task.Run(() =>
+        {
+            if (OldestSvnLog != null)
+            {
+                _svnService.GetSvnLogs(SelectedSvnPath.Path,
+                    0,
+                    OldestSvnLog.Revision,
+                    amount,
+                    SelectedSvnPath.IsNeedExtractJiraId);
+            }
+            else
+            {
+                _svnService.GetSvnLogs(SelectedSvnPath.Path,
+                    0,
+                    long.MaxValue,
+                    amount,
+                    SelectedSvnPath.IsNeedExtractJiraId);
+            }
+        });
+        IsNotQuerySvnLoging = true;
+        RefreshSelectPathSvnLog();
+    }
+
+    [RelayCommand(CanExecute = nameof(CanQueryNextLog))]
+    public async Task DownloadNextSvnLogByAmount(object parameter)
+    {
+        if (SelectedJiraInfo == null || SelectedSvnPath == null
+            || NewestSvnLog == null
+            || !int.TryParse(parameter.ToString(), out int amount))
+        {
+            return;
+        }
+
+        IsNotQuerySvnLoging = false;
+        await Task.Run(() =>
+        {
+            if (NewestSvnLog != null)
+            {
+                _svnService.GetSvnLogs(SelectedSvnPath.Path,
+                    NewestSvnLog.Revision,
+                    int.MaxValue,
+                    amount,
+                    SelectedSvnPath.IsNeedExtractJiraId);
+            }
+
+        });
+        IsNotQuerySvnLoging = true;
+        RefreshSelectPathSvnLog();
+    }
+
 
     #endregion
 }

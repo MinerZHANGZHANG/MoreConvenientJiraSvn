@@ -38,6 +38,15 @@ public record SvnPath
         }
     }
     private string _pathName = string.Empty;
+
+    public string FullPathName => string.IsNullOrWhiteSpace(_pathName) ? Path : $"({PathName}){Path}";
+
+    public bool IsNeedExtractJiraId => SvnPathType == SvnPathType.Document || SvnPathType == SvnPathType.Code;
+
+    public override string ToString()
+    {
+        return FullPathName;
+    }
 }
 
 public enum SvnPathType

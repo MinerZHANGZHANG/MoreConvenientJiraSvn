@@ -156,6 +156,62 @@ public class SvnService : IDisposable
         return result;
     }
 
+    public List<SvnLog> GetSvnLogs(string path, long? beginRevision, long? endRevision, int maxNumber = 200, bool isNeedExtractJiraId = false)
+    {
+        List<SvnLog> result = [];
+
+        if (_client == null)
+        {
+            return result;
+        }
+
+        var logArgs = new SvnLogArgs()
+        {
+            Limit = maxNumber,
+            Start = beginRevision ?? 0,
+            End = endRevision ?? long.MaxValue,
+        };
+        try
+        {
+            _client.GetLog(new Uri(path), logArgs, out var logEventArgs);
+            foreach (var item in logEventArgs)
+            {
+                SvnLog svnLog = new()
+                {
+                    Author = item.Author ?? string.Empty,
+                    DateTime = item.Time,
+                    Message = item.LogMessage ?? string.Empty,
+                    SvnPath = path,
+                    Revision = item.Revision,
+                    ChangedUrls = [],
+                    Operation = string.Empty
+                };
+
+                if (item.ChangedPaths != null && item.ChangedPaths.Count > 0)
+                {
+                    svnLog.ChangedUrls = item.ChangedPaths.Select(s => s.Path)
+                                                    .ToList();
+                    svnLog.Operation = string.Join(',', item.ChangedPaths.Select(s => s.Action.ToString())
+                                                                  .Distinct());
+                }
+
+                if (isNeedExtractJiraId && !string.IsNullOrEmpty(svnLog.Message))
+                {
+                    (svnLog.IssueJiraId, svnLog.SubIssueJiraId) = ExtractJiraId(svnLog.Message);
+                }
+
+                result.Add(svnLog);
+            }
+        }
+        catch (Exception ex)
+        {
+
+        }
+
+        return result;
+    }
+
+
     /// <summary>
     /// According your develop environment
     /// </summary>
@@ -182,13 +238,7 @@ public class SvnService : IDisposable
         return (issueId, subIssueId);
     }
 
-    public IEnumerable<SvnLog> SelectSvnLogByJiraIdLocal(string jiraId)
-    {
-        return _dataService.SelectByExpression<SvnLog>(Query.Or(
-                                                        Query.EQ(nameof(SvnLog.IssueJiraId), jiraId)
-                                                      , Query.EQ(nameof(SvnLog.SubIssueJiraId), jiraId)
-                                                      ));
-    }
+
 
     //public List<SvnLog> GetLatestLogs(string path, int maxNumber = 200)
     //{

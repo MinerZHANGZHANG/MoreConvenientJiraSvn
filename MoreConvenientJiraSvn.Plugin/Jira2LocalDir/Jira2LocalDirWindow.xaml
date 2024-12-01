@@ -45,13 +45,13 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <!--Left jira title-->
+        <!--  Left jira title  -->
         <DockPanel
             Grid.Row="0"
             Grid.Column="0"
             Margin="16">
-            
-            <!--Jira search bar-->
+
+            <!--  Jira search bar  -->
             <DockPanel
                 Grid.Row="0"
                 HorizontalAlignment="Stretch"
@@ -100,7 +100,7 @@
                     Style="{StaticResource MaterialDesignRaisedSecondaryDarkButton}" />
             </DockPanel>
 
-            <!--Jira list-->
+            <!--  Jira list  -->
             <DataGrid
                 AutoGenerateColumns="False"
                 CanUserAddRows="False"
@@ -138,7 +138,7 @@
             </DataGrid>
         </DockPanel>
 
-        <!--Right jira detail-->
+        <!--  Right jira detail  -->
         <Grid
             Grid.Row="0"
             Grid.Column="1"
@@ -152,7 +152,7 @@
                 HorizontalScrollBarVisibility="Disabled"
                 VerticalScrollBarVisibility="Auto">
                 <DockPanel>
-                    <!--Common setting-->
+                    <!--  Common setting  -->
                     <Expander
                         Margin="6"
                         DockPanel.Dock="Top"
@@ -194,8 +194,8 @@
                         </StackPanel>
 
                     </Expander>
-                    
-                    <!--Local Operation-->
+
+                    <!--  Local Operation  -->
                     <Expander
                         Margin="6"
                         DockPanel.Dock="Top"
@@ -208,10 +208,11 @@
                             <Button Command="{Binding CopyAnnotationTextCommand}" Content="复制注释信息" />
                         </WrapPanel>
                     </Expander>
-                    
-                    <!--Jira info-->
+
+                    <!--  Jira info  -->
                     <Expander
                         Margin="6"
+                        DockPanel.Dock="Top"
                         Header="Jira信息"
                         IsExpanded="True">
                         <WrapPanel>
@@ -277,6 +278,124 @@
                             </Border>
                         </WrapPanel>
                     </Expander>
+
+                    <!--  Svn logs  -->
+                    <Expander
+                        Margin="6"
+                        DockPanel.Dock="Top"
+                        Header="Svn信息">
+                        <DockPanel Margin="8">
+                            <Grid DockPanel.Dock="Top">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+
+                                <TextBlock
+                                    Grid.Row="0"
+                                    Grid.Column="0"
+                                    Margin="4"
+                                    Text="所选Svn路径" />
+                                <ComboBox
+                                    Grid.Row="0"
+                                    Grid.Column="1"
+                                    Grid.ColumnSpan="3"
+                                    Margin="4"
+                                    DisplayMemberPath="FullPathName"
+                                    IsEnabled="{Binding IsNotQuerySvnLoging}"
+                                    ItemsSource="{Binding SvnPaths}"
+                                    SelectedItem="{Binding SelectedSvnPath}"
+                                    SelectionChanged="ComboBox_SelectionChanged" />
+
+                                <TextBlock
+                                    Grid.Row="1"
+                                    Grid.Column="0"
+                                    Grid.ColumnSpan="2"
+                                    Text="{Binding SvnLogVersionRangeText}" />
+                                <TextBlock
+                                    Grid.Row="1"
+                                    Grid.Column="2"
+                                    Grid.ColumnSpan="2"
+                                    Text="{Binding SvnLogTimeRangeText}" />
+
+                                <Button
+                                    Grid.Row="2"
+                                    Grid.Column="0"
+                                    Margin="8"
+                                    Command="{Binding DownloadPrevSvnLogByAmountCommand}"
+                                    CommandParameter="100"
+                                    Content="Prev 100" />
+                                <Button
+                                    Grid.Row="2"
+                                    Grid.Column="1"
+                                    Margin="8"
+                                    Command="{Binding DownloadNextSvnLogByAmountCommand}"
+                                    CommandParameter="100"
+                                    Content="Next 100" />
+                                <Button
+                                    Grid.Row="2"
+                                    Grid.Column="2"
+                                    Margin="8"
+                                    Command="{Binding DownloadPrevSvnLogByDateCommand}"
+                                    CommandParameter="1"
+                                    Content="Prev 1 Day" />
+                                <Button
+                                    Grid.Row="2"
+                                    Grid.Column="3"
+                                    Margin="8"
+                                    Command="{Binding DownloadNextSvnLogByDateCommand}"
+                                    CommandParameter="1"
+                                    Content="Next 1 Day" />
+                            </Grid>
+
+                            <DataGrid
+                                AutoGenerateColumns="False"
+                                CanUserAddRows="False"
+                                DockPanel.Dock="Bottom"
+                                Foreground="Black"
+                                GridLinesVisibility="Horizontal"
+                                HorizontalGridLinesBrush="Gray"
+                                HorizontalScrollBarVisibility="Auto"
+                                IsReadOnly="True"
+                                ItemsSource="{Binding SelectedJiraSvnLogs}"
+                                ScrollViewer.HorizontalScrollBarVisibility="Visible"
+                                ScrollViewer.VerticalScrollBarVisibility="Visible"
+                                SelectionMode="Extended"
+                                SelectionUnit="FullRow"
+                                VerticalScrollBarVisibility="Auto">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn
+                                        Width="1*"
+                                        Binding="{Binding Revision}"
+                                        Header="版本" />
+                                    <DataGridTextColumn
+                                        Width="1*"
+                                        Binding="{Binding Operation}"
+                                        Header="操作类型" />
+                                    <DataGridTextColumn
+                                        Width="1*"
+                                        Binding="{Binding Author}"
+                                        Header="作者" />
+                                    <DataGridTextColumn
+                                        Width="1*"
+                                        Binding="{Binding DateTime}"
+                                        Header="更新日期" />
+                                    <DataGridTextColumn
+                                        Width="3*"
+                                        Binding="{Binding Message}"
+                                        Header="信息" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </DockPanel>
+                    </Expander>
+
                 </DockPanel>
             </ScrollViewer>
         </Grid>

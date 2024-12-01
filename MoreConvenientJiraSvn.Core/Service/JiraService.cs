@@ -1,4 +1,5 @@
-﻿using MoreConvenientJiraSvn.Core.Model;
+﻿using LiteDB;
+using MoreConvenientJiraSvn.Core.Model;
 using System.Net.Http.Headers;
 using System.Text.Json;
 
@@ -7,13 +8,15 @@ namespace MoreConvenientJiraSvn.Core.Service
     public class JiraService
     {
         private readonly SettingService _settingService;
+        private readonly DataService _dataService;
         private HttpClient? _httpClient;
 
         public JiraConfig Config { get; private set; }
 
-        public JiraService(SettingService settingService)
+        public JiraService(SettingService settingService, DataService dataService)
         {
             this._settingService = settingService;
+            this._dataService = dataService;
             this.Config = _settingService.GetSingleSettingFromDatabase<JiraConfig>() ?? new();
 
             this.InitHttpClient(Config);
@@ -236,6 +239,20 @@ namespace MoreConvenientJiraSvn.Core.Service
                 }
             }
             return result;
+        }
+
+        #endregion
+
+        #region link svn
+
+        public IEnumerable<SvnLog> GetSvnLogByJiraIdLocal(string jiraId, string path)
+        {
+            return _dataService.SelectByExpression<SvnLog>(Query.And(
+                                                                     Query.EQ(nameof(SvnLog.SvnPath), path),
+                                                                     Query.Or(
+                                                                        Query.EQ(nameof(SvnLog.IssueJiraId), jiraId),
+                                                                        Query.EQ(nameof(SvnLog.SubIssueJiraId), jiraId)
+                                                           )));
         }
 
         #endregion
