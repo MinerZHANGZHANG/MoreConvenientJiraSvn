@@ -96,7 +96,26 @@
                 Grid.Row="0"
                 Header="路径信息"
                 IsExpanded="True">
-                <Button Command="{Binding GetLatestSvnLogCommand}" Content="刷新Log" />
+                <StackPanel>
+                    <Button Command="{Binding GetLatestSvnLogCommand}" Content="刷新Log" />
+                    <control:ConfigLine Margin="8" ConfigName="关联Jira版本">
+                        <DockPanel>
+                            <TextBox
+                                MinWidth="160"
+                                HorizontalAlignment="Left"
+                                DockPanel.Dock="Left"
+                                IsReadOnly="True"
+                                Style="{StaticResource MaterialDesignTextBox}"
+                                Text="{Binding SelectPathRelation.FixVersion}" />
+                            <Button
+                                Width="60"
+                                HorizontalAlignment="Right"
+                                Command="{Binding SetRelationVersionCommand}"
+                                Content="设置"
+                                DockPanel.Dock="Right" />
+                        </DockPanel>
+                    </control:ConfigLine>
+                </StackPanel>
             </Expander>
             <Expander
                 Grid.Row="1"

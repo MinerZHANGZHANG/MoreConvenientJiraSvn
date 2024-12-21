@@ -206,6 +206,7 @@
                             <Button Command="{Binding UseSelectedToCreateLocalJiraCommand}" Content="{Binding LocalJiraOperationText}" />
                             <Button Command="{Binding CopyCommitTextCommand}" Content="复制提交信息" />
                             <Button Command="{Binding CopyAnnotationTextCommand}" Content="复制注释信息" />
+                            <Button Command="{Binding OpenWebPageCommand}" Content="打开Jira网页" />
                         </WrapPanel>
                     </Expander>
 
@@ -219,61 +220,94 @@
                             <Border Style="{StaticResource StackPanelStyle}">
                                 <StackPanel>
                                     <TextBlock FontWeight="Bold" Text="Jira ID:" />
-                                    <TextBlock Text="{Binding SelectedJiraInfo.JiraId}" />
+                                    <TextBox
+                                        IsReadOnly="True"
+                                        Style="{StaticResource MaterialDesignFilledTextBox}"
+                                        Text="{Binding SelectedJiraInfo.JiraId}" />
                                 </StackPanel>
                             </Border>
                             <Border Style="{StaticResource StackPanelStyle}">
                                 <StackPanel>
                                     <TextBlock FontWeight="Bold" Text="Summary:" />
-                                    <TextBlock Text="{Binding SelectedJiraInfo.Summary}" TextWrapping="Wrap" />
+                                    <TextBox
+                                        IsReadOnly="True"
+                                        Style="{StaticResource MaterialDesignFilledTextBox}"
+                                        Text="{Binding SelectedJiraInfo.Summary}"
+                                        TextWrapping="Wrap" />
                                 </StackPanel>
                             </Border>
                             <Border Style="{StaticResource StackPanelStyle}">
                                 <StackPanel>
                                     <TextBlock FontWeight="Bold" Text="Status:" />
-                                    <TextBlock Text="{Binding SelectedJiraInfo.StatusName}" />
+                                    <TextBox
+                                        IsReadOnly="True"
+                                        Style="{StaticResource MaterialDesignFilledTextBox}"
+                                        Text="{Binding SelectedJiraInfo.StatusName}" />
                                 </StackPanel>
                             </Border>
                             <Border Style="{StaticResource StackPanelStyle}">
                                 <StackPanel>
                                     <TextBlock FontWeight="Bold" Text="Priority:" />
-                                    <TextBlock Text="{Binding SelectedJiraInfo.PriorityName}" />
+                                    <TextBox
+                                        IsReadOnly="True"
+                                        Style="{StaticResource MaterialDesignFilledTextBox}"
+                                        Text="{Binding SelectedJiraInfo.PriorityName}" />
                                 </StackPanel>
                             </Border>
                             <Border Style="{StaticResource StackPanelStyle}">
                                 <StackPanel>
                                     <TextBlock FontWeight="Bold" Text="Creator:" />
-                                    <TextBlock Text="{Binding SelectedJiraInfo.CreatorName}" />
+                                    <TextBox
+                                        IsReadOnly="True"
+                                        Style="{StaticResource MaterialDesignFilledTextBox}"
+                                        Text="{Binding SelectedJiraInfo.CreatorName}" />
                                 </StackPanel>
                             </Border>
                             <Border Style="{StaticResource StackPanelStyle}">
                                 <StackPanel>
                                     <TextBlock FontWeight="Bold" Text="Issue Type:" />
-                                    <TextBlock Text="{Binding SelectedJiraInfo.IssueTypeName}" />
+                                    <TextBox
+                                        IsReadOnly="True"
+                                        Style="{StaticResource MaterialDesignFilledTextBox}"
+                                        Text="{Binding SelectedJiraInfo.IssueTypeName}" />
                                 </StackPanel>
                             </Border>
                             <Border Style="{StaticResource StackPanelStyle}">
                                 <StackPanel>
                                     <TextBlock FontWeight="Bold" Text="Fix Versions:" />
-                                    <TextBlock Text="{Binding SelectedJiraInfo.FixVersionNameText}" TextWrapping="Wrap" />
+                                    <TextBox
+                                        IsReadOnly="True"
+                                        Style="{StaticResource MaterialDesignFilledTextBox}"
+                                        Text="{Binding SelectedJiraInfo.FixVersionNameText}"
+                                        TextWrapping="Wrap" />
                                 </StackPanel>
                             </Border>
                             <Border Style="{StaticResource StackPanelStyle}">
                                 <StackPanel>
                                     <TextBlock FontWeight="Bold" Text="Resolution:" />
-                                    <TextBlock Text="{Binding SelectedJiraInfo.ResolutionName}" />
+                                    <TextBox
+                                        IsReadOnly="True"
+                                        Style="{StaticResource MaterialDesignFilledTextBox}"
+                                        Text="{Binding SelectedJiraInfo.ResolutionName}" />
                                 </StackPanel>
                             </Border>
                             <Border Style="{StaticResource StackPanelStyle}">
                                 <StackPanel>
                                     <TextBlock FontWeight="Bold" Text="Developer Leader:" />
-                                    <TextBlock Text="{Binding SelectedJiraInfo.DeveloperLeaderName}" />
+                                    <TextBox
+                                        IsReadOnly="True"
+                                        Style="{StaticResource MaterialDesignFilledTextBox}"
+                                        Text="{Binding SelectedJiraInfo.DeveloperLeaderName}" />
                                 </StackPanel>
                             </Border>
                             <Border Style="{StaticResource StackPanelStyle}">
                                 <StackPanel>
                                     <TextBlock FontWeight="Bold" Text="Developers:" />
-                                    <TextBlock Text="{Binding SelectedJiraInfo.DeveloperNamesString}" TextWrapping="Wrap" />
+                                    <TextBox
+                                        IsReadOnly="True"
+                                        Style="{StaticResource MaterialDesignFilledTextBox}"
+                                        Text="{Binding SelectedJiraInfo.DeveloperNamesString}"
+                                        TextWrapping="Wrap" />
                                 </StackPanel>
                             </Border>
                         </WrapPanel>

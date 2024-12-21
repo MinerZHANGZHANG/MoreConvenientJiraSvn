@@ -24,11 +24,13 @@ public partial class SvnJiraLinkViewModel(ServiceProvider serviceProvider) : Obs
 
     [ObservableProperty]
     private List<SvnPath> _svnPaths = [];
-    [ObservableProperty]
-    private SvnPath? _selectedPath;
 
     [ObservableProperty]
+    private SvnPath? _selectedPath;
+    [ObservableProperty]
     private List<SvnLog> _selectedSvnLogs = [];
+    [ObservableProperty]
+    private JiraSvnPathRelation _selectPathRelation = new();
 
     #endregion
 
@@ -43,6 +45,8 @@ public partial class SvnJiraLinkViewModel(ServiceProvider serviceProvider) : Obs
         if (SelectedPath != null)
         {
             SelectedSvnLogs = _dataService.SelectByExpression<SvnLog>(Query.EQ(nameof(SvnLog.SvnPath), SelectedPath.Path)).ToList();
+            SelectPathRelation = _dataService.SelectOneByExpression<JiraSvnPathRelation>(Query.EQ(nameof(JiraSvnPathRelation.SvnPath), SelectedPath.Path))
+                ?? new() { SvnPath = SelectedPath.Path };
         }
     }
 
@@ -60,7 +64,7 @@ public partial class SvnJiraLinkViewModel(ServiceProvider serviceProvider) : Obs
             await Task.Run(() =>
             {
                 bool isHaveJiraId = SelectedPath.SvnPathType == SvnPathType.Code || SelectedPath.SvnPathType == SvnPathType.Document;
-                
+
                 addition = _svnService.GetSvnLogs(SelectedPath.Path, begTime, DateTime.Now, isNeedExtractJiraId: isHaveJiraId);
             });
             if (addition != null)
@@ -68,6 +72,24 @@ public partial class SvnJiraLinkViewModel(ServiceProvider serviceProvider) : Obs
                 _dataService.InsertOrUpdateMany(addition);
                 SelectedSvnLogs = [.. SelectedSvnLogs, .. addition];
             }
+        }
+    }
+
+    [RelayCommand]
+    public void SetRelationVersion()
+    {
+        if (SelectedPath != null && SelectPathRelation?.FixVersion != null)
+        {
+            var relation = _dataService.SelectOneByExpression<JiraSvnPathRelation>(Query.EQ(nameof(JiraSvnPathRelation.SvnPath), SelectedPath.Path));
+            if (relation != null)
+            {
+                relation.FixVersion = SelectPathRelation.FixVersion;
+            }
+            else
+            {
+                relation = SelectPathRelation;
+            }
+            _dataService.InsertOrUpdate(relation);
         }
     }
 

@@ -8,6 +8,7 @@ using MoreConvenientJiraSvn.Core.Service;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Security.Policy;
 using System.Text;
 using System.Windows;
 
@@ -55,6 +56,7 @@ public partial class Jira2LocalDirViewModel(ServiceProvider serviceProvider) : O
     [NotifyCanExecuteChangedFor(nameof(UseSelectedToCreateLocalJiraCommand))]
     [NotifyCanExecuteChangedFor(nameof(CopyCommitTextCommand))]
     [NotifyCanExecuteChangedFor(nameof(CopyAnnotationTextCommand))]
+    [NotifyCanExecuteChangedFor(nameof(OpenWebPageCommand))]
     private JiraInfo? _selectedJiraInfo;
 
     public bool HasJiraBeSelected => SelectedJiraInfo != null;
@@ -70,7 +72,7 @@ public partial class Jira2LocalDirViewModel(ServiceProvider serviceProvider) : O
     // Local Svn log
 
     [ObservableProperty]
-    private List<SvnPath> _svnPaths = [];
+    private List<SvnPath> _relatSvnPaths = [];
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CanQueryNextLog))]
@@ -124,8 +126,7 @@ public partial class Jira2LocalDirViewModel(ServiceProvider serviceProvider) : O
         JiraFilters = await _jiraService.GetCurrentUserFavouriteFilterAsync();
         LocalJiraSetting = _settingService.GetSingleSettingFromDatabase<LocalJiraSetting>() ?? new();
 
-        SvnPaths = _svnService.Paths;
-        SelectedSvnPath = SvnPaths.FirstOrDefault();
+        SelectedSvnPath = RelatSvnPaths.FirstOrDefault();
 
     }
 
@@ -178,6 +179,7 @@ public partial class Jira2LocalDirViewModel(ServiceProvider serviceProvider) : O
             return;
         }
 
+        RelatSvnPaths = _jiraService.GetRelatSvnPath(SelectedJiraInfo).ToList();
         SelectedJiraSvnLogs = [.. _jiraService.GetSvnLogByJiraIdLocal(SelectedJiraInfo.JiraId, SelectedSvnPath.Path).OrderByDescending(log => log.DateTime)];
 
         NewestSvnLog = SelectedJiraSvnLogs?.FirstOrDefault();
@@ -232,6 +234,25 @@ public partial class Jira2LocalDirViewModel(ServiceProvider serviceProvider) : O
         {
         }
 
+    }
+
+    [RelayCommand(CanExecute = nameof(HasJiraBeSelected))]
+    public void OpenWebPage()
+    {
+        string? url = SelectedJiraInfo?.SelfUrl;
+        if (string.IsNullOrEmpty(url))
+        {
+            return;
+        }
+
+        try
+        {
+            Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"无法打开网页: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
     }
 
     [RelayCommand(CanExecute = nameof(HasJiraBeSelected))]
