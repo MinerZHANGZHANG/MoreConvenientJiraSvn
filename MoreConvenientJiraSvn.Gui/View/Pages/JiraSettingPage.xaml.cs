@@ -18,7 +18,7 @@ namespace MoreConvenientJiraSvn.Gui.View.Pages
             InitializeComponent();
         }
 
-        private async void TextBox_KeyUp(object sender, KeyEventArgs e)
+        private async void TextBox_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
             {
@@ -29,6 +29,11 @@ namespace MoreConvenientJiraSvn.Gui.View.Pages
         private async void TextBox_LostFocus(object sender, RoutedEventArgs e)
         {
             await viewModel.UpdateConfig();
+        }
+
+        private void CheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            viewModel.UpdateFilter();
         }
     }
 }

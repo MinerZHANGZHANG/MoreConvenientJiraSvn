@@ -153,7 +153,7 @@ public partial class Jira2LocalDirViewModel(ServiceProvider serviceProvider) : O
                 if (SelectedFilter != null)
                 {
                     var jiraInfos = await _jiraService.GetIssuesAsyncByFilter(SelectedFilter);
-                    tempJiraInfoList.AddRange(jiraInfos);
+                    tempJiraInfoList.AddRange(jiraInfos.Select(i=>i.New));
                 }
                 break;
             default:

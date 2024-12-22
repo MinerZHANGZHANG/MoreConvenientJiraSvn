@@ -17,7 +17,7 @@
 
     <ScrollViewer>
         <StackPanel Margin="8">
-            <!--Base setting-->
+            <!--  Base setting  -->
             <Expander Header="基础设置">
                 <StackPanel Orientation="Vertical">
                     <control:ConfigLine
@@ -29,7 +29,7 @@
                             KeyUp="TextBox_KeyUp"
                             LostFocus="TextBox_LostFocus"
                             Style="{StaticResource CustomMaterialTextBoxStyle}"
-                            Text="{Binding Config.BaseUrl,UpdateSourceTrigger=PropertyChanged}" />
+                            Text="{Binding Config.BaseUrl, UpdateSourceTrigger=PropertyChanged}" />
                     </control:ConfigLine>
                     <control:ConfigLine
                         Margin="8"
@@ -40,12 +40,12 @@
                             KeyUp="TextBox_KeyUp"
                             LostFocus="TextBox_LostFocus"
                             Style="{StaticResource CustomMaterialTextBoxStyle}"
-                            Text="{Binding Config.ApiToken,UpdateSourceTrigger=PropertyChanged}" />
+                            Text="{Binding Config.ApiToken, UpdateSourceTrigger=PropertyChanged}" />
                     </control:ConfigLine>
                 </StackPanel>
             </Expander>
 
-            <!--User info-->
+            <!--  User info  -->
             <Expander Header="用户信息">
                 <StackPanel Orientation="Vertical">
                     <control:ConfigLine
@@ -75,6 +75,30 @@
                             Style="{StaticResource CustomMaterialTextBoxStyle}"
                             Text="{Binding Config.TokenExpringAt}" />
                     </control:ConfigLine>
+                </StackPanel>
+            </Expander>
+
+            <!--  Auto refresh info  -->
+            <Expander Header="定时刷新配置">
+                <StackPanel Orientation="Vertical">
+                    <control:ConfigLine
+                        Margin="8"
+                        ConfigName="需要定时刷新的过滤器"
+                        IsButtonVisible="False">
+                        <ComboBox ItemsSource="{Binding Filters}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <CheckBox
+                                            Checked="CheckBox_Checked"
+                                            Content="{Binding Name}"
+                                            IsChecked="{Binding IsChecked}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </control:ConfigLine>
+
                 </StackPanel>
             </Expander>
 

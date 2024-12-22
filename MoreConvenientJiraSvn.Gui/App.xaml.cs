@@ -5,6 +5,7 @@ using MoreConvenientJiraSvn.Core.Service;
 using MoreConvenientJiraSvn.Gui.Properties;
 using MoreConvenientJiraSvn.Gui.ViewModel;
 using System.Windows;
+using Application = System.Windows.Application;
 
 namespace MoreConvenientJiraSvn.Gui
 {
@@ -26,7 +27,7 @@ namespace MoreConvenientJiraSvn.Gui
             services.AddSingleton<SvnService>();
             services.AddSingleton<JiraService>();
 
-            services.AddHostedService<DownloadSvnLogHostService>();
+            services.AddHostedService<DownloadSvnLogHostedService>();
 
             services.AddTransient<MainWindowViewModel>();
             services.AddTransient<JiraSettingViewModel>();

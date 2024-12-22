@@ -7,7 +7,7 @@ namespace MoreConvenientJiraSvn.Core.Model
         [BsonId]
         public ObjectId Id { get; set; } = ObjectId.NewObjectId();
         public string? FilterId { get; set; }
-        public string? Name { get; set; }
+        public string Name { get; set; } = string.Empty;
         public string? Jql { get; set; }
         public string? SearchUrl { get; set; }
     }

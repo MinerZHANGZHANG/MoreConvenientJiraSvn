@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using MoreConvenientJiraSvn.Gui.View.Controls;
 using System.Windows;
 using System.Windows.Controls;
+using MessageBox = System.Windows.MessageBox;
 
 namespace MoreConvenientJiraSvn.Gui.ViewModel
 {
@@ -14,7 +15,7 @@ namespace MoreConvenientJiraSvn.Gui.ViewModel
         public readonly GetPluginControl getPluginControl = new();
 
         [ObservableProperty]
-        private UserControl? _currentContent = null;
+        private System.Windows.Controls.UserControl? _currentContent = null;
 
         [RelayCommand]
         public void SwitchContent(IndexContent indexContent)

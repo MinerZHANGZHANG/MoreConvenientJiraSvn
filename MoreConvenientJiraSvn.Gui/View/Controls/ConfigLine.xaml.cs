@@ -2,6 +2,7 @@
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Markup;
+using UserControl = System.Windows.Controls.UserControl;
 
 
 namespace MoreConvenientJiraSvn.Gui.View.Controls

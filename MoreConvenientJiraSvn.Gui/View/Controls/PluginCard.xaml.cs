@@ -8,7 +8,7 @@ namespace MoreConvenientJiraSvn.Gui.View.Controls
     /// <summary>
     /// PluginCard.xaml 的交互逻辑
     /// </summary>
-    public partial class PluginCard : UserControl
+    public partial class PluginCard : System.Windows.Controls.UserControl
     {
         public PluginCard()
         {

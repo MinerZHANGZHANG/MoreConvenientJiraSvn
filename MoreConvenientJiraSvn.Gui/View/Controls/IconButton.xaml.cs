@@ -8,7 +8,7 @@ namespace MoreConvenientJiraSvn.Gui.View.Controls
     /// <summary>
     /// IconButton.xaml 的交互逻辑
     /// </summary>
-    public partial class IconButton : UserControl
+    public partial class IconButton : System.Windows.Controls.UserControl
     {
         public IconButton()
         {

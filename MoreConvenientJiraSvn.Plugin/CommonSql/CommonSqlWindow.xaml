@@ -76,7 +76,6 @@
                 HorizontalAlignment="Right"
                 VerticalAlignment="Bottom"
                 PlacementMode="LeftAndAlignMiddles"
-                Style="{StaticResource MaterialDesignMultiFloatingActionPopupBox}"
                 ToolTip="Manage items"
                 UnfurlOrientation="Horizontal">
                 <!--<StackPanel Orientation="Horizontal">

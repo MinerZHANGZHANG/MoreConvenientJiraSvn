@@ -2,7 +2,7 @@
 {
     public record PluginMessage
     {
-        public string? PluginName { get; set; }
+        public string? SourceName { get; set; }
         public string? Info { get; set; }
         public InfoLevel Level { get; set; }
         public DateTime? Time { get; set; }

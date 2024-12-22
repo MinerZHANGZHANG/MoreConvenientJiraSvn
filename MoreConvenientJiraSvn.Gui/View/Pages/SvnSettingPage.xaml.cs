@@ -20,7 +20,7 @@ namespace MoreConvenientJiraSvn.Gui.View.Pages
             InitializeComponent();
         }
 
-        private void TextBox_KeyUp(object sender, KeyEventArgs e)
+        private void TextBox_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
             {

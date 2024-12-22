@@ -13,5 +13,7 @@ namespace MoreConvenientJiraSvn.Core.Model
         public string Email { get; set; } = string.Empty;
         public string TokenExpringAt { get; set; } = string.Empty;
 
+        public List<string> NeedAutoRefreshFliterNames { get; set; } = [];
+
     }
 }

@@ -1,6 +1,7 @@
 ﻿using LiteDB;
 using MoreConvenientJiraSvn.Core.Model;
 using System.Net.Http.Headers;
+using System.Runtime;
 using System.Text.Json;
 
 namespace MoreConvenientJiraSvn.Core.Service
@@ -179,12 +180,13 @@ namespace MoreConvenientJiraSvn.Core.Service
             var jsonResponse = await response.Content.ReadAsStringAsync();
 
             result = new() { JiraId = issueId, JsonResult = jsonResponse };
+            SaveIssues([result]);
             return result;
         }
 
-        public async Task<List<JiraInfo>> GetIssuesAsyncByFilter(JiraFilter jiraFilter, int maxJiraCount = 200)
+        public async Task<List<JiraInfoCompareTuple>> GetIssuesAsyncByFilter(JiraFilter jiraFilter, int maxJiraCount = 200)
         {
-            List<JiraInfo> result = [];
+            List<JiraInfoCompareTuple> result = [];
 
             if (_httpClient == null)
             {
@@ -205,7 +207,6 @@ namespace MoreConvenientJiraSvn.Core.Service
                     using JsonDocument doc = JsonDocument.Parse(jsonResponse);
                     JsonElement root = doc.RootElement;
 
-
                     if (root.TryGetProperty("startAt", out var startAtElement)
                         && root.TryGetProperty("maxResults", out var maxResultsElement)
                         && root.TryGetProperty("total", out var totalElement)
@@ -216,7 +217,10 @@ namespace MoreConvenientJiraSvn.Core.Service
                         foreach (var issue in issues)
                         {
                             // use toString will be faster?
-                            result.Add(new() { JsonResult = issue.GetRawText() });
+                            var newInfo = new JiraInfo() { JsonResult = issue.GetRawText() };
+                            var oldInfo = _dataService.SelectOneByExpression<JiraInfo>(Query.EQ(nameof(JiraInfo.JiraId), newInfo.JiraId));
+
+                            result.Add(new() { Old = oldInfo, New = newInfo });
                         }
 
                         stratAt = startAtElement.GetInt32();
@@ -238,10 +242,29 @@ namespace MoreConvenientJiraSvn.Core.Service
                     break;
                 }
             }
+            SaveIssues(result.Select(i => i.New).ToList());
             return result;
         }
 
         #endregion
+
+        public void SaveIssues(List<JiraInfo> issues)
+        {
+            foreach (JiraInfo issue in issues)
+            {
+                var localIssue = _dataService.SelectOneByExpression<JiraInfo>(Query.EQ(nameof(JiraInfo.JiraId), issue.JiraId));
+                if (localIssue != null)
+                {
+                    issue.Id = localIssue.Id;
+                }
+            }
+            _dataService.InsertOrUpdateMany(issues);
+        }
+
+        public JiraInfo? GetIssueFromLocalByJiraId(string jiraId)
+        {
+            return _dataService.SelectOneByExpression<JiraInfo>(Query.EQ(nameof(JiraInfo.JiraId), jiraId));
+        }
 
         #region link svn
 
@@ -257,7 +280,7 @@ namespace MoreConvenientJiraSvn.Core.Service
 
         public IEnumerable<SvnPath> GetRelatSvnPath(JiraInfo jiraInfo)
         {
-            if (jiraInfo.FixVersionsName == null || jiraInfo.FixVersionsName.Count() == 0)
+            if (jiraInfo.FixVersionsName == null || jiraInfo.FixVersionsName.Any())
             {
                 return [];
             }
@@ -267,5 +290,11 @@ namespace MoreConvenientJiraSvn.Core.Service
         }
 
         #endregion
+    }
+
+    public struct JiraInfoCompareTuple
+    {
+        public JiraInfo? Old;
+        public JiraInfo New;
     }
 }
