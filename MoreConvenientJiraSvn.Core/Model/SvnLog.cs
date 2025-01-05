@@ -1,5 +1,4 @@
 ﻿using LiteDB;
-using System.ComponentModel;
 
 namespace MoreConvenientJiraSvn.Core.Model
 {

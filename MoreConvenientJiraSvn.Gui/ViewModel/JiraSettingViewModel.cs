@@ -45,7 +45,7 @@ namespace MoreConvenientJiraSvn.Gui.ViewModel
             OnPropertyChanged(nameof(Filters));
         }
 
-        public void  UpdateFilter()
+        public void UpdateFilter()
         {
             if (Config == null)
             {

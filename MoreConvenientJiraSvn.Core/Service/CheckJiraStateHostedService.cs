@@ -1,15 +1,15 @@
-﻿using LiteDB;
-using MoreConvenientJiraSvn.Core.Model;
+﻿using MoreConvenientJiraSvn.Core.Model;
 
 
 namespace MoreConvenientJiraSvn.Core.Service
 {
-    public class CheckJiraStateHostedService(DataService dataService, SvnService svnService, JiraService jiraService)
+    public class CheckJiraStateHostedService(DataService dataService, SvnService svnService, JiraService jiraService, NotificationService notificationService)
     : TimedHostedService(new TimeSpan(9, 30, 0), TimeSpan.FromMinutes(5), 3)
     {
         private readonly DataService _dataService = dataService;
         private readonly SvnService _svnService = svnService;
         private readonly JiraService _jiraService = jiraService;
+        private readonly NotificationService _notificationService = notificationService;
 
         public override async Task<bool> ExecuteTask()
         {
@@ -19,12 +19,41 @@ namespace MoreConvenientJiraSvn.Core.Service
                 TaskServiceName = nameof(CheckJiraStateHostedService),
                 IsSucccess = false,
             };
+            var filters = await _jiraService.GetCurrentUserFavouriteFilterAsync();
+            foreach (var filter in filters)
+            {
+                if (_jiraService.Config.NeedAutoRefreshFliterNames.Contains(filter.Name))
+                {
+                    try
+                    {
+                        var result = await _jiraService.GetIssuesAsyncByFilter(filter);
+                        var messages = GetMessage(result, filter);
 
-
-
+                        // _dataService.InsertOrUpdateMany(messages);
+                        hostTaskLog.IsSucccess = true;
+                        hostTaskLog.Message = $"存在{messages.Count}处需要注意的变动，请查看首页";
+                        if (messages.Any(m => m.Level == InfoLevel.Error))
+                        {
+                            _notificationService.ShowNotification("获取和检测jira状态已完成", hostTaskLog.Message, ToolTipIcon.Error);
+                        }
+                        else if (messages.Any(m => m.Level == InfoLevel.Warning))
+                        {
+                            _notificationService.ShowNotification("获取和检测jira状态已完成", hostTaskLog.Message, ToolTipIcon.Warning);
+                        }
+                        else
+                        {
+                            _notificationService.ShowNotification("获取和检测jira状态已完成", hostTaskLog.Message);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        hostTaskLog.IsSucccess = false;
+                        hostTaskLog.Message = $"获取和检测Jira消息时，发生错误:{ex.Message}";
+                    }
+                }
+            }
             _dataService.Insert(hostTaskLog);
             return hostTaskLog.IsSucccess;
-
         }
 
         public List<PluginMessage> GetMessage(List<JiraInfoCompareTuple> jiraInfoCompareTuples, JiraFilter jiraFilter)

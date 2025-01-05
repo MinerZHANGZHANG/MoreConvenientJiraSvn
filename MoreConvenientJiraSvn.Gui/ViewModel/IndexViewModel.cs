@@ -2,8 +2,6 @@
 using CommunityToolkit.Mvvm.Input;
 using MoreConvenientJiraSvn.Gui.View.Controls;
 using System.Windows;
-using System.Windows.Controls;
-using MessageBox = System.Windows.MessageBox;
 
 namespace MoreConvenientJiraSvn.Gui.ViewModel
 {

@@ -1,5 +1,4 @@
 ﻿using MoreConvenientJiraSvn.Gui.ViewModel;
-using System.Windows.Controls;
 
 namespace MoreConvenientJiraSvn.Gui.View.Controls
 {

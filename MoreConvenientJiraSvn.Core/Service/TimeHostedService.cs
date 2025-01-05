@@ -1,11 +1,5 @@
-﻿using LiteDB;
-using Microsoft.Extensions.Hosting;
-using MoreConvenientJiraSvn.Core.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.Extensions.Hosting;
+using Timer = System.Threading.Timer;
 
 namespace MoreConvenientJiraSvn.Core.Service
 {
@@ -21,7 +15,7 @@ namespace MoreConvenientJiraSvn.Core.Service
         {
             var now = DateTime.Now;
             var nextExecution = GetNextExecutionTime(now);
-  
+
             if (now >= nextExecution)
             {
                 await ExecuteWithRetry();

@@ -1,14 +1,15 @@
-﻿using System;
-using LiteDB;
+﻿using LiteDB;
 using MoreConvenientJiraSvn.Core.Model;
+using System.Text;
 
 namespace MoreConvenientJiraSvn.Core.Service;
 
-public class DownloadSvnLogHostedService(DataService dataService, SvnService svnService) 
+public class DownloadSvnLogHostedService(DataService dataService, SvnService svnService, NotificationService notificationService)
     : TimedHostedService(new TimeSpan(9, 30, 0), TimeSpan.FromMinutes(5), 3)
 {
     private readonly DataService _dataService = dataService;
     private readonly SvnService _svnService = svnService;
+    private readonly NotificationService _notificationService = notificationService;
 
     public override async Task<bool> ExecuteTask()
     {
@@ -19,14 +20,15 @@ public class DownloadSvnLogHostedService(DataService dataService, SvnService svn
             IsSucccess = false,
         };
 
-
         if (_svnService.Paths.Count > 0
             && (!_svnService.Config?.IsAutoUpdateLogDaily ?? false))
         {
             // todo:add default date to svn config / use version instead
+            int successPathCount = 0;
+            StringBuilder messageBuilder = new();
             await Task.Run(() =>
             {
-                var count = 0;
+                var updateLogCount = 0;
                 foreach (var path in _svnService.Paths)
                 {
                     var isHaveJiraId = path.SvnPathType == SvnPathType.Code || path.SvnPathType == SvnPathType.Document;
@@ -40,17 +42,18 @@ public class DownloadSvnLogHostedService(DataService dataService, SvnService svn
                     {
                         var logs = _svnService.GetSvnLogs(path.Path, pathBeginTime, pathEndTime, 500, isNeedExtractJiraId: isHaveJiraId);
                         _dataService.InsertOrUpdateMany(logs);
-                        count += logs.Count;
+                        updateLogCount += logs.Count;
+                        successPathCount += 1;
+                        messageBuilder.AppendLine($"成功获取SVN日志并保存,路径:{path.Path}({pathBeginTime}->{pathEndTime}) 数量:{updateLogCount}");
                     }
                     catch (Exception ex)
                     {
-                        hostTaskLog.IsSucccess = false;
-                        hostTaskLog.Message = $"获取SVN日志并保存的过程中出错：Path:{path.Path}({pathBeginTime}->{pathEndTime} \n Error:{ex.Message}";
+                        messageBuilder.AppendLine($"获取SVN日志并保存的过程中出错：路径:{path.Path}({pathBeginTime}->{pathEndTime}) 错误:{ex.Message}");
                         break;
                     }
-                    hostTaskLog.IsSucccess = true;
-                    hostTaskLog.Message = $"成功保存日志,数量:{count}";
                 }
+                hostTaskLog.IsSucccess = successPathCount == _svnService.Paths.Count;
+                hostTaskLog.Message = messageBuilder.ToString();
             });
         }
         else
@@ -59,6 +62,7 @@ public class DownloadSvnLogHostedService(DataService dataService, SvnService svn
             hostTaskLog.Message = "没有开启svn自动更新log，或未添加svn路径";
         }
 
+        _notificationService.ShowNotification($"后台下载SvnLog结束", hostTaskLog.Message);
         _dataService.Insert(hostTaskLog);
         return hostTaskLog.IsSucccess;
 

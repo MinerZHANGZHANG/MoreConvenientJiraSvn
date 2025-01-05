@@ -33,7 +33,7 @@ namespace MoreConvenientJiraSvn.Core.Service
         public IEnumerable<T> SelectByExpression<T>(BsonExpression expression) where T : class
         {
             var result = _db.GetCollection<T>().Find(expression);
-            return result??[];
+            return result ?? [];
         }
 
         public T? SelectByObjectId<T>(ObjectId id) where T : class

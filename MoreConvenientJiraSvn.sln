@@ -3,11 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.12.35209.166
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoreConvenientJiraSvn.Gui", "MoreConvenientJiraSvn.Gui\MoreConvenientJiraSvn.Gui.csproj", "{7CCAEDC2-FA7E-46DB-9B52-7AB37C84B615}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MoreConvenientJiraSvn.Gui", "MoreConvenientJiraSvn.Gui\MoreConvenientJiraSvn.Gui.csproj", "{7CCAEDC2-FA7E-46DB-9B52-7AB37C84B615}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoreConvenientJiraSvn.Core", "MoreConvenientJiraSvn.Core\MoreConvenientJiraSvn.Core.csproj", "{5F60230F-94FB-4A29-91C0-23D206A14792}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MoreConvenientJiraSvn.Core", "MoreConvenientJiraSvn.Core\MoreConvenientJiraSvn.Core.csproj", "{5F60230F-94FB-4A29-91C0-23D206A14792}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoreConvenientJiraSvn.Plugin", "MoreConvenientJiraSvn.Plugin\MoreConvenientJiraSvn.Plugin.csproj", "{FC33896F-FF8B-427B-943E-DEF75FB33CF1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MoreConvenientJiraSvn.Plugin", "MoreConvenientJiraSvn.Plugin\MoreConvenientJiraSvn.Plugin.csproj", "{FC33896F-FF8B-427B-943E-DEF75FB33CF1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AntlrUtil", "AntlrUtil\AntlrUtil.csproj", "{B49FC2FB-3B12-4281-8C99-7DFC9681A2D4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{FC33896F-FF8B-427B-943E-DEF75FB33CF1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FC33896F-FF8B-427B-943E-DEF75FB33CF1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FC33896F-FF8B-427B-943E-DEF75FB33CF1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B49FC2FB-3B12-4281-8C99-7DFC9681A2D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B49FC2FB-3B12-4281-8C99-7DFC9681A2D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B49FC2FB-3B12-4281-8C99-7DFC9681A2D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B49FC2FB-3B12-4281-8C99-7DFC9681A2D4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -5,7 +5,6 @@ using MoreConvenientJiraSvn.Core.Service;
 using MoreConvenientJiraSvn.Core.Utils;
 using System.Collections.ObjectModel;
 using System.Windows;
-using MessageBox = System.Windows.MessageBox;
 
 namespace MoreConvenientJiraSvn.Gui.ViewModel
 {

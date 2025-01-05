@@ -1,7 +1,6 @@
 ﻿using LiteDB;
 using MoreConvenientJiraSvn.Core.Model;
 using System.Net.Http.Headers;
-using System.Runtime;
 using System.Text.Json;
 
 namespace MoreConvenientJiraSvn.Core.Service

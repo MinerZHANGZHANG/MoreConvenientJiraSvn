@@ -23,7 +23,7 @@ public static class EnumHelper
         FieldInfo? field = value?.GetType()?.GetField(value.ToString() ?? string.Empty);
         return field?.GetCustomAttributes(typeof(DescriptionAttribute), false)
                       .FirstOrDefault() is not DescriptionAttribute attribute
-                      ? value?.ToString() ?? string.Empty 
+                      ? value?.ToString() ?? string.Empty
                       : attribute.Description;
     }
 }

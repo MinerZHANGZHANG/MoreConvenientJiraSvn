@@ -21,6 +21,7 @@ namespace MoreConvenientJiraSvn.Gui
             var services = new ServiceCollection();
 
             services.AddSingleton(new LiteDatabase(Settings.Default.DatabaseName));
+            services.AddSingleton(new NotificationService(Settings.Default.IconUrl));
 
             services.AddSingleton<DataService>();
             services.AddSingleton<SettingService>();
@@ -28,6 +29,7 @@ namespace MoreConvenientJiraSvn.Gui
             services.AddSingleton<JiraService>();
 
             services.AddHostedService<DownloadSvnLogHostedService>();
+            services.AddHostedService<CheckJiraStateHostedService>();
 
             services.AddTransient<MainWindowViewModel>();
             services.AddTransient<JiraSettingViewModel>();
@@ -43,6 +45,8 @@ namespace MoreConvenientJiraSvn.Gui
 
             this.Exit += App_Exit;
             this.Startup += App_Startup;
+            this.DispatcherUnhandledException += App_DispatcherUnhandledException;
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
         }
 
         private async void App_Startup(object sender, StartupEventArgs e)
@@ -63,6 +67,33 @@ namespace MoreConvenientJiraSvn.Gui
             }
 
             await _services.DisposeAsync();
+        }
+
+        private void App_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+        {
+            LogException(e.Exception);
+            MessageBox.Show($"发生了一个未处理的异常: {e.Exception.Message}\n{e.Exception.StackTrace}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+
+            e.Handled = true;
+        }
+
+        private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            if (e.IsTerminating)
+            {
+                MessageBox.Show("应用程序发生了无法恢复的错误，将会结束运行。", "致命错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            else
+            {
+                Exception ex = (Exception)e.ExceptionObject;
+                LogException(ex);
+            }
+        }
+
+        private void LogException(Exception ex)
+        {
+            // TODO: Replace it to a more useful log
+            System.IO.File.AppendAllText("exceptions.log", $"{DateTime.Now}: {ex}\n");
         }
     }
 

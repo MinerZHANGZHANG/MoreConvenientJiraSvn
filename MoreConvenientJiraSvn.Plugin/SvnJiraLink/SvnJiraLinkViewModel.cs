@@ -4,7 +4,6 @@ using LiteDB;
 using Microsoft.Extensions.DependencyInjection;
 using MoreConvenientJiraSvn.Core.Model;
 using MoreConvenientJiraSvn.Core.Service;
-using System.Collections.ObjectModel;
 
 namespace MoreConvenientJiraSvn.Plugin.SvnJiraLink;
 

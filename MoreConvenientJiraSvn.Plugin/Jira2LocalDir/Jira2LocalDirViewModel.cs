@@ -8,7 +8,6 @@ using MoreConvenientJiraSvn.Core.Service;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.Security.Policy;
 using System.Text;
 using System.Windows;
 
@@ -153,7 +152,7 @@ public partial class Jira2LocalDirViewModel(ServiceProvider serviceProvider) : O
                 if (SelectedFilter != null)
                 {
                     var jiraInfos = await _jiraService.GetIssuesAsyncByFilter(SelectedFilter);
-                    tempJiraInfoList.AddRange(jiraInfos.Select(i=>i.New));
+                    tempJiraInfoList.AddRange(jiraInfos.Select(i => i.New));
                 }
                 break;
             default:

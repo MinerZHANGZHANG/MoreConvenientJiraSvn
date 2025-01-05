@@ -82,7 +82,9 @@
             <Button
                 Width="100"
                 Margin="10"
-                Content="插件3"
+                Command="{Binding OpenPluginPageCommand}"
+                CommandParameter="SqlCheck"
+                Content="Sql检测"
                 Style="{StaticResource MaterialDesignFlatButton}" />
             <Button
                 Width="100"
