@@ -279,11 +279,11 @@ namespace MoreConvenientJiraSvn.Core.Service
 
         public IEnumerable<SvnPath> GetRelatSvnPath(JiraInfo jiraInfo)
         {
-            if (jiraInfo.FixVersionsName == null || jiraInfo.FixVersionsName.Any())
+            if (jiraInfo.FixVersionsName == null || !jiraInfo.FixVersionsName.Any())
             {
                 return [];
             }
-            var relations = _dataService.SelectByExpression<JiraSvnPathRelation>(Query.In(nameof(JiraSvnPathRelation.SvnPath), jiraInfo.FixVersionsName.Select(v => new BsonValue(v))));
+            var relations = _dataService.SelectByExpression<JiraSvnPathRelation>(Query.In(nameof(JiraSvnPathRelation.FixVersion), jiraInfo.FixVersionsName.Select(v => new BsonValue(v))));
             var svnPaths = _dataService.SelectByExpression<SvnPath>(Query.In(nameof(SvnPath.Path), relations.Select(v => new BsonValue(v.SvnPath))));
             return svnPaths;
         }

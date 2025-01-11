@@ -14,12 +14,12 @@ namespace MoreConvenientJiraSvn.Core.Service
         public async Task StartAsync(CancellationToken cancellationToken)
         {
             var now = DateTime.Now;
-            var nextExecution = GetNextExecutionTime(now);
 
+            var nextExecution = GetNextExecutionTimeWhenStart(now);
             if (now >= nextExecution)
             {
                 await ExecuteWithRetry();
-                nextExecution = GetNextExecutionTime(DateTime.Now);
+                nextExecution = GetNextExecutionTime(now);
             }
 
             var interval = nextExecution - now;
@@ -33,21 +33,21 @@ namespace MoreConvenientJiraSvn.Core.Service
 
         private DateTime GetNextExecutionTime(DateTime now)
         {
-            var nextExecution = DateTime.Today.Add(_executionTime);
-            if (now >= nextExecution)
+            var todayExecution = DateTime.Today.Add(_executionTime);
+            if (now >= todayExecution)
             {
-                nextExecution = nextExecution.AddDays(1);
+                return todayExecution.AddDays(1);
             }
-            return nextExecution;
+            return todayExecution;
         }
 
-        private async Task ExecuteWithRetry()
+        private DateTime GetNextExecutionTimeWhenStart(DateTime now)
         {
-            for (int attempt = 1; attempt <= _maxTryCount; attempt++)
+            if (now >= DateTime.Today.Add(_executionTime))
             {
                 // query log to decide execute?
                 //var successLogs = _dataService.SelectByExpression<HostTaskLog>(Query.And(
-                //     Query.EQ(nameof(HostTaskLog.TaskServiceName), nameof(DownloadSvnLogHostedService)),
+                //     Query.EQ(nameof(HostTaskLog.TaskServiceName), nameof(this.GetType().Name)),
                 //     Query.EQ(nameof(HostTaskLog.IsSucccess), true)
                 //     ));
                 //var lastestLog = successLogs.OrderByDescending(log => log.DateTime)
@@ -59,6 +59,18 @@ namespace MoreConvenientJiraSvn.Core.Service
                 //    hostTaskLog.Message = $"今天已经执行过一次了，时间：{lastestLog.DateTime}";
                 //}
 
+                return now;
+            }
+            else
+            {
+                return GetNextExecutionTime(now);
+            }
+        }
+
+        private async Task ExecuteWithRetry()
+        {
+            for (int attempt = 1; attempt <= _maxTryCount; attempt++)
+            {
                 bool success = await ExecuteTask();
 
                 if (success)

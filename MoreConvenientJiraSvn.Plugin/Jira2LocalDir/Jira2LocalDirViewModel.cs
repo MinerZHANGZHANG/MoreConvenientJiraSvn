@@ -125,8 +125,6 @@ public partial class Jira2LocalDirViewModel(ServiceProvider serviceProvider) : O
         JiraFilters = await _jiraService.GetCurrentUserFavouriteFilterAsync();
         LocalJiraSetting = _settingService.GetSingleSettingFromDatabase<LocalJiraSetting>() ?? new();
 
-        SelectedSvnPath = RelatSvnPaths.FirstOrDefault();
-
     }
 
     #region Command
@@ -169,6 +167,9 @@ public partial class Jira2LocalDirViewModel(ServiceProvider serviceProvider) : O
         }
 
         SelectedJiraLocalInfo = _dataService.SelectOneByExpression<LocalJiraInfo>(BsonExpression.Create($"JiraId = \"{SelectedJiraInfo.JiraId}\""));
+        
+        RelatSvnPaths = _jiraService.GetRelatSvnPath(SelectedJiraInfo).ToList();
+        SelectedSvnPath = RelatSvnPaths.FirstOrDefault();
     }
 
     public void RefreshSelectPathSvnLog()
@@ -178,7 +179,6 @@ public partial class Jira2LocalDirViewModel(ServiceProvider serviceProvider) : O
             return;
         }
 
-        RelatSvnPaths = _jiraService.GetRelatSvnPath(SelectedJiraInfo).ToList();
         SelectedJiraSvnLogs = [.. _jiraService.GetSvnLogByJiraIdLocal(SelectedJiraInfo.JiraId, SelectedSvnPath.Path).OrderByDescending(log => log.DateTime)];
 
         NewestSvnLog = SelectedJiraSvnLogs?.FirstOrDefault();
@@ -317,7 +317,7 @@ public partial class Jira2LocalDirViewModel(ServiceProvider serviceProvider) : O
                 await File.WriteAllTextAsync(commitFileFullName, commitText.ToString());
             }
 
-            string documentFileFullName = Path.Combine(fullDirName, $"文档-{SelectedJiraInfo.JiraId}.txt");
+            string documentFileFullName = Path.Combine(fullDirName, $"{SelectedJiraInfo.JiraId}-{LocalJiraSetting.UserName}-{SelectedJiraInfo.Summary}.txt");
             if (!File.Exists(documentFileFullName))
             {
                 StringBuilder documentText = new($"一、需求描述:\r\n");

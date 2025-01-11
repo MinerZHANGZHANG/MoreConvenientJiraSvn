@@ -28,10 +28,18 @@ namespace MoreConvenientJiraSvn.Core.Service
                     {
                         var result = await _jiraService.GetIssuesAsyncByFilter(filter);
                         var messages = GetMessage(result, filter);
-
-                        // _dataService.InsertOrUpdateMany(messages);
+                       
+                        _dataService.InsertOrUpdateMany(messages);
                         hostTaskLog.IsSucccess = true;
-                        hostTaskLog.Message = $"存在{messages.Count}处需要注意的变动，请查看首页";
+                        if (messages.Count > 0)
+                        {
+                            hostTaskLog.Message = $"过滤器[{filter.Name}]相关Jira存在{messages.Count}处需要注意的变动，请查看首页";
+                        }
+                        else
+                        {
+                            hostTaskLog.Message = $"过滤器[{filter.Name}]相关Jira未发现需要注意的变动";
+                        }
+                        
                         if (messages.Any(m => m.Level == InfoLevel.Error))
                         {
                             _notificationService.ShowNotification("获取和检测jira状态已完成", hostTaskLog.Message, ToolTipIcon.Error);
@@ -70,7 +78,7 @@ namespace MoreConvenientJiraSvn.Core.Service
                         Time = DateTime.Now,
                         SourceName = nameof(CheckJiraStateHostedService),
                     };
-
+                    messageList.Add(message);
                     jiraInfoCompareTuples.RemoveAt(i);
                 }
             }
@@ -88,7 +96,7 @@ namespace MoreConvenientJiraSvn.Core.Service
                         Time = DateTime.Now,
                         SourceName = nameof(CheckJiraStateHostedService),
                     };
-
+                    messageList.Add(message);
                     jiraInfoCompareTuples.RemoveAt(i);
                 }
             }
@@ -106,7 +114,7 @@ namespace MoreConvenientJiraSvn.Core.Service
                         Time = DateTime.Now,
                         SourceName = nameof(CheckJiraStateHostedService),
                     };
-
+                    messageList.Add(message);
                     jiraInfoCompareTuples.RemoveAt(i);
                 }
             }

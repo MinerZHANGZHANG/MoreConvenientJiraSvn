@@ -9,7 +9,7 @@ namespace MoreConvenientJiraSvn.Gui.View.Controls
     {
         public MainControl()
         {
-            DataContext = new MainControlViewModel();
+            DataContext = ViewModelsManager.GetViewModel<MainControlViewModel>();
             InitializeComponent();
         }
     }

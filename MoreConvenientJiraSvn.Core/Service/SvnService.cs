@@ -73,6 +73,7 @@ public class SvnService : IDisposable
         {
             _settingService.InsertOrUpdateSettingIntoDatabase(newPath);
         }
+        this.Paths = _settingService.GetSettingsFromDatabase<SvnPath>()?.ToList() ?? [];
 
     }
 
@@ -83,12 +84,14 @@ public class SvnService : IDisposable
         {
             _settingService.DeleteSettingToDatabaseById<SvnPath>(oldPath.Id);
         }
+        this.Paths = _settingService.GetSettingsFromDatabase<SvnPath>()?.ToList() ?? [];
     }
 
     public void UpdatePathMany(List<SvnPath> paths)
     {
         Paths = paths;
         _settingService.InsertOrUpdateSettingIntoDatabase(paths);
+        this.Paths = _settingService.GetSettingsFromDatabase<SvnPath>()?.ToList() ?? [];
     }
 
     #endregion

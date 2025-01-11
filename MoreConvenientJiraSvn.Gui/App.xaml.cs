@@ -35,6 +35,8 @@ namespace MoreConvenientJiraSvn.Gui
             services.AddTransient<JiraSettingViewModel>();
             services.AddTransient<SvnSettingViewModel>();
 
+            services.AddTransient<MainControlViewModel>();
+
             _services = services.BuildServiceProvider(true);
 
             Settings.Default.LastStartTime = DateTime.Now;
@@ -49,12 +51,12 @@ namespace MoreConvenientJiraSvn.Gui
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
         }
 
-        private async void App_Startup(object sender, StartupEventArgs e)
+        private void App_Startup(object sender, StartupEventArgs e)
         {
             var hostServices = _services.GetServices<IHostedService>();
             foreach (var service in hostServices)
             {
-                await service.StartAsync(CancellationToken.None);
+                service.StartAsync(CancellationToken.None);
             }
         }
 

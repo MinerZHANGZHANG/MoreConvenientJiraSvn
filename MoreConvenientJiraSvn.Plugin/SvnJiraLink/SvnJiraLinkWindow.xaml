@@ -104,7 +104,6 @@
                                 MinWidth="160"
                                 HorizontalAlignment="Left"
                                 DockPanel.Dock="Left"
-                                IsReadOnly="True"
                                 Style="{StaticResource MaterialDesignTextBox}"
                                 Text="{Binding SelectPathRelation.FixVersion}" />
                             <Button

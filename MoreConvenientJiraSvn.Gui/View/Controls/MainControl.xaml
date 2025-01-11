@@ -24,18 +24,20 @@
                 VerticalAlignment="Center"
                 FontSize="20"
                 Text="插件信息" />
+            <Button Command="{Binding RefreshMessageCommand}" Content="刷新" Style="{StaticResource MaterialDesignOutlinedButton}"/>
         </StackPanel>
 
         <DataGrid
             Grid.Row="1"
             Margin="10"
             AutoGenerateColumns="False"
+            ItemsSource="{Binding PluginMessages}"
             CanUserAddRows="False">
             <DataGrid.Columns>
                 <DataGridTextColumn
                     Width="*"
-                    Binding="{Binding PluginName}"
-                    Header="插件名称" />
+                    Binding="{Binding SourceName}"
+                    Header="来源" />
                 <DataGridTextColumn
                     Width="*"
                     Binding="{Binding Info}"
