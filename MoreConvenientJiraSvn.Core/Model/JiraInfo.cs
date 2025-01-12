@@ -1,4 +1,5 @@
 ﻿using LiteDB;
+using MoreConvenientJiraSvn.Core.Service;
 using System.Text.Json;
 
 namespace MoreConvenientJiraSvn.Core.Model
@@ -159,7 +160,7 @@ namespace MoreConvenientJiraSvn.Core.Model
 
         public static ObjectId GetKey(string jiraId)
         {
-            return new(jiraId);
+            return DataService.ConvertToObjectId(jiraId);
         }
 
         public JiraInfo(string json)

@@ -1,4 +1,5 @@
 ﻿using LiteDB;
+using MoreConvenientJiraSvn.Core.Service;
 
 namespace MoreConvenientJiraSvn.Core.Model
 {
@@ -20,7 +21,7 @@ namespace MoreConvenientJiraSvn.Core.Model
 
         public static ObjectId GetKey(string svnPath,long Revision)
         {
-            return new ObjectId($"{svnPath}-{Revision:16d}");
+            return DataService.ConvertToObjectId($"{svnPath}-{Revision:16d}");
         }
 
         // rewrite equals?

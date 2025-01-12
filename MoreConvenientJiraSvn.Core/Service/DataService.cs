@@ -53,5 +53,25 @@ namespace MoreConvenientJiraSvn.Core.Service
             var result = _db.GetCollection<T>().Delete(id);
             return result;
         }
+
+        /// <summary>
+        /// Need length less than 24 char
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        public static ObjectId ConvertToObjectId(string str)
+        {
+            string cleanedString = new(str.Where(c => "0123456789abcdefABCDEF".Contains(c)).ToArray());
+            if (cleanedString.Length < 24)
+            {
+                cleanedString = cleanedString.PadLeft(24, '0');
+            }
+            else if (cleanedString.Length > 24)
+            {
+                cleanedString = cleanedString[..24]; 
+            }
+
+            return new ObjectId(cleanedString);
+        }
     }
 }
