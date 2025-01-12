@@ -33,7 +33,7 @@ using ParserRuleContext = Antlr4.Runtime.ParserRuleContext;
 /// </summary>
 [System.CodeDom.Compiler.GeneratedCode("ANTLR", "4.13.2")]
 [System.Diagnostics.DebuggerNonUserCode]
-[System.CLSCompliant(false)]
+//[System.CLSCompliant(false)]
 public partial class PlSqlParserBaseListener : IPlSqlParserListener {
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="PlSqlParser.sql_script"/>.

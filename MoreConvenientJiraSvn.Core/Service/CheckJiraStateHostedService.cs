@@ -1,4 +1,7 @@
 ﻿using MoreConvenientJiraSvn.Core.Model;
+using MoreConvenientJiraSvn.Core.Utils;
+using System.Text;
+using System.Windows.Forms;
 
 
 namespace MoreConvenientJiraSvn.Core.Service
@@ -19,52 +22,52 @@ namespace MoreConvenientJiraSvn.Core.Service
                 TaskServiceName = nameof(CheckJiraStateHostedService),
                 IsSucccess = false,
             };
-            var filters = await _jiraService.GetCurrentUserFavouriteFilterAsync();
+
+            var filters = await _jiraService.GetNeedRefreshFavouriteFilterAsync();
+            var messages = new List<PluginMessage>();
             foreach (var filter in filters)
             {
-                if (_jiraService.Config.NeedAutoRefreshFliterNames.Contains(filter.Name))
+                try
                 {
-                    try
-                    {
-                        var result = await _jiraService.GetIssuesAsyncByFilter(filter);
-                        var messages = GetMessage(result, filter);
-                       
-                        _dataService.InsertOrUpdateMany(messages);
-                        hostTaskLog.IsSucccess = true;
-                        if (messages.Count > 0)
-                        {
-                            hostTaskLog.Message = $"过滤器[{filter.Name}]相关Jira存在{messages.Count}处需要注意的变动，请查看首页";
-                        }
-                        else
-                        {
-                            hostTaskLog.Message = $"过滤器[{filter.Name}]相关Jira未发现需要注意的变动";
-                        }
-                        
-                        if (messages.Any(m => m.Level == InfoLevel.Error))
-                        {
-                            _notificationService.ShowNotification("获取和检测jira状态已完成", hostTaskLog.Message, ToolTipIcon.Error);
-                        }
-                        else if (messages.Any(m => m.Level == InfoLevel.Warning))
-                        {
-                            _notificationService.ShowNotification("获取和检测jira状态已完成", hostTaskLog.Message, ToolTipIcon.Warning);
-                        }
-                        else
-                        {
-                            _notificationService.ShowNotification("获取和检测jira状态已完成", hostTaskLog.Message);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        hostTaskLog.IsSucccess = false;
-                        hostTaskLog.Message = $"获取和检测Jira消息时，发生错误:{ex.Message}";
-                    }
+                    var result = await _jiraService.GetIssuesAsyncByFilter(filter);
+                    var message = GenerateJiraStatusChangeNotifications(result, filter);
+                    messages.AddRange(message);
                 }
+                catch (Exception ex)
+                {
+                    hostTaskLog.IsSucccess = false;
+                    hostTaskLog.Message = $"获取和检测Jira消息时，发生错误:{ex.Message}";
+                }
+
             }
+            hostTaskLog.IsSucccess = true;
+
+            if (messages.Count > 0)
+            {
+                hostTaskLog.Message = $"过滤器[{string.Join("|", filters.Select(f => f.Name))}]相关的Jira存在{messages.Count}处需要注意的变动，请查看首页";
+            }
+            else
+            {
+                hostTaskLog.Message = $"过滤器[{string.Join("|", filters.Select(f => f.Name))}]相关的Jira未发现需要注意的变动";
+            }
+            if (messages.Any(m => m.Level == InfoLevel.Error))
+            {
+                hostTaskLog.Level = InfoLevel.Error;
+            }
+            else if (messages.Any(m => m.Level == InfoLevel.Warning))
+            {
+                hostTaskLog.Level = InfoLevel.Warning;
+            }
+
+            _dataService.InsertOrUpdateMany(messages);
             _dataService.Insert(hostTaskLog);
+
+            _notificationService.ShowNotification("获取和检测jira状态已完成", hostTaskLog.Message, EnumHelper.ConvertEnumToIcon(hostTaskLog.Level));
+            
             return hostTaskLog.IsSucccess;
         }
 
-        public List<PluginMessage> GetMessage(List<JiraInfoCompareTuple> jiraInfoCompareTuples, JiraFilter jiraFilter)
+        public List<PluginMessage> GenerateJiraStatusChangeNotifications(List<JiraInfoCompareTuple> jiraInfoCompareTuples, JiraFilter jiraFilter)
         {
             List<PluginMessage> messageList = [];
             for (int i = jiraInfoCompareTuples.Count - 1; i >= 0; i--)

@@ -6,22 +6,22 @@ namespace MoreConvenientJiraSvn.Core.Service
     {
         private readonly LiteDatabase _db = db;
 
-        public void Insert<T>(T obj) where T : class
+        public int Insert<T>(T obj) where T : class
         {
             var collection = _db.GetCollection<T>();
-            collection.Insert(obj);
+            return collection.Insert(obj);
         }
 
-        public void InsertOrUpdate<T>(T obj) where T : class
+        public bool InsertOrUpdate<T>(T obj) where T : class
         {
             var collection = _db.GetCollection<T>();
-            collection.Upsert(obj);
+            return collection.Upsert(obj);
         }
 
-        public void InsertOrUpdateMany<T>(List<T> objs) where T : class
+        public int InsertOrUpdateMany<T>(List<T> objs) where T : class
         {
             var collection = _db.GetCollection<T>();
-            collection.Upsert(objs);
+            return collection.Upsert(objs);
         }
 
         public IEnumerable<T> SelectAll<T>() where T : class

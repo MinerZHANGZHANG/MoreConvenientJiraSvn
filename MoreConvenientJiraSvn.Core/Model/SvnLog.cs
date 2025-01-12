@@ -5,7 +5,7 @@ namespace MoreConvenientJiraSvn.Core.Model
     public record SvnLog
     {
         [BsonId]
-        public ObjectId Id { get; set; } = ObjectId.NewObjectId();
+        public required ObjectId Id { get; set; }
         public required string SvnPath { get; set; }
         public required long Revision { get; set; }
         public required string Operation { get; set; }
@@ -17,6 +17,13 @@ namespace MoreConvenientJiraSvn.Core.Model
         // special property
         public string? IssueJiraId { get; set; }
         public string? SubIssueJiraId { get; set; }
+
+        public static ObjectId GetKey(string svnPath,long Revision)
+        {
+            return new ObjectId($"{svnPath}-{Revision:16d}");
+        }
+
+        // rewrite equals?
     }
 
 }

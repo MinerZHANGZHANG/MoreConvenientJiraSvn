@@ -1,4 +1,6 @@
-﻿namespace MoreConvenientJiraSvn.Core.Service;
+﻿using System.Windows.Forms;
+
+namespace MoreConvenientJiraSvn.Core.Service;
 public class NotificationService
 {
     private readonly NotifyIcon _notifyIcon;
@@ -21,6 +23,11 @@ public class NotificationService
     public void ShowNotification(string title, string message, ToolTipIcon toolTipIcon = ToolTipIcon.Info)
     {
         _notifyIcon.ShowBalloonTip(3000, title, message, toolTipIcon);
+    }
+
+    public void DebugMessage(string message)
+    {
+        _notifyIcon.ShowBalloonTip(3000, "Debug", message, ToolTipIcon.None);
     }
 
     public void Dispose()

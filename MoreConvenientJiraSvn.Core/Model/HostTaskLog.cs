@@ -10,5 +10,6 @@ namespace MoreConvenientJiraSvn.Core.Model
         public required string TaskServiceName { get; set; }
         public bool IsSucccess { get; set; }
         public string Message { get; set; } = string.Empty;
+        public InfoLevel Level { get; set; }
     }
 }

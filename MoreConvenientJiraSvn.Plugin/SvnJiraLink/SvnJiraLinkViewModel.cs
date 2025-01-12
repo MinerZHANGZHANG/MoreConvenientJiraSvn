@@ -4,6 +4,8 @@ using LiteDB;
 using Microsoft.Extensions.DependencyInjection;
 using MoreConvenientJiraSvn.Core.Model;
 using MoreConvenientJiraSvn.Core.Service;
+using MoreConvenientJiraSvn.Core.Utils;
+using System.Windows;
 
 namespace MoreConvenientJiraSvn.Plugin.SvnJiraLink;
 
@@ -12,7 +14,7 @@ public partial class SvnJiraLinkViewModel(ServiceProvider serviceProvider) : Obs
     #region Service
     private readonly SvnService _svnService = serviceProvider.GetRequiredService<SvnService>();
     private readonly DataService _dataService = serviceProvider.GetRequiredService<DataService>();
-    private readonly SettingService _settingService = serviceProvider.GetRequiredService<SettingService>();
+    //private readonly SettingService _settingService = serviceProvider.GetRequiredService<SettingService>();
 
     #endregion
 
@@ -25,12 +27,49 @@ public partial class SvnJiraLinkViewModel(ServiceProvider serviceProvider) : Obs
     private List<SvnPath> _svnPaths = [];
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(PageTipText))]
+    [NotifyPropertyChangedFor(nameof(SelectPathTipText))]
+    [NotifyPropertyChangedFor(nameof(SelectPathStateText))]
     private SvnPath? _selectedPath;
     [ObservableProperty]
     private List<SvnLog> _selectedSvnLogs = [];
     [ObservableProperty]
     private JiraSvnPathRelation _selectPathRelation = new();
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(PageTipText))]
+    private IEnumerable<SvnLog> _currentPageSvnLogs = [];
+
+    public string PageTipText => $"{_svnLogPaginator?.CurrentPageIndex ?? 0} / {_svnLogPaginator?.GetPagesCount() ?? 0}";
+    public string SelectPathTipText => $"SVN路径：{SelectedPath?.FullPathName}";
+    public string SelectPathStateText
+    {
+        get
+        {
+            if (SelectedSvnLogs.Count > 0)
+            {
+                return $"已下载Log：版本号[{SelectedSvnLogs.Min(l => l.Revision)}——{SelectedSvnLogs.Max(l => l.Revision)}] | 日期[{SelectedSvnLogs.Min(l => l.DateTime)}——{SelectedSvnLogs.Max(l => l.DateTime)}]";
+            }
+            else
+            {
+                return $"本地未下载该路径的Log";
+            }
+        }
+    }
+
+    [ObservableProperty]
+    private DateTime _beginQueryDateTime;
+    [ObservableProperty]
+    private DateTime _endQueryDateTime;
+    private const int _singleQueryMaxLogCount = 65535;
+
+    private PaginationHelper<SvnLog>? _svnLogPaginator;
+    private const int _pageSize = 20;
+
+    [ObservableProperty]
+    private bool _isShowTip = false;
+    [ObservableProperty]
+    private string _showTipMessage = string.Empty;
     #endregion
 
     public void InitViewModel()
@@ -46,31 +85,60 @@ public partial class SvnJiraLinkViewModel(ServiceProvider serviceProvider) : Obs
             SelectedSvnLogs = _dataService.SelectByExpression<SvnLog>(Query.EQ(nameof(SvnLog.SvnPath), SelectedPath.Path)).ToList();
             SelectPathRelation = _dataService.SelectOneByExpression<JiraSvnPathRelation>(Query.EQ(nameof(JiraSvnPathRelation.SvnPath), SelectedPath.Path))
                 ?? new() { SvnPath = SelectedPath.Path };
+
+            _svnLogPaginator = new PaginationHelper<SvnLog>(SelectedSvnLogs, _pageSize);
+            CurrentPageSvnLogs = _svnLogPaginator.GetCurrentItems();
+
+            if (SelectedSvnLogs.Count > 0)
+            {
+                BeginQueryDateTime = SelectedSvnLogs.Max(l => l.DateTime);
+                EndQueryDateTime = DateTime.Now;
+            }
+            else
+            {
+                BeginQueryDateTime = DateTime.Now.AddDays(-7);
+                EndQueryDateTime = DateTime.Now;
+            }
         }
     }
 
     [RelayCommand]
-    public async Task GetLatestSvnLog()
+    public async Task QuerySvnLog()
     {
+        var queryRangeSpan = EndQueryDateTime - BeginQueryDateTime;
+        if (queryRangeSpan <= TimeSpan.FromDays(1))
+        {
+            MessageBox.Show("请选择大于1天的时间范围");
+        }
+        if (queryRangeSpan > TimeSpan.FromDays(180))
+        {
+            MessageBox.Show("请选择小于180天的时间范围进行查询");
+            return;
+        }
+
         if (SelectedPath != null)
         {
-            DateTime begTime = DateTime.Now.AddYears(-20);
-            if (SelectedSvnLogs.Count != 0)
-            {
-                begTime = SelectedSvnLogs.Select(log => log.DateTime).Max();
-            }
-            List<SvnLog> addition = [];
+            List<SvnLog> querySvnLog = [];
             await Task.Run(() =>
             {
                 bool isHaveJiraId = SelectedPath.SvnPathType == SvnPathType.Code || SelectedPath.SvnPathType == SvnPathType.Document;
-
-                addition = _svnService.GetSvnLogs(SelectedPath.Path, begTime, DateTime.Now, isNeedExtractJiraId: isHaveJiraId);
+                querySvnLog = _svnService.GetSvnLogs(SelectedPath.Path, BeginQueryDateTime, EndQueryDateTime, isNeedExtractJiraId: isHaveJiraId, maxNumber: _singleQueryMaxLogCount);
             });
-            if (addition != null)
+            if (querySvnLog != null && querySvnLog.Count > 0)
             {
-                _dataService.InsertOrUpdateMany(addition);
-                SelectedSvnLogs = [.. SelectedSvnLogs, .. addition];
+                _dataService.InsertOrUpdateMany(querySvnLog);
+                SelectedSvnLogs = SelectedSvnLogs.Union(querySvnLog).ToList();
+
+                ShowTipMessage = $"查询成功，获取数据量{querySvnLog.Count}";
+                IsShowTip = true;
             }
+            else
+            {
+                ShowTipMessage = $"未查询到数据，请修改范围或稍后重试";
+                IsShowTip = true;
+            }
+            await Task.Delay(3000);
+            IsShowTip = false;
         }
     }
 
@@ -92,7 +160,25 @@ public partial class SvnJiraLinkViewModel(ServiceProvider serviceProvider) : Obs
         }
     }
 
+    [RelayCommand]
+    public void NextPage()
+    {
+        if (_svnLogPaginator != null)
+        {
+            _svnLogPaginator.CurrentPageIndex += 1;
+            CurrentPageSvnLogs = _svnLogPaginator.GetCurrentItems();
+        }
+    }
+
+    [RelayCommand]
+    public void PrevPage()
+    {
+        if (_svnLogPaginator != null)
+        {
+            _svnLogPaginator.CurrentPageIndex -= 1;
+            CurrentPageSvnLogs = _svnLogPaginator.GetCurrentItems();
+        }
+    }
+
+
 }
-
-
-

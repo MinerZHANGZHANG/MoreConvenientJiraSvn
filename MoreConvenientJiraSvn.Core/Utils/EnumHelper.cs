@@ -26,4 +26,15 @@ public static class EnumHelper
                       ? value?.ToString() ?? string.Empty
                       : attribute.Description;
     }
+
+    public static ToolTipIcon ConvertEnumToIcon(InfoLevel level)
+    {
+        return level switch
+        {
+            InfoLevel.Normal => ToolTipIcon.Info,
+            InfoLevel.Warning => ToolTipIcon.Warning,
+            InfoLevel.Error => ToolTipIcon.Error,
+            _ => ToolTipIcon.None,
+        };
+    }
 }

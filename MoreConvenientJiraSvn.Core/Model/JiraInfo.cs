@@ -6,8 +6,9 @@ namespace MoreConvenientJiraSvn.Core.Model
     public record JiraInfo
     {
         [BsonId]
-        public ObjectId Id { get; set; } = ObjectId.NewObjectId();
+        public ObjectId Id { get; set; }
         public string JiraId { get; set; } = string.Empty;
+
         [BsonIgnore]
         public string? JsonResult
         {
@@ -74,7 +75,6 @@ namespace MoreConvenientJiraSvn.Core.Model
             }
         }
         #endregion
-
 
         private bool ConvertJsonToProperty()
         {
@@ -157,6 +157,15 @@ namespace MoreConvenientJiraSvn.Core.Model
             return false;
         }
 
+        public static ObjectId GetKey(string jiraId)
+        {
+            return new(jiraId);
+        }
 
+        public JiraInfo(string json)
+        {
+            JsonResult = json;
+            Id = GetKey(JiraId);
+        }
     }
 }

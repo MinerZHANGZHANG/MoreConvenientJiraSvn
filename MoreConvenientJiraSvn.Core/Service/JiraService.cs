@@ -9,14 +9,16 @@ namespace MoreConvenientJiraSvn.Core.Service
     {
         private readonly SettingService _settingService;
         private readonly DataService _dataService;
+        private readonly NotificationService _notificationService;// TODO: Replace to log service
         private HttpClient? _httpClient;
 
         public JiraConfig Config { get; private set; }
 
-        public JiraService(SettingService settingService, DataService dataService)
+        public JiraService(SettingService settingService, DataService dataService,NotificationService notificationService)
         {
             this._settingService = settingService;
             this._dataService = dataService;
+            this._notificationService = notificationService;
             this.Config = _settingService.GetSingleSettingFromDatabase<JiraConfig>() ?? new();
 
             this.InitHttpClient(Config);
@@ -72,7 +74,8 @@ namespace MoreConvenientJiraSvn.Core.Service
             jiraConfig.UserName = string.Empty;
             jiraConfig.Email = string.Empty;
 
-            var response = await _httpClient.GetAsync($"rest/api/2/myself");
+            _notificationService.DebugMessage($"{nameof(GetCurrentUserInfoAsync)} [{jiraConfig.BaseUrl}:rest/api/2/myself]");
+            var response = await _httpClient.GetAsync($"rest/api/2/myself"); 
             if (!response.IsSuccessStatusCode)
             {
                 return;
@@ -127,6 +130,7 @@ namespace MoreConvenientJiraSvn.Core.Service
             }
             try
             {
+                _notificationService.DebugMessage($"{nameof(GetCurrentUserFavouriteFilterAsync)} [rest/api/2/filter/favourite]");
                 var response = await _httpClient.GetAsync($"rest/api/2/filter/favourite");
 
                 if (!response.IsSuccessStatusCode)
@@ -146,7 +150,7 @@ namespace MoreConvenientJiraSvn.Core.Service
                             var filter = new JiraFilter()
                             {
                                 FilterId = element.GetProperty("id").GetString(),
-                                Name = element.GetProperty("name").GetString(),
+                                Name = element.GetProperty("name").GetString() ?? "Nameless",
                                 Jql = element.GetProperty("jql").GetString(),
                                 SearchUrl = element.GetProperty("searchUrl").GetString(),
                             };
@@ -170,7 +174,7 @@ namespace MoreConvenientJiraSvn.Core.Service
             {
                 return result;
             }
-
+            _notificationService.DebugMessage($"{nameof(GetIssueAsync)} [rest/api/2/issue/{issueId}]");
             var response = await _httpClient.GetAsync($"rest/api/2/issue/{issueId}");
             if (!response.IsSuccessStatusCode)
             {
@@ -178,7 +182,7 @@ namespace MoreConvenientJiraSvn.Core.Service
             }
             var jsonResponse = await response.Content.ReadAsStringAsync();
 
-            result = new() { JiraId = issueId, JsonResult = jsonResponse };
+            result = new(jsonResponse);
             SaveIssues([result]);
             return result;
         }
@@ -198,6 +202,7 @@ namespace MoreConvenientJiraSvn.Core.Service
             int total = 51;
             while (stratAt < total)
             {
+                _notificationService.DebugMessage($"{nameof(GetIssueAsync)} [{jiraFilter.SearchUrl}&startAt={stratAt}]");
                 var response = await _httpClient.GetAsync($"{jiraFilter.SearchUrl}&startAt={stratAt}");
                 if (response.IsSuccessStatusCode)
                 {
@@ -216,7 +221,7 @@ namespace MoreConvenientJiraSvn.Core.Service
                         foreach (var issue in issues)
                         {
                             // use toString will be faster?
-                            var newInfo = new JiraInfo() { JsonResult = issue.GetRawText() };
+                            var newInfo = new JiraInfo(issue.GetRawText());
                             var oldInfo = _dataService.SelectOneByExpression<JiraInfo>(Query.EQ(nameof(JiraInfo.JiraId), newInfo.JiraId));
 
                             result.Add(new() { Old = oldInfo, New = newInfo });
@@ -243,6 +248,12 @@ namespace MoreConvenientJiraSvn.Core.Service
             }
             SaveIssues(result.Select(i => i.New).ToList());
             return result;
+        }
+
+        public async Task<IEnumerable<JiraFilter>> GetNeedRefreshFavouriteFilterAsync()
+        {
+            var filters = await GetCurrentUserFavouriteFilterAsync();
+            return filters.Where(f => Config.NeedAutoRefreshFliterNames.Contains(f.Name));
         }
 
         #endregion

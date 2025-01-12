@@ -9,16 +9,18 @@ public class SvnService : IDisposable
 {
     private readonly SettingService _settingService;
     private readonly DataService _dataService;
+    private readonly NotificationService _notificationService; // TODO:Replace to log service
 
     private SvnClient? _client;
 
     public SvnConfig? Config { get; private set; }
     public List<SvnPath> Paths { get; private set; } = [];
 
-    public SvnService(SettingService settingService, DataService dataService)
+    public SvnService(SettingService settingService, DataService dataService, NotificationService notificationService)
     {
         this._settingService = settingService;
         this._dataService = dataService;
+        this._notificationService = notificationService;
 
         this.Config = _settingService.GetSingleSettingFromDatabase<SvnConfig>();
         this.Paths = _settingService.GetSettingsFromDatabase<SvnPath>()?.ToList() ?? [];
@@ -115,6 +117,7 @@ public class SvnService : IDisposable
         };
         try
         {
+            _notificationService.DebugMessage($"{nameof(GetSvnLogs)}({path}) [{beginTime}——{endTime}](maxCount:{maxNumber})");
             _client.GetLog(new Uri(path), logArgs, out var logEventArgs);
             foreach (var item in logEventArgs)
             {
@@ -126,6 +129,7 @@ public class SvnService : IDisposable
 
                 SvnLog svnLog = new()
                 {
+                    Id = SvnLog.GetKey(path,item.Revision),
                     Author = item.Author ?? string.Empty,
                     DateTime = item.Time,
                     Message = item.LogMessage ?? string.Empty,
@@ -151,7 +155,7 @@ public class SvnService : IDisposable
                 result.Add(svnLog);
             }
         }
-        catch (Exception ex)
+        catch (Exception)
         {
 
         }
@@ -176,11 +180,13 @@ public class SvnService : IDisposable
         };
         try
         {
+            _notificationService.DebugMessage($"{nameof(GetSvnLogs)}({path}) [{beginRevision}——{endRevision}](maxCount:{maxNumber})");
             _client.GetLog(new Uri(path), logArgs, out var logEventArgs);
             foreach (var item in logEventArgs)
             {
                 SvnLog svnLog = new()
                 {
+                    Id = SvnLog.GetKey(path, item.Revision),
                     Author = item.Author ?? string.Empty,
                     DateTime = item.Time,
                     Message = item.LogMessage ?? string.Empty,
@@ -206,7 +212,7 @@ public class SvnService : IDisposable
                 result.Add(svnLog);
             }
         }
-        catch (Exception ex)
+        catch (Exception)
         {
 
         }

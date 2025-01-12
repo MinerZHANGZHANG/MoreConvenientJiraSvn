@@ -24,8 +24,8 @@ public class DownloadSvnLogHostedService(DataService dataService, SvnService svn
             && (!_svnService.Config?.IsAutoUpdateLogDaily ?? false))
         {
             // todo:add default date to svn config / use version instead
-            int successPathCount = 0;
-            StringBuilder messageBuilder = new();
+            var successPathCount = 0;
+            var messageBuilder = new StringBuilder();
             await Task.Run(() =>
             {
                 var updateLogCount = 0;
@@ -41,7 +41,13 @@ public class DownloadSvnLogHostedService(DataService dataService, SvnService svn
                     try
                     {
                         var logs = _svnService.GetSvnLogs(path.Path, pathBeginTime, pathEndTime, 500, isNeedExtractJiraId: isHaveJiraId);
-                        _dataService.InsertOrUpdateMany(logs);
+                        var upsertCount= _dataService.InsertOrUpdateMany(logs);
+
+                        if (upsertCount != logs.Count)
+                        {
+                            throw new Exception($"获取和保存到数据库的数量Log数不一致!Log({logs.Count})|Database({upsertCount})");
+                        }
+
                         updateLogCount += logs.Count;
                         successPathCount += 1;
                         messageBuilder.AppendLine($"成功获取SVN日志并保存,路径:{path.Path}({pathBeginTime}->{pathEndTime}) 数量:{updateLogCount}");
@@ -62,7 +68,7 @@ public class DownloadSvnLogHostedService(DataService dataService, SvnService svn
             hostTaskLog.Message = "没有开启svn自动更新log，或未添加svn路径";
         }
 
-        _notificationService.ShowNotification($"后台下载SvnLog结束", hostTaskLog.Message);
+        _notificationService.ShowNotification($"后台更新SvnLog结束", hostTaskLog.Message);
         _dataService.Insert(hostTaskLog);
         return hostTaskLog.IsSucccess;
 
