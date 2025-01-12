@@ -162,6 +162,11 @@ namespace MoreConvenientJiraSvn.Core.Model
         {
             return DataService.ConvertToObjectId(jiraId);
         }
+        public JiraInfo()
+        {
+            JsonResult = string.Empty;
+            Id = ObjectId.Empty;
+        }
 
         public JiraInfo(string json)
         {

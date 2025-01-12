@@ -10,7 +10,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Title="Svn关联Jira"
     Width="1280"
-    Height="731"
+    Height="744"
     d:DataContext="{d:DesignInstance Type=local:SvnJiraLinkViewModel}"
     Style="{StaticResource MaterialDesignWindow}"
     mc:Ignorable="d">
@@ -49,7 +49,7 @@
         <DockPanel
             Grid.Row="0"
             Grid.Column="0"
-            Margin="16">
+            Margin="16,16,16,16">
             <DataGrid
                 AutoGenerateColumns="False"
                 CanUserAddRows="False"
@@ -153,7 +153,7 @@
                 IsExpanded="True">
                 <DockPanel LastChildFill="True">
                     <DataGrid
-                        Height="455"
+                        Height="394"
                         AutoGenerateColumns="False"
                         CanUserAddRows="False"
                         DockPanel.Dock="Top"

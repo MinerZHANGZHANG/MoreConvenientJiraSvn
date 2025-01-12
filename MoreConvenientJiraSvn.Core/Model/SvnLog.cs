@@ -24,6 +24,7 @@ namespace MoreConvenientJiraSvn.Core.Model
             return DataService.ConvertToObjectId($"{svnPath}-{Revision:16d}");
         }
 
+
         // rewrite equals?
     }
 

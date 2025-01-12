@@ -64,7 +64,7 @@ public partial class SvnJiraLinkViewModel(ServiceProvider serviceProvider) : Obs
     private const int _singleQueryMaxLogCount = 65535;
 
     private PaginationHelper<SvnLog>? _svnLogPaginator;
-    private const int _pageSize = 20;
+    private const int _pageSize = 5;
 
     [ObservableProperty]
     private bool _isShowTip = false;
@@ -82,7 +82,7 @@ public partial class SvnJiraLinkViewModel(ServiceProvider serviceProvider) : Obs
     {
         if (SelectedPath != null)
         {
-            SelectedSvnLogs = _dataService.SelectByExpression<SvnLog>(Query.EQ(nameof(SvnLog.SvnPath), SelectedPath.Path)).ToList();
+            SelectedSvnLogs = _dataService.SelectByExpression<SvnLog>(Query.EQ(nameof(SvnLog.SvnPath), SelectedPath.Path)).OrderByDescending(s=>s.DateTime).ToList();
             SelectPathRelation = _dataService.SelectOneByExpression<JiraSvnPathRelation>(Query.EQ(nameof(JiraSvnPathRelation.SvnPath), SelectedPath.Path))
                 ?? new() { SvnPath = SelectedPath.Path };
 
