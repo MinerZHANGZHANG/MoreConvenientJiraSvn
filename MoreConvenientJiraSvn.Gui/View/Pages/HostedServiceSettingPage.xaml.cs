@@ -3,12 +3,11 @@
 namespace MoreConvenientJiraSvn.Gui.View.Pages
 {
     /// <summary>
-    /// PluginSettingPage.xaml 的交互逻辑
+    /// HostedServiceSettingPage.xaml 的交互逻辑
     /// </summary>
-    [Obsolete]
-    public partial class PluginSettingPage : Page
+    public partial class HostedServiceSettingPage : Page
     {
-        public PluginSettingPage()
+        public HostedServiceSettingPage()
         {
             InitializeComponent();
         }

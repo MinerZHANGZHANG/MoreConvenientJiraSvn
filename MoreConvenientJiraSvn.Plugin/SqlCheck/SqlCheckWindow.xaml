@@ -9,7 +9,7 @@
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Title="Sql正确性校验"
-    Width="460"
+    Width="595"
     Height="720"
     d:DataContext="{d:DesignInstance Type=local:SqlCheckViewModel}"
     Style="{StaticResource MaterialDesignWindow}"
@@ -46,31 +46,32 @@
                 Orientation="Vertical">
                 <control:ConfigLine Margin="4" ConfigName="检测路径">
                     <DockPanel>
+                        <Button
+                            Width="60"
+                            HorizontalAlignment="Right"
+                            Command="{Binding SetCheckDirCommand}"
+                            Content="选择"
+                            DockPanel.Dock="Right" />
                         <TextBox
                             MinWidth="160"
-                            HorizontalAlignment="Right"
-                            materialDesign:HintAssist.Hint="放置SQL的文件夹路径"
+                            materialDesign:HintAssist.Hint="双击选择SQL文件夹路径"
+                            DockPanel.Dock="Left"
                             IsReadOnly="True"
+                            MouseDoubleClick="TextBox_MouseDoubleClick"
                             Style="{StaticResource MaterialDesignTextBox}"
-                            Text="{Binding Setting.DefaultDir}" />
-
+                            Text="{Binding Setting.DefaultDir}"  />
                     </DockPanel>
                 </control:ConfigLine>
 
                 <DockPanel Margin="4">
                     <TextBlock Text="{Binding CheckStateText}" />
                     <Button
-                        Width="60"
-                        HorizontalAlignment="Right"
-                        Command="{Binding SetCheckDirCommand}"
-                        Content="选择" />
-                    <Button
                         x:Name="CheckButton"
                         Width="100"
                         HorizontalAlignment="Right"
                         Command="{Binding CheckDirCommand}"
-                        Content="检测SQL" />
-
+                        Content="检测SQL"
+                        DockPanel.Dock="Right" />
                 </DockPanel>
 
                 <ProgressBar
@@ -82,26 +83,29 @@
 
         <!--  Issues list  -->
         <Expander Header="问题列表" IsExpanded="True">
-            <ListView Margin="4" ItemsSource="{Binding SqlIssues}">
-                <ListView.View>
-                    <GridView>
-                        <GridViewColumn
-                            Width="Auto"
-                            DisplayMemberBinding="{Binding Message}"
-                            Header="问题描述" />
-                        <GridViewColumn Width="Auto" Header="文件路径">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <Button
-                                        Command="{Binding DataContext.OpenSqlFileCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                        CommandParameter="{Binding FilePath}"
-                                        Content="{Binding FilePath}" />
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-                    </GridView>
-                </ListView.View>
-            </ListView>
+            <DockPanel Height="400">
+                <ListView Margin="4" ItemsSource="{Binding SqlIssues}">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn
+                                Width="Auto"
+                                DisplayMemberBinding="{Binding Message}"
+                                Header="问题描述" />
+                            <GridViewColumn Width="Auto" Header="文件路径">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button
+                                            Command="{Binding DataContext.OpenSqlFileCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                            CommandParameter="{Binding FilePath}"
+                                            Content="{Binding FilePath}" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+
+            </DockPanel>
 
         </Expander>
 

@@ -29,15 +29,15 @@ namespace MoreConvenientJiraSvn.Plugin.SqlCheck
                 string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
                 if (files.Length > 0)
                 {
-                    _viewModel.CheckSingle(Path.GetFileName(files[0]));
+                    _viewModel.CheckFile(Path.GetFileName(files[0]));
                 }
             }
 
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void TextBox_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-
+            this._viewModel.SetCheckDir();
         }
     }
 }

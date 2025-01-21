@@ -1,7 +1,5 @@
 ﻿using MoreConvenientJiraSvn.Core.Model;
 using MoreConvenientJiraSvn.Core.Utils;
-using System.Text;
-using System.Windows.Forms;
 
 
 namespace MoreConvenientJiraSvn.Core.Service

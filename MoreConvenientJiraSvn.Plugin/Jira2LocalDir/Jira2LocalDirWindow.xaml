@@ -223,7 +223,7 @@
                                     <TextBox
                                         IsReadOnly="True"
                                         Style="{StaticResource MaterialDesignFilledTextBox}"
-                                        Text="{Binding SelectedJiraInfo.JiraId,Mode=OneWay}" />
+                                        Text="{Binding SelectedJiraInfo.JiraId, Mode=OneWay}" />
                                 </StackPanel>
                             </Border>
                             <Border Style="{StaticResource StackPanelStyle}">
@@ -232,7 +232,7 @@
                                     <TextBox
                                         IsReadOnly="True"
                                         Style="{StaticResource MaterialDesignFilledTextBox}"
-                                        Text="{Binding SelectedJiraInfo.Summary,Mode=OneWay}"
+                                        Text="{Binding SelectedJiraInfo.Summary, Mode=OneWay}"
                                         TextWrapping="Wrap" />
                                 </StackPanel>
                             </Border>
@@ -242,7 +242,7 @@
                                     <TextBox
                                         IsReadOnly="True"
                                         Style="{StaticResource MaterialDesignFilledTextBox}"
-                                        Text="{Binding SelectedJiraInfo.StatusName,Mode=OneWay}" />
+                                        Text="{Binding SelectedJiraInfo.StatusName, Mode=OneWay}" />
                                 </StackPanel>
                             </Border>
                             <Border Style="{StaticResource StackPanelStyle}">
@@ -251,7 +251,7 @@
                                     <TextBox
                                         IsReadOnly="True"
                                         Style="{StaticResource MaterialDesignFilledTextBox}"
-                                        Text="{Binding SelectedJiraInfo.PriorityName,Mode=OneWay}" />
+                                        Text="{Binding SelectedJiraInfo.PriorityName, Mode=OneWay}" />
                                 </StackPanel>
                             </Border>
                             <Border Style="{StaticResource StackPanelStyle}">
@@ -260,7 +260,7 @@
                                     <TextBox
                                         IsReadOnly="True"
                                         Style="{StaticResource MaterialDesignFilledTextBox}"
-                                        Text="{Binding SelectedJiraInfo.CreatorName,Mode=OneWay}" />
+                                        Text="{Binding SelectedJiraInfo.CreatorName, Mode=OneWay}" />
                                 </StackPanel>
                             </Border>
                             <Border Style="{StaticResource StackPanelStyle}">
@@ -269,7 +269,7 @@
                                     <TextBox
                                         IsReadOnly="True"
                                         Style="{StaticResource MaterialDesignFilledTextBox}"
-                                        Text="{Binding SelectedJiraInfo.IssueTypeName,Mode=OneWay}" />
+                                        Text="{Binding SelectedJiraInfo.IssueTypeName, Mode=OneWay}" />
                                 </StackPanel>
                             </Border>
                             <Border Style="{StaticResource StackPanelStyle}">
@@ -278,7 +278,7 @@
                                     <TextBox
                                         IsReadOnly="True"
                                         Style="{StaticResource MaterialDesignFilledTextBox}"
-                                        Text="{Binding SelectedJiraInfo.FixVersionNameText,Mode=OneWay}"
+                                        Text="{Binding SelectedJiraInfo.FixVersionNameText, Mode=OneWay}"
                                         TextWrapping="Wrap" />
                                 </StackPanel>
                             </Border>
@@ -288,7 +288,7 @@
                                     <TextBox
                                         IsReadOnly="True"
                                         Style="{StaticResource MaterialDesignFilledTextBox}"
-                                        Text="{Binding SelectedJiraInfo.ResolutionName,Mode=OneWay}" />
+                                        Text="{Binding SelectedJiraInfo.ResolutionName, Mode=OneWay}" />
                                 </StackPanel>
                             </Border>
                             <Border Style="{StaticResource StackPanelStyle}">
@@ -297,7 +297,7 @@
                                     <TextBox
                                         IsReadOnly="True"
                                         Style="{StaticResource MaterialDesignFilledTextBox}"
-                                        Text="{Binding SelectedJiraInfo.DeveloperLeaderName,Mode=OneWay}" />
+                                        Text="{Binding SelectedJiraInfo.DeveloperLeaderName, Mode=OneWay}" />
                                 </StackPanel>
                             </Border>
                             <Border Style="{StaticResource StackPanelStyle}">
@@ -306,11 +306,21 @@
                                     <TextBox
                                         IsReadOnly="True"
                                         Style="{StaticResource MaterialDesignFilledTextBox}"
-                                        Text="{Binding SelectedJiraInfo.DeveloperNamesString,Mode=OneWay}"
+                                        Text="{Binding SelectedJiraInfo.DeveloperNamesString, Mode=OneWay}"
                                         TextWrapping="Wrap" />
                                 </StackPanel>
                             </Border>
                         </WrapPanel>
+                    </Expander>
+
+                    <!--  Link Jira  -->
+                    <Expander
+                        Margin="6"
+                        DockPanel.Dock="Top"
+                        Header="关联Jira">
+                        <DockPanel Margin="8">
+                            <ListBox />
+                        </DockPanel>
                     </Expander>
 
                     <!--  Svn logs  -->

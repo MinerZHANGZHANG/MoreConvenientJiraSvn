@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
 using MoreConvenientJiraSvn.Core.Service;
+using MoreConvenientJiraSvn.Core.Utils;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
@@ -19,7 +20,7 @@ public partial class SqlCheckViewModel(ServiceProvider serviceProvider) : Observ
 
     #endregion
 
-    #region Property
+    #region Property & Field
 
     [ObservableProperty]
     private SqlCheckSetting _setting = new();
@@ -32,6 +33,8 @@ public partial class SqlCheckViewModel(ServiceProvider serviceProvider) : Observ
 
     [ObservableProperty]
     private ObservableCollection<SqlIssue> _sqlIssues = [];
+
+    private Dictionary<string, int> _viewAlertCountDict = [];
 
     #endregion
 
@@ -59,6 +62,7 @@ public partial class SqlCheckViewModel(ServiceProvider serviceProvider) : Observ
                 _settingService.InsertOrUpdateSettingIntoDatabase(Setting);
             }
         }
+        CheckStateText = string.Empty;
     }
 
     [RelayCommand]
@@ -68,6 +72,7 @@ public partial class SqlCheckViewModel(ServiceProvider serviceProvider) : Observ
         {
             return;
         }
+        _viewAlertCountDict = [];
         CheckStateProgress = 0;
         string[] fileInfos = Directory.GetFiles(Setting.DefaultDir, "*.sql");
         if (fileInfos.Length == 0)
@@ -75,13 +80,14 @@ public partial class SqlCheckViewModel(ServiceProvider serviceProvider) : Observ
             MessageBox.Show($"{Setting.DefaultDir}路径下没有.sql文件");
             return;
         }
+        CheckStateText = $"找到{fileInfos.Length}个Sql文件，正在检测...";
         float eachRatio = 100f / fileInfos.Length;
         List<SqlIssue> tempIssues = [];
         await Task.Run(() =>
         {
             Parallel.ForEach(fileInfos, file =>
             {
-                var issues = CheckSingle(file);
+                var issues = SqlCheckPipeline.CheckSingleFile(file, _viewAlertCountDict);
                 lock (tempIssues)
                 {
                     tempIssues.AddRange(issues);
@@ -91,9 +97,15 @@ public partial class SqlCheckViewModel(ServiceProvider serviceProvider) : Observ
             });
         });
 
-        CheckStateProgress += eachRatio;
+        CheckStateProgress = 1;
         SqlIssues = [.. tempIssues];
+        CheckStateText = $"检测完成，发现{SqlIssues.Count}个问题";
+    }
 
+    public List<SqlIssue> CheckFile(string filePath)
+    {
+        _viewAlertCountDict = [];
+        return SqlCheckPipeline.CheckSingleFile(filePath, _viewAlertCountDict);
     }
 
     [RelayCommand]
@@ -132,7 +144,7 @@ public partial class SqlCheckViewModel(ServiceProvider serviceProvider) : Observ
             List<SqlIssue> sqlIssues = [];
             await Task.Run(() =>
             {
-                sqlIssues = CheckSingle(fileBrowserDialog.FileName);
+                sqlIssues = CheckFile(fileBrowserDialog.FileName);
             });
 
             if (sqlIssues.Count > 0)
@@ -143,17 +155,6 @@ public partial class SqlCheckViewModel(ServiceProvider serviceProvider) : Observ
 
     }
 
-    public List<SqlIssue> CheckSingle(string filePath)
-    {
-        SqlCheckPipeline sqlCheckPipeline = new(filePath);
-        sqlCheckPipeline.ReadSqlFile()
-                     ?.ClearPrompts()
-                     ?.ParserSql()
-                     ?.CheckWhereCondition()
-                     ?.CheckInsideIfBlock();
-
-        return sqlCheckPipeline.SqlIssues ?? [];
-    }
 }
 
 
