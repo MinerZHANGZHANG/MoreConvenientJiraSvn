@@ -36,11 +36,11 @@
                     NavigationUIVisibility="Hidden"
                     Source="/View/Pages/SvnSettingPage.xaml" />
             </TabItem>
-            <TabItem Header="插件设置">
+            <TabItem Header="定时任务设置">
                 <Frame
                     Height="520"
                     NavigationUIVisibility="Hidden"
-                    Source="/View/Pages/PluginSettingPage.xaml" />
+                    Source="/View/Pages/HostedServiceSettingPage.xaml" />
             </TabItem>
         </TabControl>
     </StackPanel>

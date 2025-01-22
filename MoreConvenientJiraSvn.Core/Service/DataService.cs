@@ -6,7 +6,7 @@ namespace MoreConvenientJiraSvn.Core.Service
     {
         private readonly LiteDatabase _db = db;
 
-        public int Insert<T>(T obj) where T : class
+        public BsonValue Insert<T>(T obj) where T : class
         {
             var collection = _db.GetCollection<T>();
             return collection.Insert(obj);

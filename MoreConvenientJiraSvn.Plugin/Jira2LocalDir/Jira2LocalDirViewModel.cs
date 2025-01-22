@@ -167,7 +167,7 @@ public partial class Jira2LocalDirViewModel(ServiceProvider serviceProvider) : O
         }
 
         SelectedJiraLocalInfo = _dataService.SelectOneByExpression<LocalJiraInfo>(BsonExpression.Create($"JiraId = \"{SelectedJiraInfo.JiraId}\""));
-        
+
         RelatSvnPaths = _jiraService.GetRelatSvnPath(SelectedJiraInfo).ToList();
         SelectedSvnPath = RelatSvnPaths.FirstOrDefault();
     }
@@ -238,7 +238,7 @@ public partial class Jira2LocalDirViewModel(ServiceProvider serviceProvider) : O
     [RelayCommand(CanExecute = nameof(HasJiraBeSelected))]
     public void OpenWebPage()
     {
-        string? url = SelectedJiraInfo?.SelfUrl;
+        string? url = $"{_jiraService.Config.BaseUrl}/{SelectedJiraInfo?.JiraId}";
         if (string.IsNullOrEmpty(url))
         {
             return;
@@ -291,6 +291,8 @@ public partial class Jira2LocalDirViewModel(ServiceProvider serviceProvider) : O
             if (Directory.Exists(fullDirName))
             {
                 MessageBox.Show($"{LocalJiraSetting.ParentDir}目录下已经有一个{dirName}文件夹了!");
+                SelectedJiraLocalInfo = new() { JiraId = SelectedJiraInfo.JiraId, LocalDir = fullDirName };
+                _dataService.InsertOrUpdate<LocalJiraInfo>(SelectedJiraLocalInfo);
                 return;
             }
 

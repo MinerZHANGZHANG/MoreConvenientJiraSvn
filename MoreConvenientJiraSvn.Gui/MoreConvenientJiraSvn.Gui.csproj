@@ -41,6 +41,9 @@
 			<AutoGen>True</AutoGen>
 			<DependentUpon>Settings.settings</DependentUpon>
 		</Compile>
+		<Compile Update="View\Pages\HostedServiceSettingPage.xaml.cs">
+		  <SubType>Code</SubType>
+		</Compile>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -56,6 +59,12 @@
 
 	<ItemGroup>
 		<SplashScreen Include="View\Screen\SplashScreen.png" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Page Update="View\Pages\HostedServiceSettingPage.xaml">
+	    <SubType>Designer</SubType>
+	  </Page>
 	</ItemGroup>
 
 </Project>

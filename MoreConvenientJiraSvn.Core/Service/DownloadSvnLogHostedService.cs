@@ -67,9 +67,10 @@ public class DownloadSvnLogHostedService(DataService dataService, SvnService svn
             hostTaskLog.IsSucccess = false;
             hostTaskLog.Message = "没有开启svn自动更新log，或未添加svn路径";
         }
+        _dataService.Insert(hostTaskLog);
 
         _notificationService.ShowNotification($"后台更新SvnLog结束", hostTaskLog.Message);
-        _dataService.Insert(hostTaskLog);
+
         return hostTaskLog.IsSucccess;
 
     }

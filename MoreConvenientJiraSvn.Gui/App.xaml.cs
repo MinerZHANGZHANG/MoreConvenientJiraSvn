@@ -30,6 +30,7 @@ namespace MoreConvenientJiraSvn.Gui
 
             services.AddHostedService<DownloadSvnLogHostedService>();
             services.AddHostedService<CheckJiraStateHostedService>();
+            services.AddHostedService<CheckSqlHostedService>();
 
             services.AddTransient<MainWindowViewModel>();
             services.AddTransient<JiraSettingViewModel>();

@@ -2,35 +2,44 @@
 using Antlr4.Runtime.Tree;
 using MoreConvenientJiraSvn.Core.Model;
 using System.IO;
+using System.Text;
 
-namespace MoreConvenientJiraSvn.Plugin.SqlCheck;
-
-public record SqlIssue
-{
-    public required string FilePath { get; set; }
-    public required string Message { get; set; }
-    public InfoLevel Level { get; set; }
-}
+namespace MoreConvenientJiraSvn.Core.Utils;
 
 public class SqlCheckPipeline
 {
     public List<SqlIssue> SqlIssues { get; set; } = [];
 
-    private const string prompt = "prompt";
+    private static readonly string prompt = "prompt";
+    private static readonly string separator = Environment.NewLine;
+
     private string fileFullName;
     private string? fileContent;
     private PlSqlParser.Sql_scriptContext? statement;
-    private AntlrInputStream inputStream;
-    private PlSqlLexer lexer;
-    private CommonTokenStream tokenStream;
-    private PlSqlParser parser;
-    private static readonly string separator = Environment.NewLine;
+    private AntlrInputStream? inputStream;
+    private PlSqlLexer? lexer;
+    private CommonTokenStream? tokenStream;
+    private PlSqlParser? parser;
+
 
     public SqlCheckPipeline(string fileFullName)
     {
         ArgumentNullException.ThrowIfNull(fileFullName);
 
         this.fileFullName = fileFullName.Trim();
+    }
+
+    public static List<SqlIssue> CheckSingleFile(string filePath, Dictionary<string, int> viewAlertCountDict)
+    {
+        SqlCheckPipeline sqlCheckPipeline = new(filePath);
+        sqlCheckPipeline.ReadSqlFile()
+                     ?.ClearPrompts()
+                     ?.ParserSql()
+                     ?.CheckWhereCondition()
+                     ?.CheckInsideIfBlock()
+                     ?.CheckIsSame(viewAlertCountDict);
+
+        return sqlCheckPipeline.SqlIssues ?? [];
     }
 
     public SqlCheckPipeline? ReadSqlFile()
@@ -42,7 +51,8 @@ public class SqlCheckPipeline
         }
         try
         {
-            fileContent = File.ReadAllText(fileFullName);
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            fileContent = File.ReadAllText(fileFullName, System.Text.Encoding.GetEncoding("gb2312"));
         }
         catch (Exception ex)
         {
@@ -68,13 +78,9 @@ public class SqlCheckPipeline
         var lines = fileContent.Split(separator, StringSplitOptions.RemoveEmptyEntries);
         for (int i = 0; i <= lines.Length - 1; i++)
         {
-            if (lines[i].TrimStart().StartsWith(prompt))
+            if (lines[i].TrimStart().ToLower().StartsWith(prompt))
             {
                 lines[i] = string.Empty;
-            }
-            else
-            {
-                break;
             }
         }
         fileContent = string.Join(separator, lines);
@@ -138,6 +144,16 @@ public class SqlCheckPipeline
         return this;
     }
 
+    public SqlCheckPipeline? CheckIsSame(Dictionary<string, int> viewUpdateCountDict)
+    {
+        if (fileContent == null || statement == null)
+        {
+            return null;
+        }
+
+        CheckSameViewStatements(statement, viewUpdateCountDict);
+        return this;
+    }
 
     private void CheckUpdateStatements(IParseTree context)
     {
@@ -257,6 +273,36 @@ public class SqlCheckPipeline
         // 使用文件内容来提取原始文本  
         return fileContent.Substring(start, stop - start + 1);
     }
+
+    private void CheckSameViewStatements(IParseTree context, Dictionary<string, int> viewUpdateCountDict)
+    {
+        for (int i = 0; i < context.ChildCount; i++)
+        {
+            var child = context.GetChild(i);
+            if (child is PlSqlParser.Create_viewContext createStatement && createStatement.v != null)
+            {
+                var viewName = GetOriginalText(createStatement.v);
+                if (viewUpdateCountDict.TryGetValue(viewName, out int value))
+                {
+                    viewUpdateCountDict[viewName] = ++value;
+                    SqlIssues.Add(new()
+                    {
+                        FilePath = fileFullName,
+                        Level = InfoLevel.Normal,
+                        Message = $"视图{viewName}在文件夹内有多次提交记录,请确保后续提交的视图包含了之前的修改"
+                    });
+                }
+                else
+                {
+                    viewUpdateCountDict.Add(viewName, 0);
+                }
+            }
+            else
+            {
+                CheckSameViewStatements(child, viewUpdateCountDict);
+            }
+        }
+    }
 }
 
 class CustomErrorListener : BaseErrorListener
@@ -268,6 +314,13 @@ class CustomErrorListener : BaseErrorListener
         Errors.Add($"语法错误在第 {line} 行，第 {charPositionInLine} 列，内容：{msg}");
         base.SyntaxError(output, recognizer, offendingSymbol, line, charPositionInLine, msg, e);
     }
+}
+
+public record SqlIssue
+{
+    public required string FilePath { get; set; }
+    public required string Message { get; set; }
+    public InfoLevel Level { get; set; }
 }
 
 
