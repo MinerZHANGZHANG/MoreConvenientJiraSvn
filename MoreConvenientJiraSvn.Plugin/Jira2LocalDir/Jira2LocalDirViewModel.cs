@@ -115,10 +115,11 @@ public partial class Jira2LocalDirViewModel(ServiceProvider serviceProvider) : O
     [ObservableProperty]
     private Transition? _selectedTransition;
 
-
-
     [ObservableProperty]
     private OperationModel? _selectedOperation;
+
+    [ObservableProperty]
+    private ObservableCollection<FieldModel> _fieldModels = [];
 
     public bool HasSvnLog => SelectedJiraSvnLogs.Count > 0;
 
@@ -532,6 +533,8 @@ public partial class Jira2LocalDirViewModel(ServiceProvider serviceProvider) : O
         SelectedOperation = _jiraService.Operations.FirstOrDefault(
             o => o.OperationId == transition.TransitionId 
             && o.OperationName== transition.TransitionName);
+
+        FieldModels = SelectedOperation?.Fields ?? [];
     }
 
     #endregion

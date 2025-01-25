@@ -10,13 +10,13 @@ public record OperationModel
     public ObservableCollection<FieldModel> Fields { get; set; } = new ObservableCollection<FieldModel>();
 }
 
-public record FieldModel
+public class FieldModel
 {
     public required string FieldId { get; set; }
-    public required string FieldName { get; set; }
+    public required string FieldName { get; set; } = "Test";
     public required FieldType Type { get; set; }
 
-    public string? FieldValue { get; set; }
+    public string? FieldValue { get; set; } = "Test";
     public ObservableCollection<string>? SelectedValues { get; set; }
     public FieldOption[]? Options { get; set; }
 }
@@ -31,6 +31,10 @@ public record Transition
 {
     public required string TransitionId { get; set; }
     public required string TransitionName { get; set; }
+    public override string ToString()
+    {
+        return TransitionName;
+    }
 }
 
 public enum FieldType

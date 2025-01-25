@@ -175,9 +175,5 @@ namespace MoreConvenientJiraSvn.Core.Model
             Id = GetKey(JiraId);
         }
 
-        public JiraInfo()
-        {
-            Id = GetKey(JiraId);
-        }
     }
 }

@@ -8,6 +8,7 @@
     xmlns:local="clr-namespace:MoreConvenientJiraSvn.Plugin.Jira2LocalDir"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:model="clr-namespace:MoreConvenientJiraSvn.Core.Model;assembly=MoreConvenientJiraSvn.Core"
     Title="Jira本地化"
     Width="1280"
     Height="720"
@@ -34,6 +35,37 @@
                 <Setter Property="Margin" Value="6" />
                 <Setter Property="Padding" Value="6" />
             </Style>
+            <DataTemplate x:Key="ComboBoxTemplate" DataType="{x:Type model:FieldModel}">
+                <StackPanel Orientation="Horizontal" DataContext="{Binding ElementName=ContentControl, Path=DataContext}">
+                    <TextBlock MinWidth="120" Text="{Binding FieldName}"/>
+                    <ComboBox MinWidth="120" ItemsSource="{Binding Options}" SelectedItem="{Binding FieldValue}" />
+                </StackPanel>
+            </DataTemplate>
+            <DataTemplate x:Key="TextBoxTemplate" DataType="{x:Type model:FieldModel}">
+                <StackPanel Orientation="Horizontal" DataContext="{Binding ElementName=ContentControl, Path=DataContext}">
+                    <TextBlock MinWidth="120" Text="{Binding FieldName}"/>
+                    <TextBox MinWidth="120" Text="{Binding FieldValue}" />
+                </StackPanel>
+            </DataTemplate>
+            <DataTemplate x:Key="BigTextBoxTemplate" DataType="{x:Type model:FieldModel}">
+                <StackPanel Orientation="Horizontal" DataContext="{Binding ElementName=ContentControl, Path=DataContext}">
+                    <TextBlock MinWidth="120" Text="{Binding FieldName}"/>
+                    <TextBox MinWidth="120" Text="{Binding FieldValue}" />
+                </StackPanel>
+            </DataTemplate>
+            <DataTemplate x:Key="ListBoxTemplate" DataType="{x:Type model:FieldModel}">
+                <StackPanel Orientation="Horizontal" DataContext="{Binding ElementName=ContentControl, Path=DataContext}">
+                    <TextBlock MinWidth="120" Text="{Binding FieldName}"/>
+                    <ListBox MinWidth="120" ItemsSource="{Binding Options}" SelectionChanged="ListBox_SelectionChanged"
+    SelectionMode="Multiple"/> 
+                </StackPanel>
+            </DataTemplate>
+            <DataTemplate x:Key="DatePickerTemplate" DataType="{x:Type model:FieldModel}">
+                <StackPanel Orientation="Horizontal" DataContext="{Binding ElementName=ContentControl, Path=DataContext}">
+                    <TextBlock MinWidth="120" Text="{Binding FieldName}"/>
+                    <DatePicker MinWidth="120" SelectedDate="{Binding FieldValue}" />
+                </StackPanel>
+            </DataTemplate>
         </ResourceDictionary>
     </Window.Resources>
 
@@ -54,38 +86,18 @@
             </Style>
         </materialDesign:DrawerHost.Style>
         <materialDesign:DrawerHost.LeftDrawerContent>
-            <StackPanel Margin="16,16,-203,16">
+            <StackPanel Margin="16,16,16,16" Width="400">
                 <ListBox
                     ItemsSource="{Binding Transitions}"
                     SelectedValue="{Binding SelectedTransition}"
                     Style="{StaticResource MaterialDesignChoiceChipSecondaryListBox}" />
-                <ItemsControl ItemsSource="{Binding SelectedOperation.Fields}">
+                <ItemsControl ItemsSource="{Binding FieldModels}">
                     <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <ContentControl>
+                        <DataTemplate DataType="{x:Type model:FieldModel}" >
+                            <ContentControl x:Name="ContentControl">
                                 <ContentControl.Style>
                                     <Style TargetType="ContentControl">
-                                        <Setter Property="ContentTemplate">
-                                            <Setter.Value>
-                                                <DataTemplate>
-                                                    <StackPanel>
-                                                        <TextBlock Text="{Binding FieldName}" />
-                                                        <ComboBox
-                                                            ItemsSource="{Binding Options}"
-                                                            SelectedItem="{Binding FieldValue}"
-                                                            Visibility="{Binding Type, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter=ComboBox}" />
-                                                        <TextBox Text="{Binding FieldValue}" Visibility="{Binding Type, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter=TextBox}" />
-                                                        <TextBox Text="{Binding FieldValue}" Visibility="{Binding Type, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter=BigTextBox}" />
-                                                        <ListBox
-                                                            ItemsSource="{Binding Options}"
-                                                            SelectionChanged="ListBox_SelectionChanged"
-                                                            SelectionMode="Multiple"
-                                                            Visibility="{Binding Type, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter=ListBox}" />
-                                                        <DatePicker Text="{Binding FieldValue}" Visibility="{Binding Type, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter=DatePicker}" />
-                                                    </StackPanel>
-                                                </DataTemplate>
-                                            </Setter.Value>
-                                        </Setter>
+                                        <Setter Property="DataContext" Value="{Binding}"/>
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding Type}" Value="ComboBox">
                                                 <Setter Property="ContentTemplate" Value="{StaticResource ComboBoxTemplate}" />
@@ -94,7 +106,7 @@
                                                 <Setter Property="ContentTemplate" Value="{StaticResource TextBoxTemplate}" />
                                             </DataTrigger>
                                             <DataTrigger Binding="{Binding Type}" Value="BigTextBox">
-                                                <Setter Property="ContentTemplate" Value="{StaticResource TextBoxTemplate}" />
+                                                <Setter Property="ContentTemplate" Value="{StaticResource BigTextBoxTemplate}" />
                                             </DataTrigger>
                                             <DataTrigger Binding="{Binding Type}" Value="ListBox">
                                                 <Setter Property="ContentTemplate" Value="{StaticResource ListBoxTemplate}" />
@@ -102,7 +114,6 @@
                                             <DataTrigger Binding="{Binding Type}" Value="DatePicker">
                                                 <Setter Property="ContentTemplate" Value="{StaticResource DatePickerTemplate}" />
                                             </DataTrigger>
-                                            <!--  其他控件触发器  -->
                                         </Style.Triggers>
                                     </Style>
                                 </ContentControl.Style>
