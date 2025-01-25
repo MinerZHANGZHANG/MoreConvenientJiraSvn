@@ -238,7 +238,7 @@ public partial class Jira2LocalDirViewModel(ServiceProvider serviceProvider) : O
     [RelayCommand(CanExecute = nameof(HasJiraBeSelected))]
     public void OpenWebPage()
     {
-        string? url = $"{_jiraService.Config.BaseUrl}/{SelectedJiraInfo?.JiraId}";
+        string? url = $"{_jiraService.Config.BaseUrl}browse/{SelectedJiraInfo?.JiraId}";
         if (string.IsNullOrEmpty(url))
         {
             return;

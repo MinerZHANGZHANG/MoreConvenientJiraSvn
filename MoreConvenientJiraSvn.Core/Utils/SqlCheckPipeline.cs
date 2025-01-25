@@ -11,6 +11,7 @@ public class SqlCheckPipeline
     public List<SqlIssue> SqlIssues { get; set; } = [];
 
     private static readonly string prompt = "prompt";
+    private static readonly string[] stopwords = ["set feedback off", "set define off"];
     private static readonly string separator = Environment.NewLine;
 
     private string fileFullName;
@@ -20,7 +21,6 @@ public class SqlCheckPipeline
     private PlSqlLexer? lexer;
     private CommonTokenStream? tokenStream;
     private PlSqlParser? parser;
-
 
     public SqlCheckPipeline(string fileFullName)
     {
@@ -78,7 +78,8 @@ public class SqlCheckPipeline
         var lines = fileContent.Split(separator, StringSplitOptions.RemoveEmptyEntries);
         for (int i = 0; i <= lines.Length - 1; i++)
         {
-            if (lines[i].TrimStart().ToLower().StartsWith(prompt))
+            var trimLine = lines[i].TrimStart().ToLower();
+            if (trimLine.StartsWith(prompt) || stopwords.Contains(trimLine))
             {
                 lines[i] = string.Empty;
             }
