@@ -1,4 +1,6 @@
-﻿using System.Windows;
+﻿using MoreConvenientJiraSvn.Core.Model;
+using System.Windows;
+using System.Windows.Controls;
 
 namespace MoreConvenientJiraSvn.Plugin.Jira2LocalDir
 {
@@ -30,6 +32,19 @@ namespace MoreConvenientJiraSvn.Plugin.Jira2LocalDir
         private void ComboBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
             this._viewModel.RefreshSelectPathSvnLog();
+        }
+
+        private void ListBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            if (sender is ListBox listBox && listBox.DataContext is FieldModel field)
+            {
+                // 清空已选值并添加新的选中项  
+                field.SelectedValues?.Clear();
+                foreach (var item in listBox.SelectedItems)
+                {
+                    field.SelectedValues?.Add(item.ToString() ?? string.Empty);
+                }
+            }
         }
     }
 }

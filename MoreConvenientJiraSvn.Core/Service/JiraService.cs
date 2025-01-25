@@ -1,5 +1,6 @@
 ﻿using LiteDB;
 using MoreConvenientJiraSvn.Core.Model;
+using System.Collections.ObjectModel;
 using System.Net.Http.Headers;
 using System.Text.Json;
 
@@ -11,16 +12,19 @@ namespace MoreConvenientJiraSvn.Core.Service
         private readonly DataService _dataService;
         private readonly NotificationService _notificationService;// TODO: Replace to log service
         private HttpClient? _httpClient;
+        private readonly Lazy<List<OperationModel>> _operationModels;
 
         public JiraConfig Config { get; private set; }
+        public List<OperationModel> Operations => _operationModels.Value;
 
-        public JiraService(SettingService settingService, DataService dataService,NotificationService notificationService)
+        public JiraService(SettingService settingService, DataService dataService, NotificationService notificationService)
         {
             this._settingService = settingService;
             this._dataService = dataService;
             this._notificationService = notificationService;
             this.Config = _settingService.GetSingleSettingFromDatabase<JiraConfig>() ?? new();
 
+            this._operationModels = new(InitializeOperations);
             this.InitHttpClient(Config);
         }
 
@@ -48,6 +52,7 @@ namespace MoreConvenientJiraSvn.Core.Service
                     };
 
                     _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", config.ApiToken);
+
                     _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 }
                 catch (Exception)
@@ -75,7 +80,7 @@ namespace MoreConvenientJiraSvn.Core.Service
             jiraConfig.Email = string.Empty;
 
             _notificationService.DebugMessage($"{nameof(GetCurrentUserInfoAsync)} [{jiraConfig.BaseUrl}:rest/api/2/myself]");
-            var response = await _httpClient.GetAsync($"rest/api/2/myself"); 
+            var response = await _httpClient.GetAsync($"rest/api/2/myself");
             if (!response.IsSuccessStatusCode)
             {
                 return;
@@ -297,6 +302,149 @@ namespace MoreConvenientJiraSvn.Core.Service
             var relations = _dataService.SelectByExpression<JiraSvnPathRelation>(Query.In(nameof(JiraSvnPathRelation.FixVersion), jiraInfo.FixVersionsName.Select(v => new BsonValue(v))));
             var svnPaths = _dataService.SelectByExpression<SvnPath>(Query.In(nameof(SvnPath.Path), relations.Select(v => new BsonValue(v.SvnPath))));
             return svnPaths;
+        }
+
+        #endregion
+
+        #region upload
+
+        private List<OperationModel> InitializeOperations()
+        {
+            #region options
+
+            FieldOption[] uploadStateOpions = [
+                new (){ OptionId = "-1", OptionName = "无" },
+                new (){ OptionId = "17113", OptionName = "文档" },
+                new (){ OptionId = "17114", OptionName = "脚本" },
+                new (){ OptionId = "17117", OptionName = "脚本（包含视图、报表）" },
+                new (){ OptionId = "17115", OptionName = "文档&脚本" },
+                new (){ OptionId = "17118", OptionName = "文档&脚本（包含视图、报表）" },
+                new (){ OptionId = "17116", OptionName = "不提交任何内容" },
+                ];
+
+            #endregion
+
+            #region fields
+
+            var summaryField = new FieldModel
+            {
+                FieldName = "概要",
+                FieldId = "summary",
+                Type = FieldType.TextBox,
+
+                FieldValue = string.Empty,
+            };
+
+            var componentsField = new FieldModel
+            {
+                FieldName = "模块",
+                FieldId = "components",
+                Type = FieldType.ListBox,
+
+                Options = [],
+                SelectedValues = []
+            };
+
+            var developDescriptionField = new FieldModel
+            {
+                FieldName = "开发说明（原因分析/解决方案等）",
+                FieldId = "customfield_10910",
+                Type = FieldType.BigTextBox,
+
+                FieldValue = string.Empty,
+            };
+
+            var testSuggestionField = new FieldModel
+            {
+                FieldName = "测试建议",
+                FieldId = "customfield_11700",
+                Type = FieldType.BigTextBox,
+
+                FieldValue = string.Empty,
+            };
+
+            var uploadStateField = new FieldModel
+            {
+                FieldName = "文档/脚本是否提交★",
+                FieldId = "customfield_11003",
+                Type = FieldType.ComboBox,
+
+                Options = uploadStateOpions,
+                SelectedValues = []
+            };
+
+            var descriptionField = new FieldModel
+            {
+                FieldName = "描述",
+                FieldId = "description",
+                Type = FieldType.BigTextBox,
+
+                FieldValue = string.Empty,
+            };
+
+            var expectedHangOverDateField = new FieldModel
+            {
+                FieldName = "预计移交日期",
+                FieldId = "customfield_13202",
+                Type = FieldType.DatePicker,
+
+                FieldValue = string.Empty,
+            };
+
+            #endregion
+
+            #region operations
+            var operations = new List<OperationModel>();
+
+            var updateInfoOperation = new OperationModel
+            {
+                OperationName = "更新开发要素",
+                OperationId = "821"
+            };
+            updateInfoOperation.Fields.Add(summaryField);
+            updateInfoOperation.Fields.Add(componentsField);
+            updateInfoOperation.Fields.Add(developDescriptionField);
+            updateInfoOperation.Fields.Add(testSuggestionField);
+            updateInfoOperation.Fields.Add(uploadStateField);
+            updateInfoOperation.Fields.Add(descriptionField);
+            updateInfoOperation.Fields.Add(expectedHangOverDateField);
+
+            #endregion
+
+            operations.Add(updateInfoOperation);
+
+            return operations;
+        }
+
+        public async Task<List<Transition>> GetTransitionsByIssueId(string issueId)
+        {
+            List<Transition> results = [];
+            if (_httpClient == null || string.IsNullOrEmpty(issueId))
+            {
+                return results;
+            }
+            _notificationService.DebugMessage($"{nameof(GetIssueAsync)} [rest/api/2/issue/{issueId}/transitions]");
+            var response = await _httpClient.GetAsync($"rest/api/2/issue/{issueId}/transitions");
+            if (!response.IsSuccessStatusCode)
+            {
+                return results;
+            }
+            var jsonResponse = await response.Content.ReadAsStringAsync();
+
+            using JsonDocument doc = JsonDocument.Parse(jsonResponse);
+
+            var transitionsElement = doc.RootElement.GetProperty("transitions");
+            foreach (var transition in transitionsElement.EnumerateArray())
+            {
+                Transition result = new()
+                {
+                    TransitionId = transition.GetProperty("id").GetString() ?? string.Empty,
+                    TransitionName = transition.GetProperty("name").GetString() ?? string.Empty,
+                };
+                results.Add(result);
+            }
+
+            return results;
         }
 
         #endregion
