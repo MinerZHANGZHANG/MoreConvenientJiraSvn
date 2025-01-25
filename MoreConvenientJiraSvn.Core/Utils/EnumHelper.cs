@@ -1,6 +1,7 @@
 ﻿
 using MoreConvenientJiraSvn.Core.Model;
 using System.ComponentModel;
+using System.Globalization;
 using System.Reflection;
 
 namespace MoreConvenientJiraSvn.Core.Utils;

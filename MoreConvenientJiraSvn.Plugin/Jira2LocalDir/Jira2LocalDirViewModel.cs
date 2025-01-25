@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
 using MoreConvenientJiraSvn.Core.Model;
 using MoreConvenientJiraSvn.Core.Service;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -108,6 +109,17 @@ public partial class Jira2LocalDirViewModel(ServiceProvider serviceProvider) : O
     [NotifyCanExecuteChangedFor(nameof(DownloadPrevSvnLogByDateCommand))]
     private bool _isNotQuerySvnLoging = true;
 
+    [ObservableProperty]
+    private ObservableCollection<Transition> _transitions = [];
+
+    [ObservableProperty]
+    private Transition? _selectedTransition;
+
+
+
+    [ObservableProperty]
+    private OperationModel? _selectedOperation;
+
     public bool HasSvnLog => SelectedJiraSvnLogs.Count > 0;
 
     public bool CanQueryPrevLog => IsNotQuerySvnLoging && SelectedSvnPath != null;
@@ -124,7 +136,6 @@ public partial class Jira2LocalDirViewModel(ServiceProvider serviceProvider) : O
     {
         JiraFilters = await _jiraService.GetCurrentUserFavouriteFilterAsync();
         LocalJiraSetting = _settingService.GetSingleSettingFromDatabase<LocalJiraSetting>() ?? new();
-
     }
 
     #region Command
@@ -159,7 +170,7 @@ public partial class Jira2LocalDirViewModel(ServiceProvider serviceProvider) : O
         JiraInfoList = tempJiraInfoList;
     }
 
-    public void RefreshLocalJiraInfo()
+    public async void RefreshLocalJiraInfo()
     {
         if (SelectedJiraInfo == null)
         {
@@ -170,6 +181,9 @@ public partial class Jira2LocalDirViewModel(ServiceProvider serviceProvider) : O
 
         RelatSvnPaths = _jiraService.GetRelatSvnPath(SelectedJiraInfo).ToList();
         SelectedSvnPath = RelatSvnPaths.FirstOrDefault();
+
+        Transitions = new(await _jiraService.GetTransitionsByIssueId(SelectedJiraInfo.JiraId));
+        SelectedTransition = Transitions.FirstOrDefault();
     }
 
     public void RefreshSelectPathSvnLog()
@@ -503,6 +517,22 @@ public partial class Jira2LocalDirViewModel(ServiceProvider serviceProvider) : O
         RefreshSelectPathSvnLog();
     }
 
+    partial void OnSelectedTransitionChanged(Transition? value)
+    {
+        HandleTransitionChange(value);
+    }
+
+    private void HandleTransitionChange(Transition? transition)
+    {
+        if (transition == null)
+        { 
+            return; 
+        }
+
+        SelectedOperation = _jiraService.Operations.FirstOrDefault(
+            o => o.OperationId == transition.TransitionId 
+            && o.OperationName== transition.TransitionName);
+    }
 
     #endregion
 }

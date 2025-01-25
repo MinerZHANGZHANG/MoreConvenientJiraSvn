@@ -160,6 +160,7 @@ namespace MoreConvenientJiraSvn.Core.Model
 
         public static ObjectId GetKey(string jiraId)
         {
+            // Temporary solution
             return DataService.ConvertToObjectId(jiraId);
         }
         public JiraInfo()
@@ -171,6 +172,11 @@ namespace MoreConvenientJiraSvn.Core.Model
         public JiraInfo(string json)
         {
             JsonResult = json;
+            Id = GetKey(JiraId);
+        }
+
+        public JiraInfo()
+        {
             Id = GetKey(JiraId);
         }
     }
