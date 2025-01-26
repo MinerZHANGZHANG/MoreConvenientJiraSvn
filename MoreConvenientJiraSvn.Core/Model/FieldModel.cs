@@ -13,10 +13,10 @@ public record OperationModel
 public class FieldModel
 {
     public required string FieldId { get; set; }
-    public required string FieldName { get; set; } = "Test";
+    public required string FieldName { get; set; }
     public required FieldType Type { get; set; }
 
-    public string? FieldValue { get; set; } = "Test";
+    public string? FieldValue { get; set; }
     public ObservableCollection<string>? SelectedValues { get; set; }
     public FieldOption[]? Options { get; set; }
 }

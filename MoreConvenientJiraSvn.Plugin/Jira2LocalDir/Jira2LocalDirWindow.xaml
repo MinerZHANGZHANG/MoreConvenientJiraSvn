@@ -36,34 +36,46 @@
                 <Setter Property="Padding" Value="6" />
             </Style>
             <DataTemplate x:Key="ComboBoxTemplate" DataType="{x:Type model:FieldModel}">
-                <StackPanel Orientation="Horizontal" DataContext="{Binding ElementName=ContentControl, Path=DataContext}">
+                <StackPanel Orientation="Vertical" DataContext="{Binding ElementName=ContentControl, Path=DataContext}">
                     <TextBlock MinWidth="120" Text="{Binding FieldName}"/>
-                    <ComboBox MinWidth="120" ItemsSource="{Binding Options}" SelectedItem="{Binding FieldValue}" />
+                    <ComboBox MinWidth="120" ItemsSource="{Binding Options}" SelectedItem="{Binding FieldValue}" DisplayMemberPath="{Binding OptionName}" />
                 </StackPanel>
             </DataTemplate>
             <DataTemplate x:Key="TextBoxTemplate" DataType="{x:Type model:FieldModel}">
-                <StackPanel Orientation="Horizontal" DataContext="{Binding ElementName=ContentControl, Path=DataContext}">
+                <StackPanel Orientation="Vertical" DataContext="{Binding ElementName=ContentControl, Path=DataContext}">
                     <TextBlock MinWidth="120" Text="{Binding FieldName}"/>
                     <TextBox MinWidth="120" Text="{Binding FieldValue}" />
                 </StackPanel>
             </DataTemplate>
             <DataTemplate x:Key="BigTextBoxTemplate" DataType="{x:Type model:FieldModel}">
-                <StackPanel Orientation="Horizontal" DataContext="{Binding ElementName=ContentControl, Path=DataContext}">
+                <StackPanel Orientation="Vertical" DataContext="{Binding ElementName=ContentControl, Path=DataContext}">
                     <TextBlock MinWidth="120" Text="{Binding FieldName}"/>
-                    <TextBox MinWidth="120" Text="{Binding FieldValue}" />
+                    <TextBox AcceptsReturn="True"
+                               TextWrapping="Wrap"
+                             Padding="4"
+                             MinHeight="60"
+                            VerticalScrollBarVisibility="Auto"
+                                 Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                        MinWidth="120" Text="{Binding FieldValue}" />
                 </StackPanel>
             </DataTemplate>
             <DataTemplate x:Key="ListBoxTemplate" DataType="{x:Type model:FieldModel}">
-                <StackPanel Orientation="Horizontal" DataContext="{Binding ElementName=ContentControl, Path=DataContext}">
+                <StackPanel Orientation="Vertical" DataContext="{Binding ElementName=ContentControl, Path=DataContext}">
                     <TextBlock MinWidth="120" Text="{Binding FieldName}"/>
-                    <ListBox MinWidth="120" ItemsSource="{Binding Options}" SelectionChanged="ListBox_SelectionChanged"
-    SelectionMode="Multiple"/> 
+                    <ListBox MinWidth="120" ItemsSource="{Binding Options}" SelectionChanged="ListBox_SelectionChanged"  
+    SelectionMode="Multiple">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate DataType="{x:Type model:FieldOption}">
+                                <TextBlock Text="{Binding OptionName}"/>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox> 
                 </StackPanel>
             </DataTemplate>
             <DataTemplate x:Key="DatePickerTemplate" DataType="{x:Type model:FieldModel}">
-                <StackPanel Orientation="Horizontal" DataContext="{Binding ElementName=ContentControl, Path=DataContext}">
+                <StackPanel Orientation="Vertical" DataContext="{Binding ElementName=ContentControl, Path=DataContext}">
                     <TextBlock MinWidth="120" Text="{Binding FieldName}"/>
-                    <DatePicker MinWidth="120" SelectedDate="{Binding FieldValue}" />
+                    <DatePicker MinWidth="120" SelectedDateFormat="Short" SelectedDate="{Binding FieldValue}" />
                 </StackPanel>
             </DataTemplate>
         </ResourceDictionary>
@@ -74,15 +86,16 @@
         VerticalAlignment="Center"
         BorderBrush="{DynamicResource MaterialDesignDivider}"
         BorderThickness="2"
+        
         BottomDrawerBackground="{DynamicResource SecondaryHueLightBrush}"
         BottomDrawerCornerRadius="20 20 0 0">
         <materialDesign:DrawerHost.Style>
             <Style BasedOn="{StaticResource {x:Type materialDesign:DrawerHost}}" TargetType="materialDesign:DrawerHost">
-                <Style.Triggers>
+                <!--<Style.Triggers>
                     <DataTrigger Binding="{Binding IsChecked, ElementName=BackgroundToggle}" Value="True">
                         <Setter Property="OverlayBackground" Value="{DynamicResource PrimaryHueMidBrush}" />
                     </DataTrigger>
-                </Style.Triggers>
+                </Style.Triggers>-->
             </Style>
         </materialDesign:DrawerHost.Style>
         <materialDesign:DrawerHost.LeftDrawerContent>
@@ -94,7 +107,7 @@
                 <ItemsControl ItemsSource="{Binding FieldModels}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate DataType="{x:Type model:FieldModel}" >
-                            <ContentControl x:Name="ContentControl">
+                            <ContentControl x:Name="ContentControl" Margin="4,8,4,8">
                                 <ContentControl.Style>
                                     <Style TargetType="ContentControl">
                                         <Setter Property="DataContext" Value="{Binding}"/>

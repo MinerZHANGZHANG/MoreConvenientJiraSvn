@@ -50,7 +50,8 @@ namespace MoreConvenientJiraSvn.Core.Model
         }
         public string? ResolutionName { get; set; }
         public string? Descrpition { get; set; }
-
+        public string? IssuesId { get; set; }
+        public string? Creator { get; set; }
         #endregion
 
         #region Custom Property
@@ -75,6 +76,68 @@ namespace MoreConvenientJiraSvn.Core.Model
                 return string.Empty;
             }
         }
+
+        /// <summary>
+        /// in customfield_10603
+        /// </summary>
+        public IEnumerable<string>? ReviewerNames { get; set; }
+
+        public string ReviewerNamesString
+        {
+            get
+            {
+                if (ReviewerNames != null && ReviewerNames.Any())
+                {
+                    return string.Join(",", ReviewerNames);
+                }
+                return string.Empty;
+            }
+        }
+
+        /// <summary>
+        /// in customfield_11300
+        /// </summary>
+        public IEnumerable<string>? TesterNames { get; set; }
+
+        public string TesterNamesString
+        {
+            get
+            {
+                if (TesterNames != null && TesterNames.Any())
+                {
+                    return string.Join(",", TesterNames);
+                }
+                return string.Empty;
+            }
+        }
+
+        /// <summary>
+        /// customfield_13100
+        /// </summary>
+        public float? ExpectedDevelopDays {  get; set; }
+
+        /// <summary>
+        /// customfield_14022
+        /// </summary>
+        public string? ResultDescription { get; set; }
+
+        /// <summary>
+        /// customfield_14023
+        /// </summary>
+        public string? SolutionDescription { get; set; }
+
+        /// <summary>
+        /// customfield_11700
+        /// </summary>
+        public string? TestSuggestion { get; set; }
+
+        /// <summary>
+        /// customfield_13602
+        /// </summary>
+        public IEnumerable<string>? MergedVerstions { get; set; }
+
+        
+
         #endregion
 
         private bool ConvertJsonToProperty()
@@ -135,7 +198,6 @@ namespace MoreConvenientJiraSvn.Core.Model
                     this.Descrpition = fieldsElement.GetProperty("description")
                         .GetString();
 
-
                     // Custom Field
                     this.DeveloperLeaderName = fieldsElement.GetProperty("customfield_12813")
                         .GetProperty("child")
@@ -146,6 +208,7 @@ namespace MoreConvenientJiraSvn.Core.Model
                         .EnumerateArray()
                         .Select(e => e.GetProperty("name").ToString())
                         .ToArray();
+
 
                     return true;
                 }
