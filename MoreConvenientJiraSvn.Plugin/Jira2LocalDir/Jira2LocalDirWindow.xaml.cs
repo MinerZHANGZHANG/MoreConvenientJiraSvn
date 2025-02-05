@@ -1,4 +1,4 @@
-﻿using MoreConvenientJiraSvn.Core.Model;
+﻿using MoreConvenientJiraSvn.Core.Models;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -36,7 +36,7 @@ namespace MoreConvenientJiraSvn.Plugin.Jira2LocalDir
 
         private void ListBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
-            if (sender is ListBox listBox && listBox.DataContext is FieldModel field)
+            if (sender is ListBox listBox && listBox.DataContext is JiraField field)
             {
                 // 清空已选值并添加新的选中项  
                 field.SelectedValues?.Clear();

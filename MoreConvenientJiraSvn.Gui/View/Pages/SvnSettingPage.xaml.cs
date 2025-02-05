@@ -1,4 +1,4 @@
-﻿using MoreConvenientJiraSvn.Core.Model;
+﻿using MoreConvenientJiraSvn.Core.Models;
 using MoreConvenientJiraSvn.Core.Utils;
 using MoreConvenientJiraSvn.Gui.ViewModel;
 using System.Windows;

@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using MoreConvenientJiraSvn.Core.Model;
+using MoreConvenientJiraSvn.Core.Models;
 using MoreConvenientJiraSvn.Core.Service;
 using System;
 using System.Collections.Generic;
@@ -22,11 +22,11 @@ namespace MoreConvenientJiraSvn.Gui.ViewModel
         private readonly CheckSqlHostedService _checkSqlHostedService = checkSqlHostedService;
 
         [ObservableProperty]
-        private HostedServiceConfig _hostedServiceConfig = new();
+        private BackgroundTaskConfig _hostedServiceConfig = new();
 
         public void InitViewModel()
         {
-            HostedServiceConfig = _settingService.GetSingleSettingFromDatabase<HostedServiceConfig>() ?? new();
+            HostedServiceConfig = _settingService.GetSingleSettingFromDatabase<BackgroundTaskConfig>() ?? new();
         }
 
         [RelayCommand]

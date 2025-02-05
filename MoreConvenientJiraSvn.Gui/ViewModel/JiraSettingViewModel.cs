@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using MoreConvenientJiraSvn.Core.Model;
+using MoreConvenientJiraSvn.Core.Models;
 using MoreConvenientJiraSvn.Core.Service;
 
 namespace MoreConvenientJiraSvn.Gui.ViewModel

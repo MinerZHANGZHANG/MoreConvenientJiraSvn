@@ -1,10 +1,10 @@
-﻿
-using MoreConvenientJiraSvn.Core.Model;
+﻿using MoreConvenientJiraSvn.Core.Enums;
+using MoreConvenientJiraSvn.Core.Models;
 using System.ComponentModel;
-using System.Globalization;
 using System.Reflection;
 
 namespace MoreConvenientJiraSvn.Core.Utils;
+
 public static class EnumHelper
 {
     public static List<EnumDescription> GetEnumDescriptions<T>() where T : Enum

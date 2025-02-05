@@ -2,7 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using LiteDB;
 using Microsoft.Extensions.DependencyInjection;
-using MoreConvenientJiraSvn.Core.Model;
+using MoreConvenientJiraSvn.Core.Models;
 using MoreConvenientJiraSvn.Core.Service;
 using MoreConvenientJiraSvn.Core.Utils;
 using System.Windows;
@@ -145,12 +145,12 @@ public partial class SvnJiraLinkViewModel(ServiceProvider serviceProvider) : Obs
     [RelayCommand]
     public void SetRelationVersion()
     {
-        if (SelectedPath != null && SelectPathRelation?.FixVersion != null)
+        if (SelectedPath != null && SelectPathRelation?.Version != null)
         {
             var relation = _dataService.SelectOneByExpression<JiraSvnPathRelation>(Query.EQ(nameof(JiraSvnPathRelation.SvnPath), SelectedPath.Path));
             if (relation != null)
             {
-                relation.FixVersion = SelectPathRelation.FixVersion;
+                relation.FixVersion = SelectPathRelation.Version;
             }
             else
             {

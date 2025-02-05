@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" />
+    <PackageReference Include="LiteDB" Version="5.0.21" />
+    <PackageReference Include="SharpSvn" Version="1.14003.290" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="9.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AntlrUtil\MoreConvenientJiraSvn.AntlrUtil.csproj" />
+    <ProjectReference Include="..\MoreConvenientJiraSvn.Core\MoreConvenientJiraSvn.Core.csproj" />
+  </ItemGroup>
+
+</Project>

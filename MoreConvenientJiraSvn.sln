@@ -3,13 +3,43 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.12.35209.166
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MoreConvenientJiraSvn.Gui", "MoreConvenientJiraSvn.Gui\MoreConvenientJiraSvn.Gui.csproj", "{7CCAEDC2-FA7E-46DB-9B52-7AB37C84B615}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MoreConvenientJiraSvn.App", "MoreConvenientJiraSvn.Gui\MoreConvenientJiraSvn.App.csproj", "{7CCAEDC2-FA7E-46DB-9B52-7AB37C84B615}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0F723442-8D49-4D22-A7B8-23B3DA8EE995} = {0F723442-8D49-4D22-A7B8-23B3DA8EE995}
+		{91EF96EC-69B1-484A-B944-7874B6402F0E} = {91EF96EC-69B1-484A-B944-7874B6402F0E}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MoreConvenientJiraSvn.Core", "MoreConvenientJiraSvn.Core\MoreConvenientJiraSvn.Core.csproj", "{5F60230F-94FB-4A29-91C0-23D206A14792}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MoreConvenientJiraSvn.Plugin", "MoreConvenientJiraSvn.Plugin\MoreConvenientJiraSvn.Plugin.csproj", "{FC33896F-FF8B-427B-943E-DEF75FB33CF1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AntlrUtil", "AntlrUtil\AntlrUtil.csproj", "{B49FC2FB-3B12-4281-8C99-7DFC9681A2D4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoreConvenientJiraSvn.AntlrUtil", "AntlrUtil\MoreConvenientJiraSvn.AntlrUtil.csproj", "{B49FC2FB-3B12-4281-8C99-7DFC9681A2D4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoreConvenientJiraSvn.Infrastructure", "MoreConvenientJiraSvn.Infrastructure\MoreConvenientJiraSvn.Infrastructure.csproj", "{B0319228-3CF9-478C-9CB2-B8D0D0FA1AFE}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5F60230F-94FB-4A29-91C0-23D206A14792} = {5F60230F-94FB-4A29-91C0-23D206A14792}
+		{B49FC2FB-3B12-4281-8C99-7DFC9681A2D4} = {B49FC2FB-3B12-4281-8C99-7DFC9681A2D4}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoreConvenientJiraSvn.Service", "MoreConvenientJiraSvn.Service\MoreConvenientJiraSvn.Service.csproj", "{0F723442-8D49-4D22-A7B8-23B3DA8EE995}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5F60230F-94FB-4A29-91C0-23D206A14792} = {5F60230F-94FB-4A29-91C0-23D206A14792}
+		{B0319228-3CF9-478C-9CB2-B8D0D0FA1AFE} = {B0319228-3CF9-478C-9CB2-B8D0D0FA1AFE}
+		{B49FC2FB-3B12-4281-8C99-7DFC9681A2D4} = {B49FC2FB-3B12-4281-8C99-7DFC9681A2D4}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoreConvenientJiraSvn.BackgroundTasks", "MoreConvenientJiraSvn.BackgroundTasks\MoreConvenientJiraSvn.BackgroundTasks.csproj", "{91EF96EC-69B1-484A-B944-7874B6402F0E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0F723442-8D49-4D22-A7B8-23B3DA8EE995} = {0F723442-8D49-4D22-A7B8-23B3DA8EE995}
+		{5F60230F-94FB-4A29-91C0-23D206A14792} = {5F60230F-94FB-4A29-91C0-23D206A14792}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoreConvenientJiraSvn.Test", "MoreConvenientJiraSvn.Test\MoreConvenientJiraSvn.Test.csproj", "{D4E0BAEB-D8E5-4B36-83BF-DB7431458A1C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{11D3C3E4-50F8-41E2-95C2-447777C42D4A}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +63,22 @@ Global
 		{B49FC2FB-3B12-4281-8C99-7DFC9681A2D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B49FC2FB-3B12-4281-8C99-7DFC9681A2D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B49FC2FB-3B12-4281-8C99-7DFC9681A2D4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B0319228-3CF9-478C-9CB2-B8D0D0FA1AFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0319228-3CF9-478C-9CB2-B8D0D0FA1AFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0319228-3CF9-478C-9CB2-B8D0D0FA1AFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0319228-3CF9-478C-9CB2-B8D0D0FA1AFE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0F723442-8D49-4D22-A7B8-23B3DA8EE995}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0F723442-8D49-4D22-A7B8-23B3DA8EE995}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0F723442-8D49-4D22-A7B8-23B3DA8EE995}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0F723442-8D49-4D22-A7B8-23B3DA8EE995}.Release|Any CPU.Build.0 = Release|Any CPU
+		{91EF96EC-69B1-484A-B944-7874B6402F0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{91EF96EC-69B1-484A-B944-7874B6402F0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{91EF96EC-69B1-484A-B944-7874B6402F0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{91EF96EC-69B1-484A-B944-7874B6402F0E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D4E0BAEB-D8E5-4B36-83BF-DB7431458A1C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D4E0BAEB-D8E5-4B36-83BF-DB7431458A1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D4E0BAEB-D8E5-4B36-83BF-DB7431458A1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D4E0BAEB-D8E5-4B36-83BF-DB7431458A1C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

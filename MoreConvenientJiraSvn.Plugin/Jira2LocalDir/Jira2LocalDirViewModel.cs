@@ -3,7 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using LiteDB;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
-using MoreConvenientJiraSvn.Core.Model;
+using MoreConvenientJiraSvn.Core.Models;
 using MoreConvenientJiraSvn.Core.Service;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -50,14 +50,14 @@ public partial class Jira2LocalDirViewModel(ServiceProvider serviceProvider) : O
 
     // Jira list
     [ObservableProperty]
-    private List<JiraInfo>? _jiraInfoList;
+    private List<IssueInfo>? _jiraInfoList;
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasJiraBeSelected))]
     [NotifyCanExecuteChangedFor(nameof(UseSelectedToCreateLocalJiraCommand))]
     [NotifyCanExecuteChangedFor(nameof(CopyCommitTextCommand))]
     [NotifyCanExecuteChangedFor(nameof(CopyAnnotationTextCommand))]
     [NotifyCanExecuteChangedFor(nameof(OpenWebPageCommand))]
-    private JiraInfo? _selectedJiraInfo;
+    private IssueInfo? _selectedJiraInfo;
 
     public bool HasJiraBeSelected => SelectedJiraInfo != null;
 
@@ -110,16 +110,16 @@ public partial class Jira2LocalDirViewModel(ServiceProvider serviceProvider) : O
     private bool _isNotQuerySvnLoging = true;
 
     [ObservableProperty]
-    private ObservableCollection<Transition> _transitions = [];
+    private ObservableCollection<JiraTransition> _transitions = [];
 
     [ObservableProperty]
-    private Transition? _selectedTransition;
+    private JiraTransition? _selectedTransition;
 
     [ObservableProperty]
-    private OperationModel? _selectedOperation;
+    private JiraOperation? _selectedOperation;
 
     [ObservableProperty]
-    private ObservableCollection<FieldModel> _fieldModels = [];
+    private ObservableCollection<JiraField> _fieldModels = [];
 
     public bool HasSvnLog => SelectedJiraSvnLogs.Count > 0;
 
@@ -145,7 +145,7 @@ public partial class Jira2LocalDirViewModel(ServiceProvider serviceProvider) : O
     public async Task QueryJiraInfo()
     {
         // need add page func
-        List<JiraInfo> tempJiraInfoList = [];
+        List<IssueInfo> tempJiraInfoList = [];
         switch (SelectedJiraQueryType)
         {
             case JiraQueryType.JiraId:
@@ -178,12 +178,12 @@ public partial class Jira2LocalDirViewModel(ServiceProvider serviceProvider) : O
             return;
         }
 
-        SelectedJiraLocalInfo = _dataService.SelectOneByExpression<LocalJiraInfo>(BsonExpression.Create($"JiraId = \"{SelectedJiraInfo.JiraId}\""));
+        SelectedJiraLocalInfo = _dataService.SelectOneByExpression<LocalJiraInfo>(BsonExpression.Create($"IssueKey = \"{SelectedJiraInfo.IssueKey}\""));
 
         RelatSvnPaths = _jiraService.GetRelatSvnPath(SelectedJiraInfo).ToList();
         SelectedSvnPath = RelatSvnPaths.FirstOrDefault();
 
-        Transitions = new(await _jiraService.GetTransitionsByIssueId(SelectedJiraInfo.JiraId));
+        Transitions = new(await _jiraService.GetTransitionsByIssueId(SelectedJiraInfo.IssueKey));
         SelectedTransition = Transitions.FirstOrDefault();
     }
 
@@ -194,7 +194,7 @@ public partial class Jira2LocalDirViewModel(ServiceProvider serviceProvider) : O
             return;
         }
 
-        SelectedJiraSvnLogs = [.. _jiraService.GetSvnLogByJiraIdLocal(SelectedJiraInfo.JiraId, SelectedSvnPath.Path).OrderByDescending(log => log.DateTime)];
+        SelectedJiraSvnLogs = [.. _jiraService.GetSvnLogByJiraIdLocal(SelectedJiraInfo.IssueKey, SelectedSvnPath.Path).OrderByDescending(log => log.DateTime)];
 
         NewestSvnLog = SelectedJiraSvnLogs?.FirstOrDefault();
         OldestSvnLog = SelectedJiraSvnLogs?.LastOrDefault();
@@ -207,17 +207,17 @@ public partial class Jira2LocalDirViewModel(ServiceProvider serviceProvider) : O
         {
             return;
         }
-        StringBuilder commitText = new($"版本：{SelectedJiraInfo.FixVersionNameText}\r\n");
-        if (!string.IsNullOrEmpty(SelectedJiraInfo.ParentJiraId))
+        StringBuilder commitText = new($"版本：{SelectedJiraInfo.VersionsText}\r\n");
+        if (!string.IsNullOrEmpty(SelectedJiraInfo.ParentIssueKey))
         {
-            commitText.AppendLine($"需求编号：{SelectedJiraInfo.ParentJiraId}");
-            commitText.AppendLine($"内容概要：{SelectedJiraInfo.ParentSummary}");
-            commitText.AppendLine($"缺陷编号：{SelectedJiraInfo.JiraId}");
+            commitText.AppendLine($"需求编号：{SelectedJiraInfo.ParentIssueKey}");
+            commitText.AppendLine($"内容概要：{SelectedJiraInfo.ParentIssueSummary}");
+            commitText.AppendLine($"缺陷编号：{SelectedJiraInfo.IssueKey}");
             commitText.Append($"内容概要：{SelectedJiraInfo.Summary}");
         }
         else
         {
-            commitText.AppendLine($"需求编号：{SelectedJiraInfo.JiraId}");
+            commitText.AppendLine($"需求编号：{SelectedJiraInfo.IssueKey}");
             commitText.AppendLine($"内容概要：{SelectedJiraInfo.Summary}");
             commitText.AppendLine($"缺陷编号：");
             commitText.Append($"内容概要：");
@@ -240,7 +240,7 @@ public partial class Jira2LocalDirViewModel(ServiceProvider serviceProvider) : O
         }
         try
         {
-            var text = $"{DateTime.Today:yyyy-MM-dd} {LocalJiraSetting.UserName} {SelectedJiraInfo.JiraId} {SelectedJiraInfo.Summary}";
+            var text = $"{DateTime.Today:yyyy-MM-dd} {LocalJiraSetting.UserName} {SelectedJiraInfo.IssueKey} {SelectedJiraInfo.Summary}";
             Clipboard.SetText(text);
             MessageBox.Show("复制成功!");
         }
@@ -253,7 +253,7 @@ public partial class Jira2LocalDirViewModel(ServiceProvider serviceProvider) : O
     [RelayCommand(CanExecute = nameof(HasJiraBeSelected))]
     public void OpenWebPage()
     {
-        string? url = $"{_jiraService.Config.BaseUrl}browse/{SelectedJiraInfo?.JiraId}";
+        string? url = $"{_jiraService.Config.BaseUrl}browse/{SelectedJiraInfo?.IssueKey}";
         if (string.IsNullOrEmpty(url))
         {
             return;
@@ -301,32 +301,32 @@ public partial class Jira2LocalDirViewModel(ServiceProvider serviceProvider) : O
         // Local path create dir used jira name
         if (Directory.Exists(LocalJiraSetting.ParentDir))
         {
-            string dirName = $"{SelectedJiraInfo.JiraId}-{SelectedJiraInfo.Summary}";
+            string dirName = $"{SelectedJiraInfo.IssueKey}-{SelectedJiraInfo.Summary}";
             string fullDirName = Path.Combine(LocalJiraSetting.ParentDir, dirName);
             if (Directory.Exists(fullDirName))
             {
                 MessageBox.Show($"{LocalJiraSetting.ParentDir}目录下已经有一个{dirName}文件夹了!");
-                SelectedJiraLocalInfo = new() { JiraId = SelectedJiraInfo.JiraId, LocalDir = fullDirName };
+                SelectedJiraLocalInfo = new() { JiraId = SelectedJiraInfo.IssueKey, LocalDir = fullDirName };
                 _dataService.InsertOrUpdate<LocalJiraInfo>(SelectedJiraLocalInfo);
                 return;
             }
 
             DirectoryInfo directoryInfo = Directory.CreateDirectory(fullDirName);
 
-            string commitFileFullName = Path.Combine(fullDirName, $"提交文本-{SelectedJiraInfo.JiraId}.txt");
+            string commitFileFullName = Path.Combine(fullDirName, $"提交文本-{SelectedJiraInfo.IssueKey}.txt");
             if (!File.Exists(commitFileFullName))
             {
-                StringBuilder commitText = new($"版本：{SelectedJiraInfo.FixVersionNameText}\r\n");
-                if (!string.IsNullOrEmpty(SelectedJiraInfo.ParentJiraId))
+                StringBuilder commitText = new($"版本：{SelectedJiraInfo.VersionsText}\r\n");
+                if (!string.IsNullOrEmpty(SelectedJiraInfo.ParentIssueKey))
                 {
-                    commitText.AppendLine($"需求编号：{SelectedJiraInfo.ParentJiraId}");
-                    commitText.AppendLine($"内容概要：{SelectedJiraInfo.ParentSummary}");
-                    commitText.AppendLine($"缺陷编号：{SelectedJiraInfo.JiraId}");
+                    commitText.AppendLine($"需求编号：{SelectedJiraInfo.ParentIssueKey}");
+                    commitText.AppendLine($"内容概要：{SelectedJiraInfo.ParentIssueSummary}");
+                    commitText.AppendLine($"缺陷编号：{SelectedJiraInfo.IssueKey}");
                     commitText.Append($"内容概要：{SelectedJiraInfo.Summary}");
                 }
                 else
                 {
-                    commitText.AppendLine($"需求编号：{SelectedJiraInfo.JiraId}");
+                    commitText.AppendLine($"需求编号：{SelectedJiraInfo.IssueKey}");
                     commitText.AppendLine($"内容概要：{SelectedJiraInfo.Summary}");
                     commitText.AppendLine($"缺陷编号：");
                     commitText.Append($"内容概要：");
@@ -334,7 +334,7 @@ public partial class Jira2LocalDirViewModel(ServiceProvider serviceProvider) : O
                 await File.WriteAllTextAsync(commitFileFullName, commitText.ToString());
             }
 
-            string documentFileFullName = Path.Combine(fullDirName, $"{SelectedJiraInfo.JiraId}-{LocalJiraSetting.UserName}-{SelectedJiraInfo.Summary}.txt");
+            string documentFileFullName = Path.Combine(fullDirName, $"{SelectedJiraInfo.IssueKey}-{LocalJiraSetting.UserName}-{SelectedJiraInfo.Summary}.txt");
             if (!File.Exists(documentFileFullName))
             {
                 StringBuilder documentText = new($"一、需求描述:\r\n");
@@ -357,7 +357,7 @@ public partial class Jira2LocalDirViewModel(ServiceProvider serviceProvider) : O
 
             // todo:support download extra file
 
-            SelectedJiraLocalInfo = new() { JiraId = SelectedJiraInfo.JiraId, LocalDir = fullDirName };
+            SelectedJiraLocalInfo = new() { JiraId = SelectedJiraInfo.IssueKey, LocalDir = fullDirName };
             _dataService.InsertOrUpdate<LocalJiraInfo>(SelectedJiraLocalInfo);
 
             MessageBox.Show($"创建[{fullDirName}]文件夹成功!");
@@ -518,12 +518,12 @@ public partial class Jira2LocalDirViewModel(ServiceProvider serviceProvider) : O
         RefreshSelectPathSvnLog();
     }
 
-    partial void OnSelectedTransitionChanged(Transition? value)
+    partial void OnSelectedTransitionChanged(JiraTransition? value)
     {
         HandleTransitionChange(value);
     }
 
-    private void HandleTransitionChange(Transition? transition)
+    private void HandleTransitionChange(JiraTransition? transition)
     {
         if (transition == null)
         { 

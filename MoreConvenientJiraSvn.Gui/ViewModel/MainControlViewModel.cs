@@ -1,7 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using MoreConvenientJiraSvn.Core.Model;
+using MoreConvenientJiraSvn.Core.Models;
 using MoreConvenientJiraSvn.Core.Service;
 
 namespace MoreConvenientJiraSvn.Gui.ViewModel
@@ -10,12 +10,12 @@ namespace MoreConvenientJiraSvn.Gui.ViewModel
     {
         private readonly DataService _dataService;
         [ObservableProperty]
-        private ObservableCollection<PluginMessage> _pluginMessages;
+        private ObservableCollection<BackgroundTaskMessage> _pluginMessages;
 
         public MainControlViewModel(DataService dataService)
         {
             this._dataService = dataService;
-            PluginMessages = [.. _dataService.SelectAll<PluginMessage>()];
+            PluginMessages = [.. _dataService.SelectAll<BackgroundTaskMessage>()];
         }
 
         [RelayCommand]
@@ -28,7 +28,7 @@ namespace MoreConvenientJiraSvn.Gui.ViewModel
         [RelayCommand]
         public void RefreshMessage()
         {
-            PluginMessages = [.. _dataService.SelectAll<PluginMessage>()];
+            PluginMessages = [.. _dataService.SelectAll<BackgroundTaskMessage>()];
         }
     }
 }
