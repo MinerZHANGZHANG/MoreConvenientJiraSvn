@@ -10,5 +10,6 @@ public record BackgroundTaskConfig
     public List<string> CheckSqlDirectoies { get; set; } = [];
 
     public List<string> NeedAutoRefreshFliterNames { get; set; } = [];
+    public List<string> NeedAutoRefreshSvnPaths { get; set; } = [];
 }
 

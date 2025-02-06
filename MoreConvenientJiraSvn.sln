@@ -13,28 +13,28 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MoreConvenientJiraSvn.Core"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MoreConvenientJiraSvn.Plugin", "MoreConvenientJiraSvn.Plugin\MoreConvenientJiraSvn.Plugin.csproj", "{FC33896F-FF8B-427B-943E-DEF75FB33CF1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoreConvenientJiraSvn.AntlrUtil", "AntlrUtil\MoreConvenientJiraSvn.AntlrUtil.csproj", "{B49FC2FB-3B12-4281-8C99-7DFC9681A2D4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MoreConvenientJiraSvn.AntlrUtil", "AntlrUtil\MoreConvenientJiraSvn.AntlrUtil.csproj", "{B49FC2FB-3B12-4281-8C99-7DFC9681A2D4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoreConvenientJiraSvn.Infrastructure", "MoreConvenientJiraSvn.Infrastructure\MoreConvenientJiraSvn.Infrastructure.csproj", "{B0319228-3CF9-478C-9CB2-B8D0D0FA1AFE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MoreConvenientJiraSvn.Infrastructure", "MoreConvenientJiraSvn.Infrastructure\MoreConvenientJiraSvn.Infrastructure.csproj", "{B0319228-3CF9-478C-9CB2-B8D0D0FA1AFE}"
 	ProjectSection(ProjectDependencies) = postProject
 		{5F60230F-94FB-4A29-91C0-23D206A14792} = {5F60230F-94FB-4A29-91C0-23D206A14792}
 		{B49FC2FB-3B12-4281-8C99-7DFC9681A2D4} = {B49FC2FB-3B12-4281-8C99-7DFC9681A2D4}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoreConvenientJiraSvn.Service", "MoreConvenientJiraSvn.Service\MoreConvenientJiraSvn.Service.csproj", "{0F723442-8D49-4D22-A7B8-23B3DA8EE995}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MoreConvenientJiraSvn.Service", "MoreConvenientJiraSvn.Service\MoreConvenientJiraSvn.Service.csproj", "{0F723442-8D49-4D22-A7B8-23B3DA8EE995}"
 	ProjectSection(ProjectDependencies) = postProject
 		{5F60230F-94FB-4A29-91C0-23D206A14792} = {5F60230F-94FB-4A29-91C0-23D206A14792}
 		{B0319228-3CF9-478C-9CB2-B8D0D0FA1AFE} = {B0319228-3CF9-478C-9CB2-B8D0D0FA1AFE}
 		{B49FC2FB-3B12-4281-8C99-7DFC9681A2D4} = {B49FC2FB-3B12-4281-8C99-7DFC9681A2D4}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoreConvenientJiraSvn.BackgroundTasks", "MoreConvenientJiraSvn.BackgroundTasks\MoreConvenientJiraSvn.BackgroundTasks.csproj", "{91EF96EC-69B1-484A-B944-7874B6402F0E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MoreConvenientJiraSvn.BackgroundTask", "MoreConvenientJiraSvn.BackgroundTasks\MoreConvenientJiraSvn.BackgroundTask.csproj", "{91EF96EC-69B1-484A-B944-7874B6402F0E}"
 	ProjectSection(ProjectDependencies) = postProject
 		{0F723442-8D49-4D22-A7B8-23B3DA8EE995} = {0F723442-8D49-4D22-A7B8-23B3DA8EE995}
 		{5F60230F-94FB-4A29-91C0-23D206A14792} = {5F60230F-94FB-4A29-91C0-23D206A14792}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoreConvenientJiraSvn.Test", "MoreConvenientJiraSvn.Test\MoreConvenientJiraSvn.Test.csproj", "{D4E0BAEB-D8E5-4B36-83BF-DB7431458A1C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MoreConvenientJiraSvn.Test", "MoreConvenientJiraSvn.Test\MoreConvenientJiraSvn.Test.csproj", "{D4E0BAEB-D8E5-4B36-83BF-DB7431458A1C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{11D3C3E4-50F8-41E2-95C2-447777C42D4A}"
 	ProjectSection(SolutionItems) = preProject

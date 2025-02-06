@@ -1,77 +1,86 @@
 ﻿using LiteDB;
+using MoreConvenientJiraSvn.Core.Enums;
+using MoreConvenientJiraSvn.Core.Interfaces;
 using MoreConvenientJiraSvn.Core.Models;
+using MoreConvenientJiraSvn.Service;
 using System.Text;
 
-namespace MoreConvenientJiraSvn.Core.Service;
+namespace MoreConvenientJiraSvn.BackgroundTask;
 
-public class DownloadSvnLogHostedService(DataService dataService, SvnService svnService, NotificationService notificationService)
+public class DownloadSvnLogHostedService(IRepository repository, SvnService svnService, LogService logService, SettingService settingService)
     : TimedHostedService(new TimeSpan(9, 30, 0), TimeSpan.FromMinutes(5), 3)
 {
-    private readonly DataService _dataService = dataService;
+    private readonly IRepository _repository = repository;
+
     private readonly SvnService _svnService = svnService;
-    private readonly NotificationService _notificationService = notificationService;
+    private readonly LogService _logService = logService;
+    private readonly SettingService _settingService = settingService;
 
     public override async Task<bool> ExecuteTask()
     {
-        HostTaskLog hostTaskLog = new()
+        BackgroundTaskLog taskLog = new()
         {
-            DateTime = DateTime.Now,
-            TaskServiceName = nameof(DownloadSvnLogHostedService),
+            StartTime = DateTime.Now,
+            TaskName = nameof(DownloadSvnLogHostedService),
             IsSucccess = false,
         };
+        List<BackgroundTaskMessage> taskMessages = [];
 
-        if (_svnService.Paths.Count > 0
-            && (!_svnService.Config?.IsAutoUpdateLogDaily ?? false))
+        var needAutoRefreshSvnPaths = _settingService.FindSetting<BackgroundTaskConfig>()?.NeedAutoRefreshSvnPaths ?? [];
+        var svnPaths = _svnService.SvnPaths.Where(p => needAutoRefreshSvnPaths.Contains(p.Path));
+        if (svnPaths.Any())
         {
             // todo:add default date to svn config / use version instead
-            var successPathCount = 0;
-            var messageBuilder = new StringBuilder();
-            await Task.Run(() =>
+            var updatePathCount = 0;
+            var updateLogTotal = 0;
+
+            foreach (var path in svnPaths)
             {
-                var updateLogCount = 0;
-                foreach (var path in _svnService.Paths)
+                var latestLog = _repository.Find<SvnLog>(Query.EQ(nameof(SvnLog.SvnPath), path.Path))
+                    .OrderByDescending(log => log.DateTime)
+                    .FirstOrDefault();
+                var pathBeginTime = latestLog != null ? latestLog.DateTime : DateTime.Today;
+                var pathEndTime = DateTime.Today.AddDays(1);
+
+                try
                 {
-                    var isHaveJiraId = path.SvnPathType == SvnPathType.Code || path.SvnPathType == SvnPathType.Document;
-                    var latestLog = _dataService.SelectByExpression<SvnLog>(Query.EQ(nameof(SvnLog.SvnPath), path.Path))
-                        .OrderByDescending(log => log.DateTime)
-                        .FirstOrDefault();
-                    var pathBeginTime = latestLog != null ? latestLog.DateTime : DateTime.Today;
-                    var pathEndTime = DateTime.Today.AddDays(1);
+                    IEnumerable<SvnLog> logs = await _svnService.GetSvnLogs(path.Path, pathBeginTime, pathEndTime, _svnService.SvnConfig.MaxResultInSingleQuery, path.IsNeedExtractJiraId);
 
-                    try
+                    updateLogTotal += _repository.Upsert(logs);
+                    updatePathCount += 1;
+
+                    taskMessages.Add(new()
                     {
-                        var logs = _svnService.GetSvnLogs(path.Path, pathBeginTime, pathEndTime, 500, isNeedExtractJiraId: isHaveJiraId);
-                        var upsertCount= _dataService.InsertOrUpdateMany(logs);
-
-                        if (upsertCount != logs.Count)
-                        {
-                            throw new Exception($"获取和保存到数据库的数量Log数不一致!Log({logs.Count})|Database({upsertCount})");
-                        }
-
-                        updateLogCount += logs.Count;
-                        successPathCount += 1;
-                        messageBuilder.AppendLine($"成功获取SVN日志并保存,路径:{path.Path}({pathBeginTime}->{pathEndTime}) 数量:{updateLogCount}");
-                    }
-                    catch (Exception ex)
-                    {
-                        messageBuilder.AppendLine($"获取SVN日志并保存的过程中出错：路径:{path.Path}({pathBeginTime}->{pathEndTime}) 错误:{ex.Message}");
-                        break;
-                    }
+                        Info = $"成功获取SVN日志并保存,路径:{path.Path}({pathBeginTime}->{pathEndTime}) 数量:{updateLogTotal}",
+                        Level = InfoLevel.Normal,
+                    });
                 }
-                hostTaskLog.IsSucccess = successPathCount == _svnService.Paths.Count;
-                hostTaskLog.Message = messageBuilder.ToString();
-            });
+                catch (Exception ex)
+                {
+                    taskMessages.Add(new()
+                    {
+                        Info = $"获取SVN日志并保存的过程中出错：路径:{path.Path}({pathBeginTime}->{pathEndTime}) 错误:{ex.Message}",
+                        Level = InfoLevel.Error,
+                    });
+                }
+            }
+
+            taskLog.IsSucccess = updatePathCount == svnPaths.Count();
+            taskLog.Summary = $"SVN日志更新完成，成功更新了{updatePathCount}个路径";
+            taskLog.MessageIds = taskMessages.Select(x => x.Id);
         }
         else
         {
-            hostTaskLog.IsSucccess = false;
-            hostTaskLog.Message = "没有开启svn自动更新log，或未添加svn路径";
+            taskLog.IsSucccess = true;
+            taskLog.Level = InfoLevel.Normal;
+            taskLog.Summary = "没有设置需要自动更新的Svn路径，或对应的路径已在Svn配置页面删除";
         }
-        _dataService.Insert(hostTaskLog);
 
-        _notificationService.ShowNotification($"后台更新SvnLog结束", hostTaskLog.Message);
+        _repository.Insert(taskLog);
+        _repository.Insert(taskMessages);
 
-        return hostTaskLog.IsSucccess;
+        _logService.Debug(taskLog.Summary);
 
+        return taskLog.IsSucccess;
     }
 }

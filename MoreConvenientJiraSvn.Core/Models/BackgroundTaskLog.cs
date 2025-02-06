@@ -7,10 +7,10 @@ public class BackgroundTaskLog
 {
     [BsonId]
     public ObjectId Id { get; set; } = ObjectId.NewObjectId();
-    public List<ObjectId> MessageIds { get; set; } = [];
+    public IEnumerable<ObjectId> MessageIds { get; set; } = [];
     public string TaskName { get; set; } = string.Empty;
     public string Summary { get; set; } = string.Empty;
     public bool IsSucccess { get; set; }
     public InfoLevel Level { get; set; }
-    public DateTime FinishTime { get; set; }
+    public DateTime StartTime { get; set; }
 }

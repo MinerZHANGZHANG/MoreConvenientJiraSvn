@@ -27,7 +27,7 @@ public class SettingService(IRepository repository)
         return result;
     }
 
-    public int UpsertSettings<T>(List<T> objs) where T : new()
+    public int UpsertSettings<T>(IEnumerable<T> objs) where T : new()
     {
         var result = _repository.Upsert<T>(objs);
         OnConfigChanged?.Invoke(this, new(_repository.FindAll<T>()));

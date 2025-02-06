@@ -10,7 +10,7 @@ public record SvnConfig
     public string UserName { get; set; } = string.Empty;
     // Yes, use really value :), take care your data file
     public string UserPassword { get; set; } = string.Empty;
-    public bool IsAutoUpdateLogDaily { get; set; } = false;
+    public int MaxResultInSingleQuery { get; set; } = 65535;
     public List<ObjectId> PathIds { get; set; } = [];
 }
 
