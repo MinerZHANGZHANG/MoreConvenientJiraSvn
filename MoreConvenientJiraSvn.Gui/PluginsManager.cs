@@ -2,7 +2,7 @@
 using MoreConvenientJiraSvn.Plugin;
 using System.Reflection;
 
-namespace MoreConvenientJiraSvn.Gui
+namespace MoreConvenientJiraSvn.App
 {
     internal static class PluginsManager
     {

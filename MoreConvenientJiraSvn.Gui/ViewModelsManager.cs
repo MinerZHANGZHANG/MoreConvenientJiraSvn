@@ -1,7 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace MoreConvenientJiraSvn.Gui
+namespace MoreConvenientJiraSvn.App
 {
     internal static class ViewModelsManager
     {

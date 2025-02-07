@@ -21,15 +21,6 @@
     <Compile Update="ConfigLine.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="SvnJiraLink\SvnJiraLinkWindow.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Page Update="SvnJiraLink\SvnJiraLinkWindow.xaml">
-      <SubType>Designer</SubType>
-    </Page>
   </ItemGroup>
 
 </Project>

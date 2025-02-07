@@ -1,0 +1,134 @@
+﻿<Window
+    x:Class="MoreConvenientJiraSvn.App.Views.Windows.SqlCheckWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:control="clr-namespace:MoreConvenientJiraSvn.App.Views.Controls"
+    xmlns:convert="clr-namespace:MoreConvenientJiraSvn.App.Converts"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:MoreConvenientJiraSvn.App.Views.Windows"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:modelView="clr-namespace:MoreConvenientJiraSvn.App.ViewModels"
+    Title="Sql正确性校验"
+    Width="595"
+    Height="720"
+    d:DataContext="{d:DesignInstance Type=modelView:SqlCheckViewModel}"
+    Style="{StaticResource MaterialDesignWindow}"
+    mc:Ignorable="d">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <materialDesign:BundledTheme
+                    BaseTheme="Light"
+                    PrimaryColor="DeepPurple"
+                    SecondaryColor="Lime" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+            <Style BasedOn="{StaticResource MaterialDesignBody1TextBlock}" TargetType="TextBlock">
+                <Setter Property="Margin" Value="2" />
+            </Style>
+            <Style x:Key="StackPanelStyle" TargetType="Border">
+                <Setter Property="BorderThickness" Value="2" />
+                <Setter Property="BorderBrush" Value="Gray" />
+                <Setter Property="Margin" Value="6" />
+                <Setter Property="Padding" Value="6" />
+            </Style>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <StackPanel Orientation="Vertical">
+
+        <!--  Directory check  -->
+        <Expander Header="设置检测路径" IsExpanded="True">
+            <StackPanel
+                Grid.Row="0"
+                Margin="10"
+                Orientation="Vertical">
+                <control:ConfigLine Margin="4" ConfigName="检测路径">
+                    <DockPanel>
+                        <Button
+                            Width="60"
+                            HorizontalAlignment="Right"
+                            Command="{Binding SetCheckDirCommand}"
+                            Content="选择"
+                            DockPanel.Dock="Right" />
+                        <TextBox
+                            MinWidth="160"
+                            materialDesign:HintAssist.Hint="双击选择SQL文件夹路径"
+                            DockPanel.Dock="Left"
+                            IsReadOnly="True"
+                            MouseDoubleClick="TextBox_MouseDoubleClick"
+                            Style="{StaticResource MaterialDesignTextBox}"
+                            Text="{Binding Setting.DefaultDir}" />
+                    </DockPanel>
+                </control:ConfigLine>
+
+                <DockPanel Margin="4">
+                    <TextBlock Text="{Binding CheckStateText}" />
+                    <Button
+                        x:Name="CheckButton"
+                        Width="100"
+                        HorizontalAlignment="Right"
+                        Command="{Binding CheckDirCommand}"
+                        Content="检测SQL"
+                        DockPanel.Dock="Right" />
+                </DockPanel>
+
+                <ProgressBar
+                    Height="16"
+                    Margin="4"
+                    Value="{Binding CheckStateProgress}" />
+            </StackPanel>
+        </Expander>
+
+        <!--  Issues list  -->
+        <Expander Header="问题列表" IsExpanded="True">
+            <DockPanel Height="400">
+                <ListView Margin="4" ItemsSource="{Binding SqlIssues}">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn
+                                Width="Auto"
+                                DisplayMemberBinding="{Binding Message}"
+                                Header="问题描述" />
+                            <GridViewColumn Width="Auto" Header="文件路径">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button
+                                            Command="{Binding DataContext.OpenSqlFileCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                            CommandParameter="{Binding FilePath}"
+                                            Content="{Binding FilePath}" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+
+            </DockPanel>
+
+        </Expander>
+
+        <!--  Single file check  -->
+        <Expander Header="单个文件检测" IsExpanded="True">
+            <Border
+                x:Name="FileSelectArea"
+                Grid.Row="2"
+                Height="50"
+                Margin="10"
+                AllowDrop="True"
+                BorderBrush="Black"
+                BorderThickness="1"
+                Drop="FileSelectArea_Drop">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <Button
+                        Command="{Binding SetCheckFileCommand}"
+                        Content="拖拽单个文件到区域内 或 点击选择文件..."
+                        Style="{StaticResource MaterialDesignToolButton}" />
+                </StackPanel>
+            </Border>
+        </Expander>
+    </StackPanel>
+
+</Window>

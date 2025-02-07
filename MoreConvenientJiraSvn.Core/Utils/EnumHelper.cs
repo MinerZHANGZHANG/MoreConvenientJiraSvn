@@ -19,13 +19,13 @@ public static class EnumHelper
                    .ToList();
     }
 
-    private static string GetEnumDescription<T>(T value) where T : notnull
+    public static string GetEnumDescription<T>(T value) where T : notnull
     {
         FieldInfo? field = value?.GetType()?.GetField(value.ToString() ?? string.Empty);
         return field?.GetCustomAttributes(typeof(DescriptionAttribute), false)
-                      .FirstOrDefault() is not DescriptionAttribute attribute
-                      ? value?.ToString() ?? string.Empty
-                      : attribute.Description;
+                      ?.FirstOrDefault() is DescriptionAttribute attribute
+                          ? attribute.Description
+                          : value?.ToString() ?? string.Empty;
     }
 
     public static ToolTipIcon ConvertEnumToIcon(InfoLevel level)

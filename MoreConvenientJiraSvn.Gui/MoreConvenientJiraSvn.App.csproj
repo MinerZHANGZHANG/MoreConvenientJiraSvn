@@ -10,22 +10,22 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <Compile Remove="View\Components\**" />
-	  <EmbeddedResource Remove="View\Components\**" />
-	  <None Remove="View\Components\**" />
-	  <Page Remove="View\Components\**" />
+	  <Compile Remove="Views\Components\**" />
+	  <EmbeddedResource Remove="Views\Components\**" />
+	  <None Remove="Views\Components\**" />
+	  <Page Remove="Views\Components\**" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Remove="Resource\Image\Logo.png" />
-		<None Remove="View\Screen\SplashScreen.png" />
+		<None Remove="Resources\Images\Logo.png" />
+		<None Remove="Resources\Screens\SplashScreen.png" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<Content Include="Resource\Image\Logo.ico">
+		<Content Include="Resources\Images\Logo.ico">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Content>
-		<Content Include="Resource\Image\Logo.png">
+		<Content Include="Resources\Images\Logo.png">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Content>
 	</ItemGroup>
@@ -48,7 +48,10 @@
 			<AutoGen>True</AutoGen>
 			<DependentUpon>Settings.settings</DependentUpon>
 		</Compile>
-		<Compile Update="View\Pages\HostedServiceSettingPage.xaml.cs">
+		<Compile Update="Views\Pages\HostedServiceSettingPage.xaml.cs">
+		  <SubType>Code</SubType>
+		</Compile>
+		<Compile Update="Views\Windows\SvnJiraLinkWindow.xaml.cs">
 		  <SubType>Code</SubType>
 		</Compile>
 	</ItemGroup>
@@ -61,11 +64,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<SplashScreen Include="View\Screen\SplashScreen.png" />
+		<SplashScreen Include="Resources\Screens\SplashScreen.png" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Page Update="View\Pages\HostedServiceSettingPage.xaml">
+	  <Page Update="Views\Pages\HostedServiceSettingPage.xaml">
 	    <SubType>Designer</SubType>
 	  </Page>
 	</ItemGroup>

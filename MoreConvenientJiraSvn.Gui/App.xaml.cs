@@ -2,12 +2,12 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MoreConvenientJiraSvn.Core.Service;
-using MoreConvenientJiraSvn.Gui.Properties;
-using MoreConvenientJiraSvn.Gui.ViewModel;
+using MoreConvenientJiraSvn.App.Properties;
+using MoreConvenientJiraSvn.App.ViewModels;
 using System.Windows;
 using Application = System.Windows.Application;
 
-namespace MoreConvenientJiraSvn.Gui
+namespace MoreConvenientJiraSvn.App
 {
     /// <summary>
     /// Interaction logic for App.xaml
