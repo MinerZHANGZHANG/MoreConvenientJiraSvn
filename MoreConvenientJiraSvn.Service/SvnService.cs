@@ -77,7 +77,7 @@ public class SvnService : IDisposable
 
     #region Operation methods
 
-    public async Task<List<SvnLog>> GetSvnLogs(string path, DateTime? beginDate, DateTime? endDate, int maxNumber = 200, bool isNeedExtractJiraId = false)
+    public async Task<List<SvnLog>> GetSvnLogsAsync(string path, DateTime? beginDate, DateTime? endDate, int maxNumber = 200, bool isNeedExtractJiraId = false)
     {
         _logService.Debug($"{nameof(GetSvnLogs)}({path}) [{beginDate}——{endDate}](maxCount:{maxNumber})");
 

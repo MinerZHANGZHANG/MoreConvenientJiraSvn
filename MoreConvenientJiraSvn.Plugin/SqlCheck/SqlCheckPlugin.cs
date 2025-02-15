@@ -24,8 +24,8 @@ public class SqlCheckPlugin : IPlugin
     public void OpenWindow()
     {
         if (_serviceProvider == null) { return; }
-        SqlCheckViewModel viewModel = new(_serviceProvider);
-        SqlCheckWindow commonSqlWindow = new(viewModel);
-        commonSqlWindow.Show();
+        //SqlCheckViewModel viewModel = new(_serviceProvider);
+        //SqlCheckWindow commonSqlWindow = new(viewModel);
+        //commonSqlWindow.Show();
     }
 }

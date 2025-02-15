@@ -24,8 +24,8 @@ public class Jira2LocalDirPlugin : IPlugin
     public void OpenWindow()
     {
         if (_serviceProvider == null) { return; }
-        Jira2LocalDirViewModel viewModel = new(_serviceProvider);
-        Jira2LocalDirWindow jira2LocalDirWindow = new(viewModel);
-        jira2LocalDirWindow.Show();
+        //Jira2LocalDirViewModel viewModel = new(_serviceProvider);
+        //Jira2LocalDirWindow jira2LocalDirWindow = new(viewModel);
+        //jira2LocalDirWindow.Show();
     }
 }

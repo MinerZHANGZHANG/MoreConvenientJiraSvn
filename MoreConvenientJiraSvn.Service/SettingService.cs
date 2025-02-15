@@ -19,7 +19,7 @@ public class SettingService(IRepository repository)
         return _repository.FindAll<T>();
     }
 
-    public bool UpsertSingleSetting<T>(T obj) where T : new()
+    public bool UpsertSetting<T>(T obj) where T : new()
     {
         var result = _repository.Upsert<T>(obj);
         OnConfigChanged?.Invoke(this, new(obj));

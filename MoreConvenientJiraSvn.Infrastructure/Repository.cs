@@ -95,11 +95,11 @@ public class Repository(LiteDatabase db) : IRepository
     /// </summary>
     /// <param name="str"></param>
     /// <returns></returns>
-    [Obsolete("Use BsonMapper is better")]
-    private ObjectId ConvertToObjectId(string str)
-    {
-        string cleanedString = Regex.Replace(str, "[^0-9a-fA-F]", "");
-        cleanedString = cleanedString.PadLeft(24, '0')[..24];
-        return new ObjectId(cleanedString);
-    }
+    //[Obsolete("Use BsonMapper is better")]
+    //private ObjectId ConvertToObjectId(string str)
+    //{
+    //    string cleanedString = Regex.Replace(str, "[^0-9a-fA-F]", "");
+    //    cleanedString = cleanedString.PadLeft(24, '0')[..24];
+    //    return new ObjectId(cleanedString);
+    //}
 }

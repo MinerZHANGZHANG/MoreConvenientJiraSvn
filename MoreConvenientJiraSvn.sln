@@ -3,12 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.12.35209.166
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MoreConvenientJiraSvn.App", "MoreConvenientJiraSvn.Gui\MoreConvenientJiraSvn.App.csproj", "{7CCAEDC2-FA7E-46DB-9B52-7AB37C84B615}"
-	ProjectSection(ProjectDependencies) = postProject
-		{0F723442-8D49-4D22-A7B8-23B3DA8EE995} = {0F723442-8D49-4D22-A7B8-23B3DA8EE995}
-		{91EF96EC-69B1-484A-B944-7874B6402F0E} = {91EF96EC-69B1-484A-B944-7874B6402F0E}
-	EndProjectSection
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MoreConvenientJiraSvn.Core", "MoreConvenientJiraSvn.Core\MoreConvenientJiraSvn.Core.csproj", "{5F60230F-94FB-4A29-91C0-23D206A14792}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MoreConvenientJiraSvn.Plugin", "MoreConvenientJiraSvn.Plugin\MoreConvenientJiraSvn.Plugin.csproj", "{FC33896F-FF8B-427B-943E-DEF75FB33CF1}"
@@ -41,16 +35,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoreConvenientJiraSvn.App", "MoreConvenientJiraSvn.App\MoreConvenientJiraSvn.App.csproj", "{084F5009-8487-C3F2-4069-29682CA3C722}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{7CCAEDC2-FA7E-46DB-9B52-7AB37C84B615}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7CCAEDC2-FA7E-46DB-9B52-7AB37C84B615}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7CCAEDC2-FA7E-46DB-9B52-7AB37C84B615}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7CCAEDC2-FA7E-46DB-9B52-7AB37C84B615}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5F60230F-94FB-4A29-91C0-23D206A14792}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5F60230F-94FB-4A29-91C0-23D206A14792}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5F60230F-94FB-4A29-91C0-23D206A14792}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -79,6 +71,10 @@ Global
 		{D4E0BAEB-D8E5-4B36-83BF-DB7431458A1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D4E0BAEB-D8E5-4B36-83BF-DB7431458A1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D4E0BAEB-D8E5-4B36-83BF-DB7431458A1C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{084F5009-8487-C3F2-4069-29682CA3C722}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{084F5009-8487-C3F2-4069-29682CA3C722}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{084F5009-8487-C3F2-4069-29682CA3C722}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{084F5009-8487-C3F2-4069-29682CA3C722}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

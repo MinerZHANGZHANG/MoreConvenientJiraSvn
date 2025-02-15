@@ -1,5 +1,4 @@
-﻿using MoreConvenientJiraSvn.Core.Enums;
-using MoreConvenientJiraSvn.Core.Models;
+﻿using MoreConvenientJiraSvn.Core.Models;
 using System.ComponentModel;
 using System.Reflection;
 
@@ -28,14 +27,14 @@ public static class EnumHelper
                           : value?.ToString() ?? string.Empty;
     }
 
-    public static ToolTipIcon ConvertEnumToIcon(InfoLevel level)
-    {
-        return level switch
-        {
-            InfoLevel.Normal => ToolTipIcon.Info,
-            InfoLevel.Warning => ToolTipIcon.Warning,
-            InfoLevel.Error => ToolTipIcon.Error,
-            _ => ToolTipIcon.None,
-        };
-    }
+    //public static ToolTipIcon ConvertEnumToIcon(InfoLevel level)
+    //{
+    //    return level switch
+    //    {
+    //        InfoLevel.Normal => ToolTipIcon.Info,
+    //        InfoLevel.Warning => ToolTipIcon.Warning,
+    //        InfoLevel.Error => ToolTipIcon.Error,
+    //        _ => ToolTipIcon.None,
+    //    };
+    //}
 }

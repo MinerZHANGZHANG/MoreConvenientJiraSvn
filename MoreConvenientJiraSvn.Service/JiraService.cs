@@ -47,11 +47,6 @@ namespace MoreConvenientJiraSvn.Service
             _jiraConfig = config;
         }
 
-        public void UpdateJiraConfig(JiraConfig config)
-        {
-            _settingService.UpsertSingleSetting<JiraConfig>(config);
-        }
-
         public async Task<List<JiraFilter>> GetCurrentUserFavouriteFilterAsync()
         {
             List<JiraFilter> result = await _jiraClient.GetUserFavouriteFilterAsync();

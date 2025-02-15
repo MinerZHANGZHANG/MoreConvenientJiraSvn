@@ -44,7 +44,7 @@ public class DownloadSvnLogHostedService(IRepository repository, SvnService svnS
 
                 try
                 {
-                    IEnumerable<SvnLog> logs = await _svnService.GetSvnLogs(path.Path, pathBeginTime, pathEndTime, _svnService.SvnConfig.MaxResultInSingleQuery, path.IsNeedExtractJiraId);
+                    IEnumerable<SvnLog> logs = await _svnService.GetSvnLogsAsync(path.Path, pathBeginTime, pathEndTime, _svnService.SvnConfig.MaxResultInSingleQuery, path.IsNeedExtractJiraId);
 
                     updateLogTotal += _repository.Upsert(logs);
                     updatePathCount += 1;

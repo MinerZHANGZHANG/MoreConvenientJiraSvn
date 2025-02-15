@@ -1,5 +1,4 @@
 ﻿using MoreConvenientJiraSvn.Core.Interfaces;
-using MoreConvenientJiraSvn.Core.Service;
 using System;
 using System.Collections.Generic;
 using System.Linq;
