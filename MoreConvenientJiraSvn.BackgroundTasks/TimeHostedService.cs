@@ -6,10 +6,12 @@ namespace MoreConvenientJiraSvn.BackgroundTask;
 public abstract class TimedHostedService(TimeSpan executionTime, TimeSpan retryInterval, int maxTryCount) : IHostedService, IDisposable
 {
     private Timer? _executionTimer;
-    private readonly TimeSpan _executionTime = executionTime;
+    private TimeSpan _executionTime = executionTime;
 
-    private readonly TimeSpan _retryInterval = retryInterval;
-    private readonly int _maxTryCount = maxTryCount;
+    private TimeSpan _retryInterval = retryInterval;
+    private int _maxTryCount = maxTryCount;
+
+    public bool IsRunning { get; protected set; } = false;
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
@@ -71,7 +73,9 @@ public abstract class TimedHostedService(TimeSpan executionTime, TimeSpan retryI
     {
         for (int attempt = 1; attempt <= _maxTryCount; attempt++)
         {
+            IsRunning = true;
             bool success = await ExecuteTask();
+            IsRunning = false;
 
             if (success)
             {
@@ -86,6 +90,13 @@ public abstract class TimedHostedService(TimeSpan executionTime, TimeSpan retryI
     }
 
     public abstract Task<bool> ExecuteTask();
+
+    public virtual void RefreshExecuteConfig(TimeSpan executionTime, TimeSpan retryInterval, int maxTryCount)
+    {
+        _executionTime = executionTime;
+        _retryInterval = retryInterval;
+        _maxTryCount = maxTryCount;
+    }
 
     public Task StopAsync(CancellationToken cancellationToken)
     {

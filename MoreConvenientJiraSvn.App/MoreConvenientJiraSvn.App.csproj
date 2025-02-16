@@ -75,4 +75,8 @@
 	  </Page>
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Views\TransControls\" />
+	</ItemGroup>
+
 </Project>

@@ -78,30 +78,6 @@
                 </StackPanel>
             </Expander>
 
-            <!--  Auto refresh info  -->
-            <Expander Header="定时刷新配置">
-                <StackPanel Orientation="Vertical">
-                    <control:ConfigLine
-                        Margin="8"
-                        ConfigName="需要定时刷新的过滤器"
-                        IsButtonVisible="False">
-                        <ComboBox ItemsSource="{Binding Filters}">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <StackPanel Orientation="Horizontal">
-                                        <CheckBox
-                                            Checked="CheckBox_Checked"
-                                            Content="{Binding Name}"
-                                            IsChecked="{Binding IsChecked}" />
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
-                    </control:ConfigLine>
-
-                </StackPanel>
-            </Expander>
-
         </StackPanel>
     </ScrollViewer>
 </Page>

@@ -6,12 +6,13 @@ using System.Windows.Controls;
 
 namespace MoreConvenientJiraSvn.App.ViewModels;
 
-public partial class IndexViewModel : ObservableObject
+public partial class MainPageViewModel : ObservableObject
 {
-
-    public readonly MainControl mainControl = new();
-
-    public readonly GetPluginControl getPluginControl = new();
+    public readonly MainControl MainControl = new();
+    public readonly AppSettingControl AppSettingControl = new();
+    //public readonly GetPluginControl getPluginControl = new();
+    public readonly IntroduceWhatControl IntroduceWhatControl = new();
+    public readonly IntroduceHowControl IntroduceHowControl = new();
 
     [ObservableProperty]
     private UserControl? _currentContent = null;
@@ -22,15 +23,21 @@ public partial class IndexViewModel : ObservableObject
         switch (indexContent)
         {
             case IndexContent.Index:
-                CurrentContent = mainControl;
-                break;
-            case IndexContent.Plugin:
-                MessageBox.Show("尚未支持");
-                //CurrentContent = getPluginControl;
+                CurrentContent = MainControl;
                 break;
             case IndexContent.Setting:
+                CurrentContent = AppSettingControl;
+                break;
+            case IndexContent.Plugin:
+                //CurrentContent = getPluginControl;
+                MessageBox.Show("尚未支持");
+                break;
             case IndexContent.What:
+                CurrentContent = IntroduceWhatControl;
+                break;
             case IndexContent.How:
+                CurrentContent = IntroduceHowControl;
+                break;
             case IndexContent.Expand:
                 MessageBox.Show("尚未支持");
                 break;

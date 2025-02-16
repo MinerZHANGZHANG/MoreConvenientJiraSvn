@@ -1,0 +1,83 @@
+﻿<UserControl
+    x:Class="MoreConvenientJiraSvn.App.Views.Controls.IntroduceHowControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:MoreConvenientJiraSvn.App.Views.Controls"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mc:Ignorable="d">
+    <materialDesign:Transitioner SelectedIndex="0">
+        <!--  First slide  -->
+        <DockPanel>
+            <DockPanel.Background>
+                <ImageBrush ImageSource="/Resources/Screens/SplashScreen.png" />
+            </DockPanel.Background>
+            <Button
+                Margin="32"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Bottom"
+                Command="{x:Static materialDesign:Transitioner.MoveNextCommand}"
+                DockPanel.Dock="Right"
+                Style="{StaticResource MaterialDesignFloatingActionLightButton}">
+                <materialDesign:PackIcon
+                    Width="40"
+                    Height="40"
+                    Kind="NavigateNext" />
+            </Button>
+        </DockPanel>
+
+        <materialDesign:TransitionerSlide OpeningEffect="{materialDesign:TransitionEffect FadeIn}">
+            <DockPanel>
+                <DockPanel.Background>
+                    <ImageBrush ImageSource="/Resources/Screens/SplashScreen.png" />
+                </DockPanel.Background>
+                <Button
+                    Margin="32"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Bottom"
+                    Command="{x:Static materialDesign:Transitioner.MovePreviousCommand}"
+                    Style="{StaticResource MaterialDesignFloatingActionLightButton}">
+                    <materialDesign:PackIcon
+                        Width="40"
+                        Height="40"
+                        Kind="NavigateBefore" />
+                </Button>
+                <Button
+                    Margin="32"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Bottom"
+                    Command="{x:Static materialDesign:Transitioner.MoveNextCommand}"
+                    DockPanel.Dock="Right"
+                    Style="{StaticResource MaterialDesignFloatingActionLightButton}">
+                    <materialDesign:PackIcon
+                        Width="40"
+                        Height="40"
+                        Kind="NavigateNext" />
+                </Button>
+            </DockPanel>
+        </materialDesign:TransitionerSlide>
+
+        <!--  Last slide  -->
+        <materialDesign:TransitionerSlide OpeningEffect="{materialDesign:TransitionEffect SlideInFromTop}">
+            <DockPanel>
+                <DockPanel.Background>
+                    <ImageBrush ImageSource="/Resources/Screens/SplashScreen.png" />
+                </DockPanel.Background>
+                <Button
+                    Margin="32"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Bottom"
+                    Command="{x:Static materialDesign:Transitioner.MovePreviousCommand}"
+                    Style="{StaticResource MaterialDesignFloatingActionLightButton}">
+                    <materialDesign:PackIcon
+                        Width="40"
+                        Height="40"
+                        Kind="NavigateBefore" />
+                </Button>
+            </DockPanel>
+        </materialDesign:TransitionerSlide>
+    </materialDesign:Transitioner>
+</UserControl>

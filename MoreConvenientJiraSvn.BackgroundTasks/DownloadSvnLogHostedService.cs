@@ -7,14 +7,29 @@ using System.Text;
 
 namespace MoreConvenientJiraSvn.BackgroundTask;
 
-public class DownloadSvnLogHostedService(IRepository repository, SvnService svnService, LogService logService, SettingService settingService)
-    : TimedHostedService(new TimeSpan(9, 30, 0), TimeSpan.FromMinutes(5), 3)
+public class DownloadSvnLogHostedService : TimedHostedService
 {
-    private readonly IRepository _repository = repository;
+    private readonly IRepository _repository;
 
-    private readonly SvnService _svnService = svnService;
-    private readonly LogService _logService = logService;
-    private readonly SettingService _settingService = settingService;
+    private readonly SvnService _svnService;
+    private readonly LogService _logService;
+    private readonly SettingService _settingService;
+
+    public DownloadSvnLogHostedService(IRepository repository, SvnService svnService, LogService logService, SettingService settingService)
+        : base(new TimeSpan(9, 30, 0), TimeSpan.FromMinutes(5), 3)
+    {
+        _repository = repository;
+
+        _svnService = svnService;
+        _logService = logService;
+        _settingService = settingService;
+
+        var config = settingService.FindSetting<BackgroundTaskConfig>();
+        if (config != null)
+        {
+
+        }
+    }
 
     public override async Task<bool> ExecuteTask()
     {

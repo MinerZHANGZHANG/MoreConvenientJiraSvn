@@ -8,14 +8,13 @@ public static class EnumHelper
 {
     public static List<EnumDescription> GetEnumDescriptions<T>() where T : Enum
     {
-        return Enum.GetValues(typeof(T))
+        return [.. Enum.GetValues(typeof(T))
                    .Cast<T>()
                    .Select(e => new EnumDescription
                    {
                        Value = e,
                        Description = GetEnumDescription(e)
-                   })
-                   .ToList();
+                   })];
     }
 
     public static string GetEnumDescription<T>(T value) where T : notnull

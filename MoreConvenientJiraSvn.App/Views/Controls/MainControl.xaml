@@ -42,21 +42,21 @@
             <DataGrid.Columns>
                 <DataGridTextColumn
                     Width="*"
-                    Binding="{Binding SourceName}"
-                    Header="来源" />
-                <DataGridTextColumn
-                    Width="*"
-                    Binding="{Binding Info}"
-                    Header="信息" />
-                <DataGridTextColumn
-                    Width="*"
                     Binding="{Binding Level}"
                     Header="级别" />
                 <DataGridTextColumn
-                    Width="*"
+                    Width="2*"
+                    Binding="{Binding SourceName}"
+                    Header="来源" />
+                <DataGridTextColumn
+                    Width="5*"
+                    Binding="{Binding Info}"
+                    Header="信息" />
+                <DataGridTextColumn
+                    Width="2*"
                     Binding="{Binding Time}"
                     Header="时间" />
-                <DataGridTemplateColumn Width="100" Header="编辑">
+                <DataGridTemplateColumn Width="64" Header="编辑">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Button Command="{Binding EditCommand}" Content="编辑" />
@@ -70,27 +70,26 @@
         <!--  bottom button  -->
         <StackPanel
             Grid.Row="2"
-            Margin="10"
             HorizontalAlignment="Center"
             Orientation="Horizontal">
             <Button
                 Width="128"
                 Margin="8"
-                Command="{Binding OpenPluginPageCommand}"
+                Command="{Binding OpenWindowCommand}"
                 CommandParameter="{x:Static enum:WindowType.Jira}"
                 Content="Jira浏览"
                 Style="{StaticResource MaterialDesignFlatButton}" />
             <Button
                 Width="128"
                 Margin="8"
-                Command="{Binding OpenPluginPageCommand}"
+                Command="{Binding OpenWindowCommand}"
                 CommandParameter="{x:Static enum:WindowType.Svn}"
                 Content="Svn浏览"
                 Style="{StaticResource MaterialDesignFlatButton}" />
             <Button
                 Width="128"
                 Margin="8"
-                Command="{Binding OpenPluginPageCommand}"
+                Command="{Binding OpenWindowCommand}"
                 CommandParameter="{x:Static enum:WindowType.Sql}"
                 Content="PLSql检测"
                 Style="{StaticResource MaterialDesignFlatButton}" />

@@ -1,5 +1,4 @@
-﻿using MoreConvenientJiraSvn.App.ViewModels;
-using System.Windows;
+﻿using System.Windows;
 
 namespace MoreConvenientJiraSvn.App.Views.Windows
 {
@@ -10,9 +9,7 @@ namespace MoreConvenientJiraSvn.App.Views.Windows
     {
         public MainWindow()
         {
-            DataContext = ViewModelsManager.GetViewModel<MainWindowViewModel>();
             InitializeComponent();
-
         }
     }
 }

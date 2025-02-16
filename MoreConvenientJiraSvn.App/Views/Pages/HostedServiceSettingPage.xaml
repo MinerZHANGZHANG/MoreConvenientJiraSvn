@@ -15,30 +15,50 @@
     <ScrollViewer>
         <StackPanel Margin="8">
             <!--  Base setting  -->
-            <Expander Header="基础设置" IsExpanded="True">
+            <Expander Header="Jira状态检测设置" IsExpanded="True">
                 <StackPanel Orientation="Vertical">
-                    <!--<control:ConfigLine
-                        Margin="8"
-                        ConfigName="Sql检测路径"
-                        Foreground="Black">
-                        <TextBox
-                            Foreground="Black"
-                            KeyUp="TextBox_KeyUp"
-                            LostFocus="TextBox_LostFocus"
-                            Style="{StaticResource CustomMaterialTextBoxStyle}"
-                            Text="{Binding Config.BaseUrl, UpdateSourceTrigger=PropertyChanged}" />
-                    </control:ConfigLine>
                     <control:ConfigLine
                         Margin="8"
-                        ConfigName="用户ApiToken"
-                        ShowConfigDescriptionCommand="">
-                        <TextBox
-                            Foreground="Black"
-                            KeyUp="TextBox_KeyUp"
-                            LostFocus="TextBox_LostFocus"
-                            Style="{StaticResource CustomMaterialTextBoxStyle}"
-                            Text="{Binding Config.ApiToken, UpdateSourceTrigger=PropertyChanged}" />
-                    </control:ConfigLine>-->
+                        ConfigName="上一次执行时间"
+                        Foreground="Black"
+                        IsButtonVisible="False">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox
+                                Grid.Column="0"
+                                Foreground="Black"
+                                IsEnabled="False"
+                                KeyUp="TextBox_KeyUp"
+                                LostFocus="TextBox_LostFocus"
+                                Style="{StaticResource CustomMaterialTextBoxStyle}"
+                                Text="20254343" />
+                            <Button
+                                Grid.Column="1"
+                                HorizontalAlignment="Right"
+                                Content="执行" />
+                        </Grid>
+                    </control:ConfigLine>
+
+                    <control:ConfigLine
+                        Margin="8"
+                        ConfigName="需要定时刷新的过滤器"
+                        IsButtonVisible="False">
+                        <ComboBox ItemsSource="{Binding Filters}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <CheckBox
+                                            Checked="CheckBox_Checked"
+                                            Content="{Binding Name}"
+                                            IsChecked="{Binding IsChecked}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </control:ConfigLine>
                 </StackPanel>
             </Expander>
 

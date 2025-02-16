@@ -58,5 +58,29 @@ namespace MoreConvenientJiraSvn.App.Properties {
                 this["IconUrl"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public int LogRemindLevel {
+            get {
+                return ((int)(this["LogRemindLevel"]));
+            }
+            set {
+                this["LogRemindLevel"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool IsEnableWriteOperation {
+            get {
+                return ((bool)(this["IsEnableWriteOperation"]));
+            }
+            set {
+                this["IsEnableWriteOperation"] = value;
+            }
+        }
     }
 }

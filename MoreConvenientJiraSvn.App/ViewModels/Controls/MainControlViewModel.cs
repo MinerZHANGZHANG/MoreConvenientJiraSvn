@@ -20,7 +20,7 @@ public partial class MainControlViewModel : ObservableObject
     }
 
     [RelayCommand]
-    public void OpenPluginPage(WindowType windowType)
+    public void OpenWindow(WindowType windowType)
     {
         WindowsManager.OpenOrFocusWindow(windowType);
     }
