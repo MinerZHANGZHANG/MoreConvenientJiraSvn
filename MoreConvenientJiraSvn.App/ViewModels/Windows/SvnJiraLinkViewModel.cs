@@ -11,12 +11,11 @@ using MoreConvenientJiraSvn.Core.Interfaces;
 
 namespace MoreConvenientJiraSvn.App.ViewModels;
 
-public partial class SvnJiraLinkViewModel(ServiceProvider serviceProvider) : ObservableObject
+public partial class SvnJiraLinkViewModel(SvnService svnService, IRepository repository) : ObservableObject
 {
     #region Service
-    private readonly SvnService _svnService = serviceProvider.GetRequiredService<SvnService>();
-    private readonly IRepository _repository = serviceProvider.GetRequiredService<IRepository>();
-    //private readonly SettingService _settingService = serviceProvider.GetRequiredService<SettingService>();
+    private readonly SvnService _svnService = svnService;
+    private readonly IRepository _repository = repository;
 
     #endregion
 

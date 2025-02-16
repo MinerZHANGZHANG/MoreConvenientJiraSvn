@@ -77,7 +77,7 @@ public class DownloadSvnLogHostedService(IRepository repository, SvnService svnS
         }
 
         _repository.Insert(taskLog);
-        _repository.Insert(taskMessages);
+        _repository.Insert<BackgroundTaskMessage>(taskMessages);
 
         _logService.Debug(taskLog.Summary);
 

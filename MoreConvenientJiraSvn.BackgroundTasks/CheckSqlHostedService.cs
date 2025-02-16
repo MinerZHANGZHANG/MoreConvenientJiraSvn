@@ -87,7 +87,7 @@ public class CheckSqlHostedService(IRepository repository, IPlSqlCheckPipeline p
             }
         }
 
-        _repository.Insert(taskMessages);
+        _repository.Insert<BackgroundTaskMessage>(taskMessages);
         _repository.Insert(taskLog);
         _logService.Debug($"检测Sql已完成:{taskLog.Summary}");
 

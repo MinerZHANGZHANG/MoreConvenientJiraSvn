@@ -1,6 +1,5 @@
 ﻿using LiteDB;
 using MoreConvenientJiraSvn.Core.Interfaces;
-using System.Text.RegularExpressions;
 
 namespace MoreConvenientJiraSvn.Infrastructure;
 
@@ -12,6 +11,12 @@ public class Repository(LiteDatabase db) : IRepository
     {
         var collection = _db.GetCollection<T>();
         return collection.Insert(obj);
+    }
+
+    public BsonValue Insert<T>(IEnumerable<T> objs) where T : class
+    {
+        var collection = _db.GetCollection<T>();
+        return collection.Insert(objs);
     }
 
     public bool Upsert<T>(T obj) where T : new()

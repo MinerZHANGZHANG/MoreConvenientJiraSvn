@@ -1,7 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using LiteDB;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
 using MoreConvenientJiraSvn.Core.Interfaces;
 using MoreConvenientJiraSvn.Core.Models;
@@ -16,13 +15,13 @@ using System.Windows;
 
 namespace MoreConvenientJiraSvn.App.ViewModels;
 
-public partial class Jira2LocalDirViewModel(ServiceProvider serviceProvider) : ObservableObject
+public partial class Jira2LocalDirViewModel(JiraService jiraService, SvnService svnService, IRepository repository, SettingService settingService) : ObservableObject
 {
     #region Service
-    private readonly JiraService _jiraService = serviceProvider.GetRequiredService<JiraService>();
-    private readonly SvnService _svnService = serviceProvider.GetRequiredService<SvnService>();
-    private readonly IRepository _repository = serviceProvider.GetRequiredService<IRepository>();
-    private readonly SettingService _settingService = serviceProvider.GetRequiredService<SettingService>();
+    private readonly JiraService _jiraService = jiraService;
+    private readonly SvnService _svnService = svnService;
+    private readonly IRepository _repository = repository;
+    private readonly SettingService _settingService = settingService;
 
     #endregion
 

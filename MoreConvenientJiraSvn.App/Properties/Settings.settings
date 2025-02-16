@@ -1,5 +1,5 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="MoreConvenientJiraSvn.Gui.Properties" GeneratedClassName="Settings">
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="MoreConvenientJiraSvn.App.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
     <Setting Name="LastStartTime" Type="System.DateTime" Scope="User">
@@ -9,7 +9,7 @@
       <Value Profile="(Default)">litedb.db</Value>
     </Setting>
     <Setting Name="IconUrl" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Resource\Image\Logo.ico</Value>
+      <Value Profile="(Default)">Resources\Images\Logo.ico</Value>
     </Setting>
   </Settings>
 </SettingsFile>

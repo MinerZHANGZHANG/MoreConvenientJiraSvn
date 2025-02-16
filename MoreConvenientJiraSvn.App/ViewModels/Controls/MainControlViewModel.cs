@@ -22,19 +22,7 @@ public partial class MainControlViewModel : ObservableObject
     [RelayCommand]
     public void OpenPluginPage(WindowType windowType)
     {
-        switch (windowType)
-        {
-            case WindowType.Main:
-                break;
-            case WindowType.Jira:
-                break;
-            case WindowType.Svn:
-                break;
-            case WindowType.Sql:
-                break;
-            default:
-                break;
-        }
+        WindowsManager.OpenOrFocusWindow(windowType);
     }
 
     [RelayCommand]

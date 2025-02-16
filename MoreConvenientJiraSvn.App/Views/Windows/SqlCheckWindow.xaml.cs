@@ -10,12 +10,19 @@ namespace MoreConvenientJiraSvn.App.Views.Windows;
 public partial class SqlCheckWindow : Window
 {
     private SqlCheckViewModel _viewModel;
-    public SqlCheckWindow(SqlCheckViewModel viewModel)
+    public SqlCheckWindow()
     {
         InitializeComponent();
-        this.DataContext = viewModel;
-        this._viewModel = viewModel;
-        Loaded += SqlCheckWindow_Loaded;
+        this._viewModel = ViewModelsManager.GetViewModel<SqlCheckViewModel>();
+
+        this.DataContext = _viewModel;
+        this.Loaded += SqlCheckWindow_Loaded;
+        this.Closed += SqlCheckWindow_Closed;
+    }
+
+    private void SqlCheckWindow_Closed(object? sender, EventArgs e)
+    {
+        WindowsManager.RemoveWindow(this);
     }
 
     private void SqlCheckWindow_Loaded(object sender, RoutedEventArgs e)

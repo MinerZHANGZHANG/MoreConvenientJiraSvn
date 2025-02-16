@@ -6,6 +6,8 @@ public interface IRepository
 {
     BsonValue Insert<T>(T obj) where T : new();
 
+    BsonValue Insert<T>(IEnumerable<T> objs) where T :class;
+
     bool Upsert<T>(T obj) where T : new();
 
     int Upsert<T>(IEnumerable<T> objs) where T : new();

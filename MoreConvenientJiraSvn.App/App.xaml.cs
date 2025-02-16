@@ -27,6 +27,11 @@ namespace MoreConvenientJiraSvn.App
             services.AddSingleton(new NotificationService(Settings.Default.IconUrl));
 
             services.AddSingleton<IRepository, Repository>();
+            services.AddSingleton<IJiraClient, JiraClient>();
+            services.AddSingleton<IPlSqlCheckPipeline, PlSqlCheckPipeline>();
+            services.AddSingleton<ISubversionClient, SubversionClient>();
+
+            services.AddSingleton<LogService>();
             services.AddSingleton<SettingService>();
             services.AddSingleton<SvnService>();
             services.AddSingleton<JiraService>();
@@ -38,7 +43,9 @@ namespace MoreConvenientJiraSvn.App
             services.AddTransient<MainWindowViewModel>();
             services.AddTransient<JiraSettingViewModel>();
             services.AddTransient<SvnSettingViewModel>();
-
+            services.AddTransient<Jira2LocalDirViewModel>();
+            services.AddTransient<SvnJiraLinkViewModel>();
+            services.AddTransient<SqlCheckViewModel>();
             services.AddTransient<MainControlViewModel>();
 
             _services = services.BuildServiceProvider(true);
@@ -46,7 +53,6 @@ namespace MoreConvenientJiraSvn.App
             Settings.Default.LastStartTime = DateTime.Now;
             Settings.Default.Save();
 
-            PluginsManager.InitPlugins(_services);
             ViewModelsManager.InitService(_services);
 
             this.Exit += App_Exit;

@@ -11,13 +11,19 @@ namespace MoreConvenientJiraSvn.App.Views.Windows;
 public partial class Jira2LocalDirWindow : Window
 {
     private Jira2LocalDirViewModel _viewModel;
-    public Jira2LocalDirWindow(Jira2LocalDirViewModel viewModel)
+    public Jira2LocalDirWindow()
     {
         InitializeComponent();
-        this.DataContext = viewModel;
-        this._viewModel = viewModel;
-
+        this._viewModel = ViewModelsManager.GetViewModel<Jira2LocalDirViewModel>();
+        
+        this.DataContext = _viewModel;
         this.Loaded += Jira2LocalDirWindow_Loaded;
+        this.Closed += Jira2LocalDirWindow_Closed;
+    }
+
+    private void Jira2LocalDirWindow_Closed(object? sender, EventArgs e)
+    {
+        WindowsManager.RemoveWindow(this);
     }
 
     private async void Jira2LocalDirWindow_Loaded(object sender, RoutedEventArgs e)

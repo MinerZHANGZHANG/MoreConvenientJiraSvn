@@ -13,7 +13,7 @@
     Title="Jira本地化"
     Width="1280"
     Height="720"
-    d:DataContext="{d:DesignInstance Type= viewModel:Jira2LocalDirViewModel}"
+    d:DataContext="{d:DesignInstance Type=viewModel:Jira2LocalDirViewModel}"
     Style="{StaticResource MaterialDesignWindow}"
     mc:Ignorable="d">
     <Window.Resources>
@@ -69,7 +69,7 @@
             <DataTemplate x:Key="ListBoxTemplate" DataType="{x:Type model:JiraField}">
                 <StackPanel DataContext="{Binding ElementName=ContentControl, Path=DataContext}" Orientation="Vertical">
                     <TextBlock MinWidth="120" Text="{Binding FieldName}" />
-                    <ListBox
+                    <!--<ListBox
                         MinWidth="120"
                         ItemsSource="{Binding Options}"
                         SelectionChanged="ListBox_SelectionChanged"
@@ -79,7 +79,7 @@
                                 <TextBlock Text="{Binding OptionName}" />
                             </DataTemplate>
                         </ListBox.ItemTemplate>
-                    </ListBox>
+                    </ListBox>-->
                 </StackPanel>
             </DataTemplate>
             <DataTemplate x:Key="DatePickerTemplate" DataType="{x:Type model:JiraField}">
@@ -186,7 +186,7 @@
                         SelectedItem="{Binding SelectedJiraQueryType}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Converter={x:Static convert:JiraSelectTypeToStringConverter.Instance}}" />
+                                <TextBlock Text="{Binding Converter={x:Static convert:JiraQueryTypeToStringConverter.Instance}}" />
                             </DataTemplate>
                         </ComboBox.ItemTemplate>
                     </ComboBox>
@@ -349,7 +349,7 @@
                                         <TextBox
                                             IsReadOnly="True"
                                             Style="{StaticResource MaterialDesignFilledTextBox}"
-                                            Text="{Binding SelectedJiraInfo.JiraId, Mode=OneWay}" />
+                                            Text="{Binding SelectedJiraInfo.IssueKey, Mode=OneWay}" />
                                     </StackPanel>
                                 </Border>
                                 <Border Style="{StaticResource StackPanelStyle}">
@@ -404,7 +404,7 @@
                                         <TextBox
                                             IsReadOnly="True"
                                             Style="{StaticResource MaterialDesignFilledTextBox}"
-                                            Text="{Binding SelectedJiraInfo.FixVersionNameText, Mode=OneWay}"
+                                            Text="{Binding SelectedJiraInfo.VersionsText, Mode=OneWay}"
                                             TextWrapping="Wrap" />
                                     </StackPanel>
                                 </Border>
@@ -419,11 +419,11 @@
                                 </Border>
                                 <Border Style="{StaticResource StackPanelStyle}">
                                     <StackPanel>
-                                        <TextBlock FontWeight="Bold" Text="Developer Leader:" />
+                                        <TextBlock FontWeight="Bold" Text="Tester:" />
                                         <TextBox
                                             IsReadOnly="True"
                                             Style="{StaticResource MaterialDesignFilledTextBox}"
-                                            Text="{Binding SelectedJiraInfo.DeveloperLeaderName, Mode=OneWay}" />
+                                            Text="{Binding SelectedJiraInfo.TesterNamesString, Mode=OneWay}" />
                                     </StackPanel>
                                 </Border>
                                 <Border Style="{StaticResource StackPanelStyle}">

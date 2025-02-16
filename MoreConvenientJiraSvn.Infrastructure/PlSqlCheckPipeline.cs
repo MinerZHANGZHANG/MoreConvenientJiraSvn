@@ -3,12 +3,11 @@ using Antlr4.Runtime.Tree;
 using MoreConvenientJiraSvn.Core.Enums;
 using MoreConvenientJiraSvn.Core.Interfaces;
 using MoreConvenientJiraSvn.Core.Models;
-using System.IO;
 using System.Text;
 
 namespace MoreConvenientJiraSvn.Infrastructure;
 
-public class SqlCheckPipeline : IPlSqlCheckPipeline
+public class PlSqlCheckPipeline : IPlSqlCheckPipeline
 {
     public List<SqlIssue> SqlIssues { get; set; } = [];
 
@@ -16,15 +15,20 @@ public class SqlCheckPipeline : IPlSqlCheckPipeline
     private static readonly string[] stopwords = ["set feedback off", "set define off"];
     private static readonly string separator = Environment.NewLine;
 
-    private readonly string fileFullName;
+    private readonly string? fileFullName;
     private string? fileContent;
     private PlSqlParser.Sql_scriptContext? statement;
     private AntlrInputStream? inputStream;
     private PlSqlLexer? lexer;
     private CommonTokenStream? tokenStream;
     private PlSqlParser? parser;
+    
+    public PlSqlCheckPipeline()
+    {
 
-    public SqlCheckPipeline(string fileFullName)
+    }
+
+    public PlSqlCheckPipeline(string fileFullName)
     {
         ArgumentNullException.ThrowIfNull(fileFullName);
 
@@ -33,7 +37,7 @@ public class SqlCheckPipeline : IPlSqlCheckPipeline
 
     public List<SqlIssue> CheckSingleFile(string filePath, Dictionary<string, int> viewAlertCountDict)
     {
-        SqlCheckPipeline sqlCheckPipeline = new(filePath);
+        PlSqlCheckPipeline sqlCheckPipeline = new(filePath);
         sqlCheckPipeline.ReadSqlFile()
                      ?.ClearPrompts()
                      ?.ParserSql()
@@ -46,7 +50,7 @@ public class SqlCheckPipeline : IPlSqlCheckPipeline
 
     #region pipeline part
 
-    public SqlCheckPipeline? ReadSqlFile()
+    public PlSqlCheckPipeline? ReadSqlFile()
     {
         if (!File.Exists(fileFullName))
         {
@@ -72,7 +76,7 @@ public class SqlCheckPipeline : IPlSqlCheckPipeline
         return this;
     }
 
-    public SqlCheckPipeline? ClearPrompts()
+    public PlSqlCheckPipeline? ClearPrompts()
     {
         if (fileContent == null)
         {
@@ -93,7 +97,7 @@ public class SqlCheckPipeline : IPlSqlCheckPipeline
         return this;
     }
 
-    public SqlCheckPipeline? ParserSql()
+    public PlSqlCheckPipeline? ParserSql()
     {
         if (fileContent == null)
         {
@@ -126,7 +130,7 @@ public class SqlCheckPipeline : IPlSqlCheckPipeline
         return this;
     }
 
-    public SqlCheckPipeline? CheckWhereCondition()
+    public PlSqlCheckPipeline? CheckWhereCondition()
     {
         if (fileContent == null || statement == null)
         {
@@ -138,7 +142,7 @@ public class SqlCheckPipeline : IPlSqlCheckPipeline
         return this;
     }
 
-    public SqlCheckPipeline? CheckInsideIfBlock()
+    public PlSqlCheckPipeline? CheckInsideIfBlock()
     {
         if (fileContent == null || statement == null)
         {
@@ -149,7 +153,7 @@ public class SqlCheckPipeline : IPlSqlCheckPipeline
         return this;
     }
 
-    public SqlCheckPipeline? CheckIsSame(Dictionary<string, int> viewUpdateCountDict)
+    public PlSqlCheckPipeline? CheckIsSame(Dictionary<string, int> viewUpdateCountDict)
     {
         if (fileContent == null || statement == null)
         {

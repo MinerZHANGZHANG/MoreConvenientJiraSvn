@@ -20,22 +20,22 @@
             <TabItem Header="首页">
                 <Frame
                     NavigationUIVisibility="Hidden"
-                    Source="/View/Pages/IndexPage.xaml" />
+                    Source="/Views/Pages/IndexPage.xaml" />
             </TabItem>
             <TabItem Header="Jira设置">
                 <Frame
                     NavigationUIVisibility="Hidden"
-                    Source="/View/Pages/JiraSettingPage.xaml" />
+                    Source="/Views/Pages/JiraSettingPage.xaml" />
             </TabItem>
             <TabItem Header="Svn设置">
                 <Frame
                     NavigationUIVisibility="Hidden"
-                    Source="/View/Pages/SvnSettingPage.xaml" />
+                    Source="/Views/Pages/SvnSettingPage.xaml" />
             </TabItem>
             <TabItem Header="定时任务设置">
                 <Frame
                     NavigationUIVisibility="Hidden"
-                    Source="/View/Pages/HostedServiceSettingPage.xaml" />
+                    Source="/Views/Pages/HostedServiceSettingPage.xaml" />
             </TabItem>
         </TabControl>
     </StackPanel>

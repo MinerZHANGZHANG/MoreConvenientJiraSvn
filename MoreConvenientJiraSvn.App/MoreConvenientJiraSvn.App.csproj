@@ -17,16 +17,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Compile Remove="Views\Windows\Jira2LocalDirWindow.xaml.cs" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<None Remove="Resources\Images\Logo.png" />
 		<None Remove="Resources\Screens\SplashScreen.png" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Page Remove="Views\Windows\Jira2LocalDirWindow.xaml" />
 	</ItemGroup>
 
 	<ItemGroup>

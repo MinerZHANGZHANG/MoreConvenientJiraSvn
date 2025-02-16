@@ -64,7 +64,7 @@ public class CheckJiraStateHostedService(IRepository repository, SvnService svnS
             taskLog.IsSucccess = false;
         }
 
-        _repository.Upsert(taskMessages);
+        _repository.Insert<BackgroundTaskMessage>(taskMessages);
         _repository.Insert(taskLog);
 
         _logService.Debug("获取和检测jira状态已完成");

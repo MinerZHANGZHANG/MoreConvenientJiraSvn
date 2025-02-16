@@ -9,13 +9,19 @@ namespace MoreConvenientJiraSvn.App.Views.Windows;
 public partial class SvnJiraLinkWindow : Window
 {
     private SvnJiraLinkViewModel _viewModel;
-    public SvnJiraLinkWindow(SvnJiraLinkViewModel viewModel)
+    public SvnJiraLinkWindow()
     {
         InitializeComponent();
-        this.DataContext = viewModel;
-        this._viewModel = viewModel;
+        this._viewModel = ViewModelsManager.GetViewModel<SvnJiraLinkViewModel>();
 
+        this.DataContext = _viewModel;
         this.Loaded += SvnJiraLinkWindow_Loaded;
+        this.Closed += SvnJiraLinkWindow_Closed;
+    }
+
+    private void SvnJiraLinkWindow_Closed(object? sender, EventArgs e)
+    {
+        WindowsManager.RemoveWindow(this);
     }
 
     private void SvnJiraLinkWindow_Loaded(object sender, RoutedEventArgs e)
@@ -27,4 +33,6 @@ public partial class SvnJiraLinkWindow : Window
     {
         this._viewModel.RefreshSvnLog();
     }
+
+    
 }

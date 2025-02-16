@@ -1,6 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
 using MoreConvenientJiraSvn.Core.Interfaces;
 using MoreConvenientJiraSvn.Core.Models;
@@ -12,13 +11,13 @@ using System.Windows;
 
 namespace MoreConvenientJiraSvn.App.ViewModels;
 
-public partial class SqlCheckViewModel(ServiceProvider serviceProvider) : ObservableObject
+public partial class SqlCheckViewModel(SvnService svnService, IRepository repository, IPlSqlCheckPipeline plSqlCheckPipeline, SettingService settingService) : ObservableObject
 {
     #region Service
-    private readonly SvnService _svnService = serviceProvider.GetRequiredService<SvnService>();
-    private readonly IRepository _repository = serviceProvider.GetRequiredService<IRepository>();
-    private readonly IPlSqlCheckPipeline _plSqlCheckPipeline = serviceProvider.GetRequiredService<IPlSqlCheckPipeline>();
-    private readonly SettingService _settingService = serviceProvider.GetRequiredService<SettingService>();
+    private readonly SvnService _svnService = svnService;
+    private readonly IRepository _repository = repository;
+    private readonly IPlSqlCheckPipeline _plSqlCheckPipeline = plSqlCheckPipeline;
+    private readonly SettingService _settingService = settingService;
 
     #endregion
 
