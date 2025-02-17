@@ -7,14 +7,31 @@ using MoreConvenientJiraSvn.Service;
 
 namespace MoreConvenientJiraSvn.BackgroundTask;
 
-public class CheckJiraStateHostedService(IRepository repository, SvnService svnService, JiraService jiraService, LogService logService)
-  : TimedHostedService(new TimeSpan(9, 30, 0), TimeSpan.FromMinutes(5), 3)
+public class CheckJiraStateHostedService: TimedHostedService
 {
-    private readonly IRepository _repository = repository;
+    private readonly IRepository _repository ;
 
-    private readonly SvnService _svnService = svnService;
-    private readonly JiraService _jiraService = jiraService;
-    private readonly LogService _logService = logService;
+    private readonly JiraService _jiraService;
+    private readonly LogService _logService ;
+    private readonly SettingService _settingService;
+
+    public CheckJiraStateHostedService(IRepository repository, SvnService svnService, JiraService jiraService, LogService logService, SettingService settingService)
+    : base(new TimeSpan(9, 30, 0), TimeSpan.FromMinutes(5), 3)
+    {
+        _repository = repository;
+
+        _jiraService = jiraService;
+        _logService = logService;
+        _settingService = settingService;
+
+        var config = _settingService.FindSetting<BackgroundTaskConfig>();
+        if (config != null)
+        {
+            base.RefreshExecuteConfig(config.ExecutionTime - DateTime.Today,
+                TimeSpan.FromMinutes(config.RetryIntervalMinutes),
+                config.MaxRetryCount);
+        }
+    }
 
     public override async Task<bool> ExecuteTask()
     {

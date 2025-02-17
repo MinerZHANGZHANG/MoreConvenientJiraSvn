@@ -3,7 +3,6 @@ using MoreConvenientJiraSvn.Core.Enums;
 using MoreConvenientJiraSvn.Core.Interfaces;
 using MoreConvenientJiraSvn.Core.Models;
 using MoreConvenientJiraSvn.Service;
-using System.Text;
 
 namespace MoreConvenientJiraSvn.BackgroundTask;
 
@@ -24,10 +23,12 @@ public class DownloadSvnLogHostedService : TimedHostedService
         _logService = logService;
         _settingService = settingService;
 
-        var config = settingService.FindSetting<BackgroundTaskConfig>();
+        var config = _settingService.FindSetting<BackgroundTaskConfig>();
         if (config != null)
         {
-
+            base.RefreshExecuteConfig(config.ExecutionTime - DateTime.Today,
+                TimeSpan.FromMinutes(config.RetryIntervalMinutes),
+                config.MaxRetryCount);
         }
     }
 

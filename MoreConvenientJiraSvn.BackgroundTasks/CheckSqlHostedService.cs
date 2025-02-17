@@ -7,14 +7,31 @@ using System.IO;
 
 namespace MoreConvenientJiraSvn.BackgroundTask;
 
-public class CheckSqlHostedService(IRepository repository, IPlSqlCheckPipeline plSqlCheckPipeline, SettingService settingService, LogService logService)
-: TimedHostedService(new TimeSpan(9, 30, 0), TimeSpan.FromMinutes(5), 3)
+public class CheckSqlHostedService: TimedHostedService
 {
-    private readonly IRepository _repository = repository;
-    private readonly IPlSqlCheckPipeline _plSqlCheckPipeline = plSqlCheckPipeline;
+    private readonly IRepository _repository;
+    private readonly IPlSqlCheckPipeline _plSqlCheckPipeline;
 
-    private readonly SettingService _settingService = settingService;
-    private readonly LogService _logService = logService;
+    private readonly SettingService _settingService;
+    private readonly LogService _logService;
+
+    public CheckSqlHostedService(IRepository repository, IPlSqlCheckPipeline plSqlCheckPipeline, LogService logService, SettingService settingService)
+    : base(new TimeSpan(9, 30, 0), TimeSpan.FromMinutes(5), 3)
+    {
+        _repository = repository;
+        _plSqlCheckPipeline = plSqlCheckPipeline;
+
+        _logService = logService;
+        _settingService = settingService;
+
+        var config = _settingService.FindSetting<BackgroundTaskConfig>();
+        if (config != null)
+        {
+            base.RefreshExecuteConfig(config.ExecutionTime - DateTime.Today,
+                TimeSpan.FromMinutes(config.RetryIntervalMinutes),
+                config.MaxRetryCount);
+        }
+    }
 
     public override async Task<bool> ExecuteTask()
     {

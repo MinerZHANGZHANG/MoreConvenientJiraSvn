@@ -15,6 +15,59 @@
     <ScrollViewer>
         <StackPanel Margin="8">
             <!--  Base setting  -->
+            <Expander Header="执行设置">
+                <StackPanel Orientation="Vertical">
+                    <control:ConfigLine
+                        Margin="8"
+                        ConfigName="是否启用每日执行"
+                        Foreground="Black"
+                        IsButtonVisible="False">
+                        <CheckBox Content="启用" />
+                    </control:ConfigLine>
+                    <control:ConfigLine
+                        Margin="8"
+                        ConfigName="每日执行时间"
+                        Foreground="Black"
+                        IsButtonVisible="False">
+                        <materialDesign:TimePicker Is24Hours="True" />
+                    </control:ConfigLine>
+                    <control:ConfigLine
+                        Margin="8"
+                        ConfigName="失败后重试次数"
+                        Foreground="Black"
+                        IsButtonVisible="False">
+                        <materialDesign:NumericUpDown Maximum="16" Minimum="0" />
+                    </control:ConfigLine>
+                    <control:ConfigLine
+                        Margin="8"
+                        ConfigName="重试间隔(分钟)"
+                        Foreground="Black"
+                        IsButtonVisible="False">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="32" />
+                            </Grid.ColumnDefinitions>
+                            <Slider
+                                Grid.Column="0"
+                                Maximum="30"
+                                Minimum="0"
+                                TickFrequency="5"
+                                TickPlacement="BottomRight"
+                                Value="5" />
+                            <TextBlock
+                                Grid.Column="1"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Text="5" />
+                        </Grid>
+
+                    </control:ConfigLine>
+                </StackPanel>
+            </Expander>
+
+
+            <!--  Jira compare service setting  -->
             <Expander Header="Jira状态检测设置" IsExpanded="True">
                 <StackPanel Orientation="Vertical">
                     <control:ConfigLine
@@ -62,6 +115,66 @@
                 </StackPanel>
             </Expander>
 
+            <!--  Sql check service setting  -->
+            <Expander Header="Sql内容检测设置" IsExpanded="True">
+                <StackPanel Orientation="Vertical">
+                    <control:ConfigLine
+                        Margin="8"
+                        ConfigName="上一次执行时间"
+                        Foreground="Black"
+                        IsButtonVisible="False">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox
+                                Grid.Column="0"
+                                Foreground="Black"
+                                IsEnabled="False"
+                                KeyUp="TextBox_KeyUp"
+                                LostFocus="TextBox_LostFocus"
+                                Style="{StaticResource CustomMaterialTextBoxStyle}"
+                                Text="20254343" />
+                            <Button
+                                Grid.Column="1"
+                                HorizontalAlignment="Right"
+                                Content="执行" />
+                        </Grid>
+                    </control:ConfigLine>
+                </StackPanel>
+            </Expander>
+
+            <!--  Download svn log service setting  -->
+            <Expander Header="Svn日志下载设置" IsExpanded="True">
+                <StackPanel Orientation="Vertical">
+                    <control:ConfigLine
+                        Margin="8"
+                        ConfigName="上一次执行时间"
+                        Foreground="Black"
+                        IsButtonVisible="False">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox
+                                Grid.Column="0"
+                                Foreground="Black"
+                                IsEnabled="False"
+                                KeyUp="TextBox_KeyUp"
+                                LostFocus="TextBox_LostFocus"
+                                Style="{StaticResource CustomMaterialTextBoxStyle}"
+                                Text="20254343" />
+                            <Button
+                                Grid.Column="1"
+                                HorizontalAlignment="Right"
+                                Content="执行" />
+                        </Grid>
+                    </control:ConfigLine>
+
+                </StackPanel>
+            </Expander>
 
 
         </StackPanel>
