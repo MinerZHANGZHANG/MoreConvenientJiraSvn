@@ -103,9 +103,9 @@ namespace MoreConvenientJiraSvn.Service
         {
             var filters = await _jiraClient.GetUserFavouriteFilterAsync();
             var backgroundTaskConfig = _settingService.FindSetting<BackgroundTaskConfig>();
-            if (backgroundTaskConfig?.NeedAutoRefreshFliterNames != null)
+            if (backgroundTaskConfig?.CheckJiraFliterNames != null)
             {
-                return filters.Where(f => backgroundTaskConfig.NeedAutoRefreshFliterNames.Contains(f.Name));
+                return filters.Where(f => backgroundTaskConfig.CheckJiraFliterNames.Contains(f.Name));
             }
             return [];
         }

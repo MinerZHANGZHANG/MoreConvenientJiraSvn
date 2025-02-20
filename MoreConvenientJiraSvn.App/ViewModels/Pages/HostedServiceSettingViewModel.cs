@@ -1,14 +1,12 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using LiteDB;
+using Microsoft.Win32;
 using MoreConvenientJiraSvn.BackgroundTask;
+using MoreConvenientJiraSvn.Core.Interfaces;
 using MoreConvenientJiraSvn.Core.Models;
 using MoreConvenientJiraSvn.Service;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MoreConvenientJiraSvn.App.ViewModels;
 
@@ -16,31 +14,69 @@ public partial class HostedServiceSettingViewModel(SettingService settingService
     DownloadSvnLogHostedService svnLogHostedService,
     CheckJiraStateHostedService jiraStateHostedService,
     CheckSqlHostedService checkSqlHostedService,
-    JiraService jiraService) : ObservableObject
+    JiraService jiraService,
+    IRepository repository) : ObservableObject
 {
     private readonly SettingService _settingService = settingService;
 
     private readonly DownloadSvnLogHostedService _downloadLogHostedService = svnLogHostedService;
     private readonly CheckJiraStateHostedService _checkJiraHostedService = jiraStateHostedService;
     private readonly CheckSqlHostedService _checkSqlHostedService = checkSqlHostedService;
+
     private readonly JiraService _jiraService = jiraService;
+    private readonly IRepository _repository = repository;
 
     [ObservableProperty]
     private BackgroundTaskConfig _hostedServiceConfig = new();
 
     [ObservableProperty]
-    private ObservableCollection<JiraFilterItem> _filters = [];
+    private string _lastCheckJiraExectionTimeText = "None";
+    [ObservableProperty]
+    private ObservableCollection<CheckComboxItem> _jiraFilterItems = [];
+
+    [ObservableProperty]
+    private string _lastCheckSqlExectionTimeText = "None";
+    [ObservableProperty]
+    private ObservableCollection<string> _checkSqlDirectories = [];
+    [ObservableProperty]
+    private string? _selectSqlCheckDirectoryPath;
+
+    [ObservableProperty]
+    private string _lastDownloadSvnExectionTimeText = "None";
+    [ObservableProperty]
+    private ObservableCollection<CheckComboxItem> _svnPathItems = [];
 
     public async Task InitViewModel()
     {
         HostedServiceConfig = _settingService.FindSetting<BackgroundTaskConfig>() ?? new();
 
-        var allFilters = (await _jiraService.GetCurrentUserFavouriteFilterAsync());
-        Filters = [.. allFilters.Select(f => new JiraFilterItem() { Name = f.Name })];
+        await InitJiraStateCheckSettingAsync();
+        InitSqlCheckSetting();
+        InitSvnDownloadSetting();
+    }
 
-        foreach (var name in HostedServiceConfig.NeedAutoRefreshFliterNames)
+    private void InitSqlCheckSetting()
+    {
+        LastCheckSqlExectionTimeText = _repository
+            .Find<BackgroundTaskLog>(Query.EQ(nameof(BackgroundTaskLog.TaskName), nameof(CheckSqlHostedService)))
+            .Max(l => l.StartTime)
+            .ToString("yyyy-MM-dd HH:mm:ss");
+
+        CheckSqlDirectories = [.. HostedServiceConfig.CheckSqlDirectoies];
+    }
+
+    private async Task InitJiraStateCheckSettingAsync()
+    {
+        LastCheckJiraExectionTimeText = _repository
+            .Find<BackgroundTaskLog>(Query.EQ(nameof(BackgroundTaskLog.TaskName), nameof(CheckJiraStateHostedService)))
+            .Max(l => l.StartTime)
+            .ToString("yyyy-MM-dd HH:mm:ss");
+
+        var allFilters = (await _jiraService.GetCurrentUserFavouriteFilterAsync());
+        JiraFilterItems = [.. allFilters.Select(f => new CheckComboxItem() { Name = f.Name })];
+        foreach (var name in HostedServiceConfig.CheckJiraFliterNames)
         {
-            var selectedFilter = Filters.FirstOrDefault(f => f.Name == name);
+            var selectedFilter = JiraFilterItems.FirstOrDefault(f => f.Name == name);
             if (selectedFilter != null)
             {
                 selectedFilter.IsChecked = true;
@@ -48,14 +84,100 @@ public partial class HostedServiceSettingViewModel(SettingService settingService
         }
     }
 
-    [RelayCommand]
-    public void SaveConfig()
+    private void InitSvnDownloadSetting()
     {
+        LastDownloadSvnExectionTimeText = _repository
+            .Find<BackgroundTaskLog>(Query.EQ(nameof(BackgroundTaskLog.TaskName), nameof(DownloadSvnLogHostedService)))
+            .Max(l => l.StartTime)
+            .ToString("yyyy-MM-dd HH:mm:ss");
+
+        var allSqlPaths = _settingService.FindSettings<SvnPath>() ?? [];
+        SvnPathItems = [.. allSqlPaths.Select(p => new CheckComboxItem() { Name = p.PathName })];
+        foreach (var dir in HostedServiceConfig.CheckSqlDirectoies)
+        {
+            var selectedPath = SvnPathItems.FirstOrDefault(f => f.Name == dir);
+            if (selectedPath != null)
+            {
+                selectedPath.IsChecked = true;
+            }
+        }
+    }
+
+    [RelayCommand]
+    public async Task ExecuteService(string serviceName)
+    {
+        if (serviceName == nameof(CheckJiraStateHostedService))
+        {
+            LastCheckJiraExectionTimeText = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            var isSuccess = await _checkJiraHostedService.ExecuteTask();
+        }
+        else if (serviceName == nameof(CheckSqlHostedService))
+        {
+            LastCheckSqlExectionTimeText = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            var isSuccess = await _checkSqlHostedService.ExecuteTask();
+        }
+        else if (serviceName == nameof(DownloadSvnLogHostedService))
+        {
+            LastDownloadSvnExectionTimeText = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            var isSuccess = await _downloadLogHostedService.ExecuteTask();
+        }
+    }
+
+    [RelayCommand]
+    public void SaveSetting()
+    {
+        HostedServiceConfig.CheckJiraFliterNames = [.. JiraFilterItems.Where(i => i.IsChecked).Select(i => i.Name)];
+        HostedServiceConfig.CheckSqlDirectoies = [.. CheckSqlDirectories];
+        HostedServiceConfig.CheckSvnPaths = [.. SvnPathItems.Where(i => i.IsChecked).Select(i => i.Name)];
+
         _settingService.UpsertSetting(HostedServiceConfig);
+    }
+
+    [RelayCommand]
+    public void SetSqlDirectory()
+    {
+        var folderBrowserDialog = new OpenFolderDialog
+        {
+            Title = "选择Sql所在的本地文件夹"
+        };
+
+        var result = folderBrowserDialog.ShowDialog();
+        if (result == true)
+        {
+            string selectedPath = folderBrowserDialog.FolderName;
+            if (!string.IsNullOrEmpty(selectedPath))
+            {
+                SelectSqlCheckDirectoryPath = selectedPath;
+            }
+        }
+    }
+
+    [RelayCommand]
+    public void AddSqlDirectory()
+    {
+        if (!string.IsNullOrEmpty(SelectSqlCheckDirectoryPath)
+            && !CheckSqlDirectories.Contains(SelectSqlCheckDirectoryPath))
+        {
+            CheckSqlDirectories.Add(SelectSqlCheckDirectoryPath);
+
+            SaveSetting();
+        }
+    }
+
+    [RelayCommand]
+    public void RemoveSqlDirectory(string directoryPath)
+    {
+        if (!string.IsNullOrEmpty(directoryPath)
+            && CheckSqlDirectories.Contains(directoryPath))
+        {
+            CheckSqlDirectories.Remove(directoryPath);
+
+            SaveSetting();
+        }
     }
 }
 
-public class JiraFilterItem
+public class CheckComboxItem
 {
     public required string Name { get; set; }
     public bool IsChecked { get; set; } = false;

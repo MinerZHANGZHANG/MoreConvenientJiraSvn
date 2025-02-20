@@ -7,7 +7,9 @@
     xmlns:local="clr-namespace:MoreConvenientJiraSvn.App.Views.Pages"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewModel="clr-namespace:MoreConvenientJiraSvn.App.ViewModels"
     Title="PluginSettingPage"
+    d:DataContext="{d:DesignInstance Type=viewModel:HostedServiceSettingViewModel}"
     d:DesignHeight="520"
     d:DesignWidth="900"
     mc:Ignorable="d">
@@ -22,21 +24,31 @@
                         ConfigName="是否启用每日执行"
                         Foreground="Black"
                         IsButtonVisible="False">
-                        <CheckBox Content="启用" />
+                        <CheckBox
+                            Command="{Binding SaveSettingCommand}"
+                            Content="启用"
+                            IsChecked="{Binding HostedServiceConfig.IsEnableBackgroundTask}" />
                     </control:ConfigLine>
                     <control:ConfigLine
                         Margin="8"
                         ConfigName="每日执行时间"
                         Foreground="Black"
                         IsButtonVisible="False">
-                        <materialDesign:TimePicker Is24Hours="True" />
+                        <materialDesign:TimePicker
+                            Is24Hours="True"
+                            SelectedTime="{Binding HostedServiceConfig.ExecutionTime}"
+                            SelectedTimeChanged="TimePicker_SelectedTimeChanged" />
                     </control:ConfigLine>
                     <control:ConfigLine
                         Margin="8"
                         ConfigName="失败后重试次数"
                         Foreground="Black"
                         IsButtonVisible="False">
-                        <materialDesign:NumericUpDown Maximum="16" Minimum="0" />
+                        <materialDesign:NumericUpDown
+                            Maximum="16"
+                            Minimum="0"
+                            ValueChanged="NumericUpDown_ValueChanged"
+                            Value="{Binding HostedServiceConfig.MaxRetryCount}" />
                     </control:ConfigLine>
                     <control:ConfigLine
                         Margin="8"
@@ -54,18 +66,18 @@
                                 Minimum="0"
                                 TickFrequency="5"
                                 TickPlacement="BottomRight"
-                                Value="5" />
+                                ValueChanged="IntervalSlider_ValueChanged"
+                                Value="{Binding HostedServiceConfig.RetryIntervalMinutes}" />
                             <TextBlock
                                 Grid.Column="1"
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center"
-                                Text="5" />
+                                Text="{Binding RelativeSource={RelativeSource AncestorType=Slider}, Path=Value, StringFormat='{}{0:F0}'}" />
                         </Grid>
 
                     </control:ConfigLine>
                 </StackPanel>
             </Expander>
-
 
             <!--  Jira compare service setting  -->
             <Expander Header="Jira状态检测设置" IsExpanded="True">
@@ -84,13 +96,13 @@
                                 Grid.Column="0"
                                 Foreground="Black"
                                 IsEnabled="False"
-                                KeyUp="TextBox_KeyUp"
-                                LostFocus="TextBox_LostFocus"
                                 Style="{StaticResource CustomMaterialTextBoxStyle}"
-                                Text="20254343" />
+                                Text="{Binding LastCheckJiraExectionTimeText}" />
                             <Button
                                 Grid.Column="1"
                                 HorizontalAlignment="Right"
+                                Command="{Binding ExecuteServiceCommand}"
+                                CommandParameter="CheckJiraStateHostedService"
                                 Content="执行" />
                         </Grid>
                     </control:ConfigLine>
@@ -99,14 +111,11 @@
                         Margin="8"
                         ConfigName="需要定时刷新的过滤器"
                         IsButtonVisible="False">
-                        <ComboBox ItemsSource="{Binding Filters}">
+                        <ComboBox ItemsSource="{Binding JiraFilterItems}" SelectionChanged="ComboBox_Selected">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
-                                        <CheckBox
-                                            Checked="CheckBox_Checked"
-                                            Content="{Binding Name}"
-                                            IsChecked="{Binding IsChecked}" />
+                                        <CheckBox Content="{Binding Name}" IsChecked="{Binding IsChecked}" />
                                     </StackPanel>
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>
@@ -132,16 +141,67 @@
                                 Grid.Column="0"
                                 Foreground="Black"
                                 IsEnabled="False"
-                                KeyUp="TextBox_KeyUp"
-                                LostFocus="TextBox_LostFocus"
                                 Style="{StaticResource CustomMaterialTextBoxStyle}"
-                                Text="20254343" />
+                                Text="{Binding LastCheckSqlExectionTimeText}" />
                             <Button
                                 Grid.Column="1"
                                 HorizontalAlignment="Right"
+                                Command="{Binding ExecuteServiceCommand}"
+                                CommandParameter="CheckSqlHostedService"
                                 Content="执行" />
                         </Grid>
                     </control:ConfigLine>
+                    <control:ConfigLine
+                        Margin="8"
+                        ConfigName="需要检测的文件夹"
+                        Foreground="Black"
+                        IsButtonVisible="False">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox
+                                Grid.Column="0"
+                                Foreground="Black"
+                                Text="{Binding SelectSqlCheckDirectoryPath}" />
+                            <Button
+                                Grid.Column="1"
+                                HorizontalAlignment="Right"
+                                Command="{Binding SetSqlDirectoryCommand}"
+                                Content="选择" />
+                            <Button
+                                Grid.Column="2"
+                                HorizontalAlignment="Right"
+                                Command="{Binding AddSqlDirectoryCommand}"
+                                Content="新增" />
+                        </Grid>
+                    </control:ConfigLine>
+                    <DataGrid
+                        x:Name="AddressDataGrid"
+                        AutoGenerateColumns="False"
+                        CanUserAddRows="True"
+                        Foreground="Black"
+                        ItemsSource="{Binding CheckSqlDirectories}">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn
+                                Width="2*"
+                                Binding="{Binding}"
+                                Header="地址" />
+                            <DataGridTemplateColumn Width="*" Header="操作">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button
+                                            Margin="4"
+                                            Command="{Binding DataContext.RemoveSqlDirectoryCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                            CommandParameter="{Binding}"
+                                            Content="删除" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
                 </StackPanel>
             </Expander>
 
@@ -162,21 +222,43 @@
                                 Grid.Column="0"
                                 Foreground="Black"
                                 IsEnabled="False"
-                                KeyUp="TextBox_KeyUp"
-                                LostFocus="TextBox_LostFocus"
                                 Style="{StaticResource CustomMaterialTextBoxStyle}"
-                                Text="20254343" />
+                                Text="{Binding LastDownloadSvnExectionTimeText}" />
                             <Button
                                 Grid.Column="1"
                                 HorizontalAlignment="Right"
+                                Command="{Binding ExecuteServiceCommand}"
+                                CommandParameter="DownloadSvnLogHostedService"
                                 Content="执行" />
                         </Grid>
                     </control:ConfigLine>
-
+                    <control:ConfigLine
+                        Margin="8"
+                        ConfigName="向前下载天数"
+                        Foreground="Black"
+                        IsButtonVisible="False">
+                        <materialDesign:NumericUpDown
+                            Maximum="16"
+                            Minimum="1"
+                            ValueChanged="NumericUpDown_ValueChanged"
+                            Value="{Binding HostedServiceConfig.SvnLogDownloadPrevDays}" />
+                    </control:ConfigLine>
+                    <control:ConfigLine
+                        Margin="8"
+                        ConfigName="需要下载的SVN路径"
+                        IsButtonVisible="False">
+                        <ComboBox ItemsSource="{Binding SvnPathItems}" SelectionChanged="ComboBox_Selected">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <CheckBox Content="{Binding Name}" IsChecked="{Binding IsChecked}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </control:ConfigLine>
                 </StackPanel>
             </Expander>
-
-
         </StackPanel>
     </ScrollViewer>
 </Page>

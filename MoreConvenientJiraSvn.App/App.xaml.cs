@@ -40,6 +40,10 @@ namespace MoreConvenientJiraSvn.App
             services.AddHostedService<CheckJiraStateHostedService>();
             services.AddHostedService<CheckSqlHostedService>();
 
+            services.AddSingleton<DownloadSvnLogHostedService>();
+            services.AddSingleton<CheckJiraStateHostedService>();
+            services.AddSingleton<CheckSqlHostedService>();
+
             services.AddTransient<JiraSettingViewModel>();
             services.AddTransient<SvnSettingViewModel>();
             services.AddTransient<Jira2LocalDirViewModel>();
@@ -47,6 +51,7 @@ namespace MoreConvenientJiraSvn.App
             services.AddTransient<SqlCheckViewModel>();
             services.AddTransient<MainControlViewModel>();
             services.AddTransient<AppSettingControlViewModel>();
+            services.AddTransient<HostedServiceSettingViewModel>();
 
             _services = services.BuildServiceProvider(true);
 

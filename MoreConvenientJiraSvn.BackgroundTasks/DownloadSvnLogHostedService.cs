@@ -42,7 +42,7 @@ public class DownloadSvnLogHostedService : TimedHostedService
         };
         List<BackgroundTaskMessage> taskMessages = [];
 
-        var needAutoRefreshSvnPaths = _settingService.FindSetting<BackgroundTaskConfig>()?.NeedAutoRefreshSvnPaths ?? [];
+        var needAutoRefreshSvnPaths = _settingService.FindSetting<BackgroundTaskConfig>()?.CheckSvnPaths ?? [];
         var svnPaths = _svnService.SvnPaths.Where(p => needAutoRefreshSvnPaths.Contains(p.Path));
         if (svnPaths.Any())
         {
