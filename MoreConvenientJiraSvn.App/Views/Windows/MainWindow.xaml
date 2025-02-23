@@ -9,6 +9,7 @@
     Title="更方便的Jira和Svn"
     Width="1280"
     Height="720"
+    WindowStartupLocation="CenterScreen"
     WindowStyle="ThreeDBorderWindow"
     mc:Ignorable="d">
     <StackPanel>

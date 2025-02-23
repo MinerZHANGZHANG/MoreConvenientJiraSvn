@@ -12,11 +12,16 @@ namespace MoreConvenientJiraSvn.App.Views.Pages
         private HostedServiceSettingViewModel _viewModel;
         public HostedServiceSettingPage()
         {
-            InitializeComponent();
             _viewModel = ViewModelsManager.GetViewModel<HostedServiceSettingViewModel>();
             DataContext = _viewModel;
 
+            InitializeComponent();
             Loaded += HostedServiceSettingPage_Loaded;
+        }
+
+        private void SaveSetting()
+        {
+            _viewModel?.SaveSetting();
         }
 
         private async void HostedServiceSettingPage_Loaded(object sender, System.Windows.RoutedEventArgs e)
@@ -26,22 +31,22 @@ namespace MoreConvenientJiraSvn.App.Views.Pages
 
         private void NumericUpDown_ValueChanged(object sender, System.Windows.RoutedPropertyChangedEventArgs<int> e)
         {
-
+            SaveSetting();
         }
 
         private void TimePicker_SelectedTimeChanged(object sender, System.Windows.RoutedPropertyChangedEventArgs<DateTime?> e)
         {
-
+            SaveSetting();
         }
 
         private void IntervalSlider_ValueChanged(object sender, System.Windows.RoutedPropertyChangedEventArgs<double> e)
         {
-
+            SaveSetting();
         }
 
-        private void ComboBox_Selected(object sender, System.Windows.RoutedEventArgs e)
+        private void ComboBox_LostFocus(object sender, System.Windows.RoutedEventArgs e)
         {
-
+            SaveSetting();
         }
     }
 }

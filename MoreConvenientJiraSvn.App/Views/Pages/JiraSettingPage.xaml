@@ -7,10 +7,10 @@
     xmlns:local="clr-namespace:MoreConvenientJiraSvn.App.Views.Pages"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:model="clr-namespace:MoreConvenientJiraSvn.App.ViewModels"
+    xmlns:viewModel="clr-namespace:MoreConvenientJiraSvn.App.ViewModels"
     x:Name="Page"
     Title="JiraSettingPage"
-    d:DataContext="{d:DesignInstance Type=model:JiraSettingViewModel}"
+    d:DataContext="{d:DesignInstance Type=viewModel:JiraSettingViewModel}"
     d:DesignHeight="520"
     d:DesignWidth="900"
     mc:Ignorable="d">
@@ -18,62 +18,72 @@
     <ScrollViewer>
         <StackPanel Margin="8">
             <!--  Base setting  -->
-            <Expander Header="基础设置">
+            <Expander
+                BorderThickness="2"
+                Header="基础设置"
+                IsExpanded="True">
                 <StackPanel Orientation="Vertical">
                     <control:ConfigLine
                         Margin="8"
                         ConfigName="Jira路径"
-                        Foreground="Black">
+                        Foreground="Black"
+                        ShowConfigDescriptionCommand="{Binding ShowJiraUrlDescriptionCommand}">
                         <TextBox
                             Foreground="Black"
                             KeyUp="TextBox_KeyUp"
                             LostFocus="TextBox_LostFocus"
                             Style="{StaticResource CustomMaterialTextBoxStyle}"
-                            Text="{Binding Config.BaseUrl, UpdateSourceTrigger=PropertyChanged}" />
+                            Text="{Binding JiraConfig.BaseUrl, UpdateSourceTrigger=PropertyChanged}" />
                     </control:ConfigLine>
                     <control:ConfigLine
                         Margin="8"
                         ConfigName="用户ApiToken"
-                        ShowConfigDescriptionCommand="">
+                        ShowConfigDescriptionCommand="{Binding ShowJiraApiTokenDescriptionCommand}">
                         <TextBox
                             Foreground="Black"
                             KeyUp="TextBox_KeyUp"
                             LostFocus="TextBox_LostFocus"
                             Style="{StaticResource CustomMaterialTextBoxStyle}"
-                            Text="{Binding Config.ApiToken, UpdateSourceTrigger=PropertyChanged}" />
+                            Text="{Binding JiraConfig.ApiToken, UpdateSourceTrigger=PropertyChanged}" />
                     </control:ConfigLine>
                 </StackPanel>
             </Expander>
 
             <!--  User info  -->
-            <Expander Header="用户信息">
+            <Expander
+                BorderThickness="2"
+                Header="用户信息"
+                IsExpanded="True">
                 <StackPanel Orientation="Vertical">
                     <control:ConfigLine
                         Margin="8"
                         ConfigName="用户名"
-                        IsButtonVisible="False">
+                        ShowConfigDescriptionCommand="{Binding ShowJiraUserInfoDescriptionCommand}">
                         <TextBox
+                            IsEnabled="False"
                             IsReadOnly="True"
                             Style="{StaticResource CustomMaterialTextBoxStyle}"
-                            Text="{Binding Config.UserName}" />
+                            Text="{Binding JiraConfig.UserName}" />
                     </control:ConfigLine>
                     <control:ConfigLine
                         Margin="8"
                         ConfigName="用户邮箱"
                         IsButtonVisible="False">
                         <TextBox
+                            IsEnabled="False"
                             IsReadOnly="True"
                             Style="{StaticResource CustomMaterialTextBoxStyle}"
-                            Text="{Binding Config.Email}" />
+                            Text="{Binding JiraConfig.Email}" />
                     </control:ConfigLine>
                     <control:ConfigLine
                         Margin="8"
                         ConfigName="Token过期日"
                         IsButtonVisible="False">
                         <TextBox
+                            IsEnabled="False"
                             IsReadOnly="True"
                             Style="{StaticResource CustomMaterialTextBoxStyle}"
-                            Text="{Binding Config.TokenExpringAt}" />
+                            Text="{Binding JiraConfig.TokenExpiringTime}" />
                     </control:ConfigLine>
                 </StackPanel>
             </Expander>

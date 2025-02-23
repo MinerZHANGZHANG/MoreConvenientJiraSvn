@@ -7,6 +7,7 @@ using MoreConvenientJiraSvn.Core.Interfaces;
 using MoreConvenientJiraSvn.Core.Models;
 using MoreConvenientJiraSvn.Service;
 using System.Collections.ObjectModel;
+using System.Windows.Automation;
 
 namespace MoreConvenientJiraSvn.App.ViewModels;
 
@@ -46,13 +47,25 @@ public partial class HostedServiceSettingViewModel(SettingService settingService
     [ObservableProperty]
     private ObservableCollection<CheckComboxItem> _svnPathItems = [];
 
+    private bool _isInit = false;
     public async Task InitViewModel()
     {
         HostedServiceConfig = _settingService.FindSetting<BackgroundTaskConfig>() ?? new();
+        _settingService.OnConfigChanged += _settingService_OnConfigChanged;
 
         await InitJiraStateCheckSettingAsync();
         InitSqlCheckSetting();
         InitSvnDownloadSetting();
+
+        _isInit = true;
+    }
+
+    private void _settingService_OnConfigChanged(object? sender, ConfigChangedArgs e)
+    {
+        if (e.Config is IEnumerable<SvnPath> svnPaths)
+        {
+            InitSvnDownloadSetting();
+        }
     }
 
     private void InitSqlCheckSetting()
@@ -91,11 +104,11 @@ public partial class HostedServiceSettingViewModel(SettingService settingService
             .Max(l => l.StartTime)
             .ToString("yyyy-MM-dd HH:mm:ss");
 
-        var allSqlPaths = _settingService.FindSettings<SvnPath>() ?? [];
-        SvnPathItems = [.. allSqlPaths.Select(p => new CheckComboxItem() { Name = p.PathName })];
-        foreach (var dir in HostedServiceConfig.CheckSqlDirectoies)
+        var svnPaths = _settingService.FindSettings<SvnPath>() ?? [];
+        SvnPathItems = [.. svnPaths.Select(p => new CheckComboxItem() { Name = p.PathName })];
+        foreach (var path in HostedServiceConfig.CheckSvnPaths)
         {
-            var selectedPath = SvnPathItems.FirstOrDefault(f => f.Name == dir);
+            var selectedPath = SvnPathItems.FirstOrDefault(i => i.Name == path);
             if (selectedPath != null)
             {
                 selectedPath.IsChecked = true;
@@ -126,6 +139,11 @@ public partial class HostedServiceSettingViewModel(SettingService settingService
     [RelayCommand]
     public void SaveSetting()
     {
+        if (!_isInit)
+        {
+            return;
+        }
+
         HostedServiceConfig.CheckJiraFliterNames = [.. JiraFilterItems.Where(i => i.IsChecked).Select(i => i.Name)];
         HostedServiceConfig.CheckSqlDirectoies = [.. CheckSqlDirectories];
         HostedServiceConfig.CheckSvnPaths = [.. SvnPathItems.Where(i => i.IsChecked).Select(i => i.Name)];

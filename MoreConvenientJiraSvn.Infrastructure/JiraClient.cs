@@ -28,9 +28,14 @@ public class JiraClient : IJiraClient
 
         try
         {
+            if (!Uri.TryCreate(config.BaseUrl, UriKind.Absolute, out var result))
+            {
+                return false;
+            }
+
             _httpClient = new HttpClient()
             {
-                BaseAddress = new Uri(config.BaseUrl)
+                BaseAddress = result
             };
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", config.ApiToken);
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -134,7 +139,7 @@ public class JiraClient : IJiraClient
         var jsonResponse = await response.Content.ReadAsStringAsync();
         using JsonDocument doc = JsonDocument.Parse(jsonResponse);
 
-        if(doc.RootElement.TryGetProperty("transitions",out var transitionsElement))
+        if (doc.RootElement.TryGetProperty("transitions", out var transitionsElement))
         {
             foreach (var transition in transitionsElement.EnumerateArray())
             {

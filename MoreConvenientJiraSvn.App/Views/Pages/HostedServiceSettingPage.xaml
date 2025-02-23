@@ -17,7 +17,10 @@
     <ScrollViewer>
         <StackPanel Margin="8">
             <!--  Base setting  -->
-            <Expander Header="执行设置">
+            <Expander
+                BorderThickness="2"
+                Header="执行设置"
+                IsExpanded="True">
                 <StackPanel Orientation="Vertical">
                     <control:ConfigLine
                         Margin="8"
@@ -67,12 +70,12 @@
                                 TickFrequency="5"
                                 TickPlacement="BottomRight"
                                 ValueChanged="IntervalSlider_ValueChanged"
-                                Value="{Binding HostedServiceConfig.RetryIntervalMinutes}" />
+                                Value="{Binding HostedServiceConfig.RetryIntervalMinutes, Mode=TwoWay}" />
                             <TextBlock
                                 Grid.Column="1"
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center"
-                                Text="{Binding RelativeSource={RelativeSource AncestorType=Slider}, Path=Value, StringFormat='{}{0:F0}'}" />
+                                Text="{Binding HostedServiceConfig.RetryIntervalMinutes, Mode=TwoWay, StringFormat='{}{0:F0}'}" />
                         </Grid>
 
                     </control:ConfigLine>
@@ -80,7 +83,10 @@
             </Expander>
 
             <!--  Jira compare service setting  -->
-            <Expander Header="Jira状态检测设置" IsExpanded="True">
+            <Expander
+                BorderThickness="2"
+                Header="Jira状态检测设置"
+                IsExpanded="False">
                 <StackPanel Orientation="Vertical">
                     <control:ConfigLine
                         Margin="8"
@@ -111,11 +117,11 @@
                         Margin="8"
                         ConfigName="需要定时刷新的过滤器"
                         IsButtonVisible="False">
-                        <ComboBox ItemsSource="{Binding JiraFilterItems}" SelectionChanged="ComboBox_Selected">
+                        <ComboBox ItemsSource="{Binding JiraFilterItems}" LostFocus="ComboBox_LostFocus">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
-                                        <CheckBox Content="{Binding Name}" IsChecked="{Binding IsChecked}" />
+                                        <CheckBox Content="{Binding Name, Mode=TwoWay}" IsChecked="{Binding IsChecked, Mode=TwoWay}" />
                                     </StackPanel>
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>
@@ -125,7 +131,10 @@
             </Expander>
 
             <!--  Sql check service setting  -->
-            <Expander Header="Sql内容检测设置" IsExpanded="True">
+            <Expander
+                BorderThickness="2"
+                Header="Sql内容检测设置"
+                IsExpanded="False">
                 <StackPanel Orientation="Vertical">
                     <control:ConfigLine
                         Margin="8"
@@ -206,7 +215,10 @@
             </Expander>
 
             <!--  Download svn log service setting  -->
-            <Expander Header="Svn日志下载设置" IsExpanded="True">
+            <Expander
+                BorderThickness="2"
+                Header="Svn日志下载设置"
+                IsExpanded="False">
                 <StackPanel Orientation="Vertical">
                     <control:ConfigLine
                         Margin="8"
@@ -247,11 +259,11 @@
                         Margin="8"
                         ConfigName="需要下载的SVN路径"
                         IsButtonVisible="False">
-                        <ComboBox ItemsSource="{Binding SvnPathItems}" SelectionChanged="ComboBox_Selected">
+                        <ComboBox ItemsSource="{Binding SvnPathItems}" LostFocus="ComboBox_LostFocus">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
-                                        <CheckBox Content="{Binding Name}" IsChecked="{Binding IsChecked}" />
+                                        <CheckBox Content="{Binding Name, Mode=TwoWay}" IsChecked="{Binding IsChecked, Mode=TwoWay}" />
                                     </StackPanel>
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>

@@ -9,7 +9,7 @@ public record BackgroundTaskConfig
 
     // Todo: Split each service
     public bool IsEnableBackgroundTask { get; set; } = true;
-    public DateTime ExecutionTime { get; set; } = DateTime.MinValue;
+    public DateTime ExecutionTime { get; set; } = DateTime.Now;
     public int MaxRetryCount { get; set; } = 0;
     public int RetryIntervalMinutes { get; set; } = 5;
 

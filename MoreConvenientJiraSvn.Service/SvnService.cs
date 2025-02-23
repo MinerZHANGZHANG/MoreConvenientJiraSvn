@@ -53,28 +53,6 @@ public class SvnService : IDisposable
         GC.SuppressFinalize(this);
     }
 
-    #region Path manager
-
-    [Obsolete]
-    public void InsertOrUpdateSinglePath(SvnPath newPath)
-    {
-        _settingService.UpsertSettings(newPath);
-
-    }
-
-    [Obsolete]
-    public void DeleteSinglePath(string path)
-    {
-        _settingService.DeleteSettings<SvnPath>(path);
-    }
-
-    public void UpdatePathMany(List<SvnPath> paths)
-    {
-        _settingService.UpsertSettings(paths);
-    }
-
-    #endregion
-
     #region Operation methods
 
     public async Task<List<SvnLog>> GetSvnLogsAsync(string path, DateTime? beginDate, DateTime? endDate, int maxNumber = 200, bool isNeedExtractJiraId = false)

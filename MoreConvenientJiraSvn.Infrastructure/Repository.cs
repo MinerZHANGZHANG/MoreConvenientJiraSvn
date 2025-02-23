@@ -28,7 +28,8 @@ public class Repository(LiteDatabase db) : IRepository
     public int Upsert<T>(IEnumerable<T> objs) where T : new()
     {
         var collection = _db.GetCollection<T>();
-        return collection.Upsert(objs);
+        collection.DeleteAll();
+        return collection.Insert(objs);
     }
 
     public IEnumerable<T> FindAll<T>() where T : new()

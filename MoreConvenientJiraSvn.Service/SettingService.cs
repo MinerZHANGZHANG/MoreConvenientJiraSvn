@@ -35,13 +35,13 @@ public class SettingService(IRepository repository)
         return result;
     }
 
-    public bool UpsertSettings<T>(T obj) where T : new()
-    {
-        var result = _repository.Upsert<T>(obj);
-        OnConfigChanged?.Invoke(this, new(_repository.FindAll<T>()));
+    //public bool UpsertSettings<T>(T obj) where T : new()
+    //{
+    //    var result = _repository.Upsert<T>(obj);
+    //    OnConfigChanged?.Invoke(this, new(_repository.FindAll<T>()));
 
-        return result;
-    }
+    //    return result;
+    //}
 
     public bool DeleteSettings<T>(BsonValue id) where T : new()
     {

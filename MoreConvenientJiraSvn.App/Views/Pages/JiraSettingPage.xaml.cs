@@ -10,29 +10,25 @@ namespace MoreConvenientJiraSvn.App.Views.Pages;
 /// </summary>
 public partial class JiraSettingPage : Page
 {
-    private readonly JiraSettingViewModel viewModel;
+    private readonly JiraSettingViewModel _viewModel;
     public JiraSettingPage()
     {
-        viewModel = ViewModelsManager.GetViewModel<JiraSettingViewModel>();
-        DataContext = viewModel;
-        InitializeComponent();
-    }
+        _viewModel = ViewModelsManager.GetViewModel<JiraSettingViewModel>();
+        DataContext = _viewModel;
 
-    private void TextBox_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
-    {
-        if (e.Key == Key.Enter)
-        {
-            viewModel.UpdateConfig();
-        }
+        InitializeComponent();
     }
 
     private void TextBox_LostFocus(object sender, RoutedEventArgs e)
     {
-        viewModel.UpdateConfig();
+        _viewModel.SaveSetting();
     }
 
-    private void CheckBox_Checked(object sender, RoutedEventArgs e)
+    private void TextBox_KeyUp(object sender, KeyEventArgs e)
     {
-        viewModel.UpdateFilter();
+        if (e.Key == Key.Enter)
+        {
+            _viewModel.SaveSetting();
+        }
     }
 }
