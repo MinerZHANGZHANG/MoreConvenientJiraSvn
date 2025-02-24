@@ -3,7 +3,7 @@
 namespace MoreConvenientJiraSvn.Core.Models;
 
 /// <summary>
-/// In my surrounding，use FixVersions and JiraId link svnPath to jira
+/// In my surrounding，use FixVersions and IssueKey link svnPath to jira
 /// </summary>
 public record JiraSvnPathRelation
 {

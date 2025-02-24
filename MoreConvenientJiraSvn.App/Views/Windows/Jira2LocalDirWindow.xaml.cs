@@ -10,11 +10,11 @@ namespace MoreConvenientJiraSvn.App.Views.Windows;
 /// </summary>
 public partial class Jira2LocalDirWindow : Window
 {
-    private Jira2LocalDirViewModel _viewModel;
+    private readonly JiraIssueBrowseViewModel _viewModel;
     public Jira2LocalDirWindow()
     {
         InitializeComponent();
-        this._viewModel = ViewModelsManager.GetViewModel<Jira2LocalDirViewModel>();
+        this._viewModel = ViewModelsManager.GetViewModel<JiraIssueBrowseViewModel>();
         
         this.DataContext = _viewModel;
         this.Loaded += Jira2LocalDirWindow_Loaded;
@@ -33,12 +33,12 @@ public partial class Jira2LocalDirWindow : Window
 
     private void DataGrid_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
     {
-        this._viewModel.RefreshLocalJiraInfo();
+        this._viewModel.SelectedIssueChanged();
     }
 
     private void ComboBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
     {
-        this._viewModel.RefreshSelectPathSvnLog();
+        this._viewModel.LoadSvnLogByFromLocal();
     }
 
     private void ListBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)

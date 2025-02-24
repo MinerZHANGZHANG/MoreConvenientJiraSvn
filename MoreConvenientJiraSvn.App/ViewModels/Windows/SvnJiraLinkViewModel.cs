@@ -83,7 +83,7 @@ public partial class SvnJiraLinkViewModel(SvnService svnService, IRepository rep
     {
         if (SelectedPath != null)
         {
-            SelectedSvnLogs = _repository.Find<SvnLog>(Query.EQ(nameof(SvnLog.SvnPath), SelectedPath.Path)).OrderByDescending(s=>s.DateTime).ToList();
+            SelectedSvnLogs = [.. _repository.Find<SvnLog>(Query.EQ(nameof(SvnLog.SvnPath), SelectedPath.Path)).OrderByDescending(s=>s.DateTime)];
             SelectPathRelation = _repository.FindOne<JiraSvnPathRelation>(Query.EQ(nameof(JiraSvnPathRelation.SvnPath), SelectedPath.Path))??new();
 
             _svnLogPaginator = new PaginationHelper<SvnLog>(SelectedSvnLogs, _pageSize);
@@ -127,7 +127,7 @@ public partial class SvnJiraLinkViewModel(SvnService svnService, IRepository rep
             if (querySvnLog != null && querySvnLog.Any())
             {
                 _repository.Upsert(querySvnLog);
-                SelectedSvnLogs = SelectedSvnLogs.Union(querySvnLog).ToList();
+                SelectedSvnLogs = [.. SelectedSvnLogs.Union(querySvnLog)];
 
                 ShowTipMessage = $"查询成功，获取数据量{querySvnLog.Count()}";
                 IsShowTip = true;

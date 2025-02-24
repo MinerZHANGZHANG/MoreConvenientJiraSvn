@@ -55,20 +55,20 @@ public class SvnService : IDisposable
 
     #region Operation methods
 
-    public async Task<List<SvnLog>> GetSvnLogsAsync(string path, DateTime? beginDate, DateTime? endDate, int maxNumber = 200, bool isNeedExtractJiraId = false)
+    public async Task<List<SvnLog>> GetSvnLogsAsync(string path, DateTime? beginDate, DateTime? endDate, int maxNumber = 200, bool isNeedExtractJiraId = false, CancellationToken cancellationToken = default)
     {
         _logService.Debug($"{nameof(GetSvnLogs)}({path}) [{beginDate}——{endDate}](maxCount:{maxNumber})");
 
-        List<SvnLog> result = await _svnClient.GetSvnLogAsync(path, beginDate ?? DateTime.MinValue, endDate ?? DateTime.Today, maxNumber, isNeedExtractJiraId);
+        List<SvnLog> result = await _svnClient.GetSvnLogAsync(path, beginDate ?? DateTime.MinValue, endDate ?? DateTime.Today, maxNumber, isNeedExtractJiraId, cancellationToken);
 
         return result;
     }
 
-    public async Task<List<SvnLog>> GetSvnLogs(string path, long? beginRevision, long? endRevision, int maxNumber = 200, bool isNeedExtractJiraId = false)
+    public async Task<List<SvnLog>> GetSvnLogs(string path, long? beginRevision, long? endRevision, int maxNumber = 200, bool isNeedExtractJiraId = false, CancellationToken cancellationToken = default)
     {
         _logService.Debug($"{nameof(GetSvnLogs)}({path}) [{beginRevision}——{endRevision}](maxCount:{maxNumber})");
 
-        List<SvnLog> result = await _svnClient.GetSvnLogAsync(path, beginRevision ?? 0, endRevision ?? long.MaxValue, maxNumber, isNeedExtractJiraId);
+        List<SvnLog> result = await _svnClient.GetSvnLogAsync(path, beginRevision ?? 0, endRevision ?? long.MaxValue, maxNumber, isNeedExtractJiraId, cancellationToken);
 
         return result;
     }

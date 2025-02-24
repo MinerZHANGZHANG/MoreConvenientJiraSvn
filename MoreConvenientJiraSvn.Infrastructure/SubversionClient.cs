@@ -16,7 +16,7 @@ public class SubversionClient : ISubversionClient
     private SvnClient? _client;
     private SvnConfig? _config;
 
-    public async Task<List<SvnLog>> GetSvnLogAsync(string path, DateTime beginTime, DateTime endTime, int maxNumber = 200, bool isNeedExtractJiraId = false)
+    public async Task<List<SvnLog>> GetSvnLogAsync(string path, DateTime beginTime, DateTime endTime, int maxNumber = 200, bool isNeedExtractJiraId = false, CancellationToken cancellationToken = default)
     {
         if (_client == null)
         {
@@ -31,13 +31,13 @@ public class SubversionClient : ISubversionClient
         };
         var uri = new Uri(path);
 
-        var logEventArgs = await GetSvnLogAsync(uri, logArgs);
+        var logEventArgs = await GetSvnLogAsync(uri, logArgs, cancellationToken);
         var result = TransSvnlog(logEventArgs, path, isNeedExtractJiraId);
 
         return result;
     }
 
-    public async Task<List<SvnLog>> GetSvnLogAsync(string path, long beginRevision, long endRevision, int maxNumber = 200, bool isNeedExtractJiraId = false)
+    public async Task<List<SvnLog>> GetSvnLogAsync(string path, long beginRevision, long endRevision, int maxNumber = 200, bool isNeedExtractJiraId = false, CancellationToken cancellationToken = default)
     {
         if (_client == null)
         {
@@ -51,11 +51,14 @@ public class SubversionClient : ISubversionClient
             End = endRevision,
         };
         var uri = new Uri(path);
+        var logEventArgs = await GetSvnLogAsync(uri, logArgs, cancellationToken);
 
-        var logEventArgs = await GetSvnLogAsync(uri, logArgs);
-        var result = TransSvnlog(logEventArgs, path, isNeedExtractJiraId);
+        if (cancellationToken.IsCancellationRequested)
+        {
+            return [];
+        }
 
-        return result;
+        return TransSvnlog(logEventArgs, path, isNeedExtractJiraId);
     }
 
     public bool InitSvnClient(SvnConfig config)
@@ -79,25 +82,24 @@ public class SubversionClient : ISubversionClient
         GC.SuppressFinalize(this);
     }
 
-    private async Task<IEnumerable<SvnLogEventArgs>> GetSvnLogAsync(Uri svnUri, SvnLogArgs svnLogArgs)
+    private async Task<IEnumerable<SvnLogEventArgs>> GetSvnLogAsync(Uri svnUri, SvnLogArgs svnLogArgs, CancellationToken cancellationToken = default)
     {
         IEnumerable<SvnLogEventArgs> results = [];
-        if (_client == null)
+        if (_client == null || cancellationToken.IsCancellationRequested)
         {
             return results;
         }
 
-        //_notificationService.DebugMessage($"{nameof(GetSvnLogs)}({path}) [{beginTime}——{endTime}](maxCount:{maxNumber})");
         await Task.Run(() =>
         {
             _client.GetLog(svnUri, svnLogArgs, out var logEventArgs);
             results = logEventArgs;
-        });
+        }, cancellationToken);
 
         return results;
     }
 
-    private List<SvnLog> TransSvnlog(IEnumerable<SvnLogEventArgs> logEventArgs, string svnPath, bool isNeedExtractJiraId = false)
+    private static List<SvnLog> TransSvnlog(IEnumerable<SvnLogEventArgs> logEventArgs, string svnPath, bool isNeedExtractJiraId = false)
     {
         List<SvnLog> results = [];
         foreach (var item in logEventArgs)

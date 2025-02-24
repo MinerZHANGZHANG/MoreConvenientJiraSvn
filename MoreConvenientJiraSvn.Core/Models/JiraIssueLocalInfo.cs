@@ -2,10 +2,10 @@
 
 namespace MoreConvenientJiraSvn.Core.Models;
 
-public record LocalJiraInfo
+public record JiraIssueLocalInfo
 {
     [BsonId]
     public ObjectId Id { get; set; } = ObjectId.NewObjectId();
-    public string JiraId { get; set; } = string.Empty;
+    public string IssueKey { get; set; } = string.Empty;
     public string LocalDir { get; set; } = string.Empty;
 }

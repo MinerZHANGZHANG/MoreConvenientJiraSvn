@@ -7,14 +7,14 @@ public interface IJiraClient
 {
     bool InitHttpClient(JiraConfig jiraConfig);
 
-    Task<JiraConfig> GetUserInfoAsync(JiraConfig jiraConfig);
+    Task<JiraConfig> GetUserInfoAsync(JiraConfig jiraConfig, CancellationToken cancellationToken = default);
 
-    Task<List<JiraFilter>> GetUserFavouriteFilterAsync();
+    Task<List<JiraIssueFilter>> GetUserFavouriteFilterAsync(CancellationToken cancellationToken = default);
 
-    Task<IssueInfo?> GetIssueAsync(string issueId);
+    Task<JiraIssue?> GetIssueAsync(string issueId, CancellationToken cancellationToken = default);
 
-    Task<IssuePageInfo> GetIssuesAsyncByUrl(string searchUrl, int startAt = 0);
+    Task<IssuePageInfo> GetIssuesAsyncByUrl(string searchUrl, int startAt = 0, CancellationToken cancellationToken = default);
 
-    Task<List<JiraTransition>> GetTransitionsByIssueId(string issueId);
+    Task<List<JiraTransition>> GetTransitionsByIssueId(string issueId, CancellationToken cancellationToken = default);
 
 }

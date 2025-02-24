@@ -2,7 +2,7 @@
 
 namespace MoreConvenientJiraSvn.Core.Models;
 
-public class JiraFilter
+public class JiraIssueFilter
 {
     [BsonId]
     public required string FilterId { get; set; }

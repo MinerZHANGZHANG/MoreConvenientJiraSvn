@@ -1,6 +1,4 @@
-﻿using Antlr4.Runtime.Atn;
-using LiteDB;
-using MoreConvenientJiraSvn.Core.Interfaces;
+﻿using MoreConvenientJiraSvn.Core.Interfaces;
 using MoreConvenientJiraSvn.Core.Models;
 using MoreConvenientJiraSvn.Core.Utils;
 using System.Net.Http.Headers;
@@ -50,28 +48,27 @@ public class JiraClient : IJiraClient
         }
     }
 
-    public async Task<IssueInfo?> GetIssueAsync(string issueId)
+    public async Task<JiraIssue?> GetIssueAsync(string issueId, CancellationToken cancellationToken = default)
     {
-        IssueInfo? result = default;
-        if (_httpClient == null || string.IsNullOrEmpty(issueId))
-        {
-            return result;
-        }
-        //_notificationService.DebugMessage($"{nameof(GetIssueAsync)} [rest/api/2/issue/{issueId}]");
-
-        var response = await _httpClient.GetAsync($"{IssueUri}/{issueId}");
-        if (!response.IsSuccessStatusCode)
+        JiraIssue? result = default;
+        if (_httpClient == null || string.IsNullOrEmpty(issueId) || cancellationToken.IsCancellationRequested)
         {
             return result;
         }
 
-        var jsonResponse = await response.Content.ReadAsStringAsync();
+        var response = await _httpClient.GetAsync($"{IssueUri}/{issueId}", cancellationToken);
+        if (!response.IsSuccessStatusCode || cancellationToken.IsCancellationRequested)
+        {
+            return result;
+        }
+
+        var jsonResponse = await response.Content.ReadAsStringAsync(cancellationToken);
         result = IssueInfoConverter.GetIssueInfoFromJson(jsonResponse);
 
         return result;
     }
 
-    public async Task<IssuePageInfo> GetIssuesAsyncByUrl(string searchUrl, int startAt = 0)
+    public async Task<IssuePageInfo> GetIssuesAsyncByUrl(string searchUrl, int startAt = 0, CancellationToken cancellationToken = default)
     {
         IssuePageInfo result = new()
         {
@@ -80,18 +77,18 @@ public class JiraClient : IJiraClient
             StartAt = startAt,
             Total = 0
         };
-        List<IssueInfo> issues = [];
+        List<JiraIssue> issues = [];
         StringBuilder errorMsgBuilder = new();
 
-        if (_httpClient == null || string.IsNullOrEmpty(searchUrl))
+        if (_httpClient == null || string.IsNullOrEmpty(searchUrl) || cancellationToken.IsCancellationRequested)
         {
             return result;
         }
 
-        var response = await _httpClient.GetAsync($"{searchUrl}&startAt={startAt}");
+        var response = await _httpClient.GetAsync($"{searchUrl}&startAt={startAt}", cancellationToken);
         response.EnsureSuccessStatusCode();
 
-        var jsonResponse = await response.Content.ReadAsStringAsync();
+        var jsonResponse = await response.Content.ReadAsStringAsync(cancellationToken);
         using JsonDocument doc = JsonDocument.Parse(jsonResponse);
         JsonElement root = doc.RootElement;
 
@@ -103,9 +100,13 @@ public class JiraClient : IJiraClient
         {
             foreach (var issueElement in issuesElement.EnumerateArray())
             {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return result;
+                }
+
                 var jsonString = issueElement.GetRawText();
-                if (!IssueInfoConverter.TryGetIssueInfoFromJson(jsonString, out var issue, out var errorMsg)
-                    || issue == null)
+                if (!IssueInfoConverter.TryGetIssueInfoFromJson(jsonString, out var issue, out var errorMsg) || issue == null)
                 {
                     errorMsgBuilder.AppendLine($"{errorMsg}:[{jsonString}]");
                     continue;
@@ -125,24 +126,29 @@ public class JiraClient : IJiraClient
         return result;
     }
 
-    public async Task<List<JiraTransition>> GetTransitionsByIssueId(string issueId)
+    public async Task<List<JiraTransition>> GetTransitionsByIssueId(string issueId, CancellationToken cancellationToken = default)
     {
         List<JiraTransition> results = [];
-        if (_httpClient == null || string.IsNullOrEmpty(issueId))
+        if (_httpClient == null || string.IsNullOrEmpty(issueId) || cancellationToken.IsCancellationRequested)
         {
             return results;
         }
-        //_notificationService.DebugMessage($"{nameof(GetIssueAsync)} [rest/api/2/issue/{issueId}/transitions]");
-        var response = await _httpClient.GetAsync($"{IssueUri}/{issueId}/transitions");
+
+        var response = await _httpClient.GetAsync($"{IssueUri}/{issueId}/transitions", cancellationToken);
         response.EnsureSuccessStatusCode();
 
-        var jsonResponse = await response.Content.ReadAsStringAsync();
+        var jsonResponse = await response.Content.ReadAsStringAsync(cancellationToken);
         using JsonDocument doc = JsonDocument.Parse(jsonResponse);
 
         if (doc.RootElement.TryGetProperty("transitions", out var transitionsElement))
         {
             foreach (var transition in transitionsElement.EnumerateArray())
             {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return results;
+                }
+
                 JiraTransition result = new()
                 {
                     TransitionId = transition.GetProperty("id").GetString() ?? string.Empty,
@@ -155,19 +161,18 @@ public class JiraClient : IJiraClient
         return results;
     }
 
-    public async Task<List<JiraFilter>> GetUserFavouriteFilterAsync()
+    public async Task<List<JiraIssueFilter>> GetUserFavouriteFilterAsync(CancellationToken cancellationToken = default)
     {
-        List<JiraFilter> result = [];
+        List<JiraIssueFilter> results = [];
         if (_httpClient == null)
         {
-            return result;
+            return results;
         }
-        //_notificationService.DebugMessage($"{nameof(GetCurrentUserFavouriteFilterAsync)} [rest/api/2/filter/favourite]");
 
-        var response = await _httpClient.GetAsync(FavouriteFilterUri);
+        var response = await _httpClient.GetAsync(FavouriteFilterUri, cancellationToken);
         response.EnsureSuccessStatusCode();
 
-        var jsonResponse = await response.Content.ReadAsStringAsync();
+        var jsonResponse = await response.Content.ReadAsStringAsync(cancellationToken);
         if (string.IsNullOrEmpty(jsonResponse))
         {
             throw new Exception("response is empty.");
@@ -178,27 +183,31 @@ public class JiraClient : IJiraClient
         {
             foreach (JsonElement element in doc.RootElement.EnumerateArray())
             {
-                var filter = new JiraFilter()
+                if(cancellationToken.IsCancellationRequested)
+                {
+                    return results; 
+                }
+
+                var filter = new JiraIssueFilter()
                 {
                     FilterId = element.GetProperty("id").GetString() ?? string.Empty,
                     Name = element.GetProperty("name").GetString() ?? "Nameless",
                     Jql = element.GetProperty("jql").GetString() ?? string.Empty,
                     SearchUrl = element.GetProperty("searchUrl").GetString() ?? string.Empty,
                 };
-                result.Add(filter);
+                results.Add(filter);
             }
         }
 
-        return result;
+        return results;
     }
 
-    public async Task<JiraConfig> GetUserInfoAsync(JiraConfig jiraConfig)
+    public async Task<JiraConfig> GetUserInfoAsync(JiraConfig jiraConfig, CancellationToken cancellationToken = default)
     {
         if (_httpClient == null)
         {
             return jiraConfig;
         }
-        //_notificationService.DebugMessage($"{nameof(GetCurrentUserInfoAsync)} [{jiraConfig.BaseUrl}:rest/api/2/myself]");
 
         #region get name&email
         string name = string.Empty;
@@ -207,7 +216,7 @@ public class JiraClient : IJiraClient
         var response = await _httpClient.GetAsync(UserInfoUri);
         response.EnsureSuccessStatusCode();
 
-        var jsonResponse = await response.Content.ReadAsStringAsync();
+        var jsonResponse = await response.Content.ReadAsStringAsync(cancellationToken);
         if (string.IsNullOrEmpty(jsonResponse))
         {
             throw new Exception("response is empty.");
@@ -231,7 +240,7 @@ public class JiraClient : IJiraClient
         response = await _httpClient.GetAsync(UserTokenUri);
         response.EnsureSuccessStatusCode();
 
-        jsonResponse = await response.Content.ReadAsStringAsync();
+        jsonResponse = await response.Content.ReadAsStringAsync(cancellationToken);
         if (string.IsNullOrEmpty(jsonResponse))
         {
             throw new Exception("response is empty.");

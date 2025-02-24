@@ -30,33 +30,17 @@ namespace MoreConvenientJiraSvn.Service
             _settingService.OnConfigChanged += RefreshJiraCilent_OnConfigChanged;
         }
 
-        private async void RefreshJiraCilent_OnConfigChanged(object? sender, ConfigChangedArgs e)
-        {
-            if (e.Config is not JiraConfig config)
-            {
-                return;
-            }
 
-            if (config.BaseUrl != null && config.ApiToken != null)
-            {
-                if (_jiraClient.InitHttpClient(config))
-                {
-                    config = await _jiraClient.GetUserInfoAsync(config);
-                }
-            }
-            _jiraConfig = config;
-        }
-
-        public async Task<List<JiraFilter>> GetCurrentUserFavouriteFilterAsync()
+        public async Task<List<JiraIssueFilter>> GetCurrentUserFavouriteFilterAsync()
         {
-            List<JiraFilter> result = await _jiraClient.GetUserFavouriteFilterAsync();
+            List<JiraIssueFilter> result = await _jiraClient.GetUserFavouriteFilterAsync();
 
             return result;
         }
 
-        public async Task<IssueInfo?> GetIssueAsync(string issueId)
+        public async Task<JiraIssue?> GetIssueAsync(string issueId)
         {
-            IssueInfo? result = await _jiraClient.GetIssueAsync(issueId);
+            JiraIssue? result = await _jiraClient.GetIssueAsync(issueId);
             if (result != null)
             {
                 _repository.Upsert(result);
@@ -65,10 +49,9 @@ namespace MoreConvenientJiraSvn.Service
             return result;
         }
 
-        public async Task<List<IssueDiff>> GetIssuesDiffByFilterAsync(JiraFilter jiraFilter, int maxRequestCount = 100)
+        public async Task<List<JiraIssue>> GetIssuesByFilterAsync(JiraIssueFilter jiraFilter, int maxRequestCount = 200)
         {
-            List<IssueDiff> issueDiffs = [];
-            List<IssueInfo> issueInfos = [];
+            List<JiraIssue> issueInfos = [];
             int start = 0;
             int total = 1;
             int requestCount = 0;
@@ -89,17 +72,25 @@ namespace MoreConvenientJiraSvn.Service
                 issueInfos.AddRange(issuePageInfo.IssueInfos);
             }
 
+            return issueInfos;
+        }
+
+        public async Task<List<IssueDiff>> GetIssuesDiffByFilterAsync(JiraIssueFilter jiraFilter, int maxRequestCount = 200)
+        {
+            List<IssueDiff> issueDiffs = [];
+            List<JiraIssue> issueInfos = await GetIssuesByFilterAsync(jiraFilter, maxRequestCount);
+
             _repository.Upsert(issueInfos);
             foreach (var newIssue in issueInfos)
             {
-                var oldIssue = _repository.FindOne<IssueInfo>(Query.EQ(nameof(IssueInfo.IssueId), newIssue.IssueId));
+                var oldIssue = _repository.FindOne<JiraIssue>(Query.EQ(nameof(JiraIssue.IssueId), newIssue.IssueId));
                 issueDiffs.Add(new() { Old = oldIssue, New = newIssue });
             }
 
             return issueDiffs;
         }
 
-        public async Task<IEnumerable<JiraFilter>> GetNeedRefreshFavouriteFilterAsync()
+        public async Task<IEnumerable<JiraIssueFilter>> GetNeedRefreshFavouriteFilterAsync()
         {
             var filters = await _jiraClient.GetUserFavouriteFilterAsync();
             var backgroundTaskConfig = _settingService.FindSetting<BackgroundTaskConfig>();
@@ -110,6 +101,22 @@ namespace MoreConvenientJiraSvn.Service
             return [];
         }
 
+        private async void RefreshJiraCilent_OnConfigChanged(object? sender, ConfigChangedArgs e)
+        {
+            if (e.Config is not JiraConfig config)
+            {
+                return;
+            }
+
+            if (config.BaseUrl != null && config.ApiToken != null)
+            {
+                if (_jiraClient.InitHttpClient(config))
+                {
+                    config = await _jiraClient.GetUserInfoAsync(config);
+                }
+            }
+            _jiraConfig = config;
+        }
 
         #region link svn
 
@@ -123,7 +130,7 @@ namespace MoreConvenientJiraSvn.Service
                                             )));
         }
 
-        public IEnumerable<SvnPath> GetRelatSvnPath(IssueInfo IssueInfo)
+        public IEnumerable<SvnPath> GetRelatSvnPath(JiraIssue IssueInfo)
         {
             if (IssueInfo.Versions.Count == 0)
             {
@@ -131,7 +138,7 @@ namespace MoreConvenientJiraSvn.Service
             }
             var relations = _repository.Find<JiraSvnPathRelation>(Query.In(nameof(JiraSvnPathRelation.Version), IssueInfo.Versions.Select(v => new BsonValue(v))));
             var svnPaths = _repository.Find<SvnPath>(Query.In(nameof(SvnPath.Path), relations.Select(v => new BsonValue(v.SvnPath))));
-            
+
             return svnPaths;
         }
 

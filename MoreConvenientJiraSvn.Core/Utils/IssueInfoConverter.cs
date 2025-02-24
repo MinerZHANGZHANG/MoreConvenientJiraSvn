@@ -30,7 +30,7 @@ public static class IssueInfoConverter
     private static Dictionary<string, IssueJsonMappingAttribute> InitPropertyMapDict()
     {
         var propertyMapDict = new Dictionary<string, IssueJsonMappingAttribute>();
-        foreach (var property in typeof(IssueInfo).GetProperties())
+        foreach (var property in typeof(JiraIssue).GetProperties())
         {
             var attributes = property.GetCustomAttributes(typeof(IssueJsonMappingAttribute), false);
             if (attributes.Length > 0)
@@ -43,7 +43,7 @@ public static class IssueInfoConverter
         return propertyMapDict;
     }
 
-    public static bool TryGetIssueInfoFromJson(string jsonString, out IssueInfo? result, out string errorMsg)
+    public static bool TryGetIssueInfoFromJson(string jsonString, out JiraIssue? result, out string errorMsg)
     {
         errorMsg=string.Empty;
         try
@@ -65,7 +65,7 @@ public static class IssueInfoConverter
     }
 
 
-    public static IssueInfo? GetIssueInfoFromJson(string jsonString)
+    public static JiraIssue? GetIssueInfoFromJson(string jsonString)
     {
         if (string.IsNullOrWhiteSpace(jsonString))
         {
@@ -79,7 +79,7 @@ public static class IssueInfoConverter
         }
         fieldsElement.TryGetProperty(ParentNodeName, out var parentElement);
 
-        var IssueInfo = new IssueInfo();
+        var IssueInfo = new JiraIssue();
         foreach (var propertyMap in PropertyMapDict)
         {
             if (propertyMap.Value.PropertyInfo == null)

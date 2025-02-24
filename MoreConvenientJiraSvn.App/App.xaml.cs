@@ -46,7 +46,7 @@ namespace MoreConvenientJiraSvn.App
 
             services.AddTransient<JiraSettingViewModel>();
             services.AddTransient<SvnSettingViewModel>();
-            services.AddTransient<Jira2LocalDirViewModel>();
+            services.AddTransient<JiraIssueBrowseViewModel>();
             services.AddTransient<SvnJiraLinkViewModel>();
             services.AddTransient<SqlCheckViewModel>();
             services.AddTransient<MainControlViewModel>();

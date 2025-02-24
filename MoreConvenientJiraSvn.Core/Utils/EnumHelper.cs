@@ -13,11 +13,11 @@ public static class EnumHelper
                    .Select(e => new EnumDescription
                    {
                        Value = e,
-                       Description = GetEnumDescription(e)
+                       Description = GetEnumValueDescription(e)
                    })];
     }
 
-    public static string GetEnumDescription<T>(T value) where T : notnull
+    public static string GetEnumValueDescription<T>(T value) where T : notnull
     {
         FieldInfo? field = value?.GetType()?.GetField(value.ToString() ?? string.Empty);
         return field?.GetCustomAttributes(typeof(DescriptionAttribute), false)
@@ -25,6 +25,7 @@ public static class EnumHelper
                           ? attribute.Description
                           : value?.ToString() ?? string.Empty;
     }
+
 
     //public static ToolTipIcon ConvertEnumToIcon(InfoLevel level)
     //{

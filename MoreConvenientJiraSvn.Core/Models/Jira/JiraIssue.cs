@@ -4,7 +4,7 @@ using MoreConvenientJiraSvn.Core.Enums;
 
 namespace MoreConvenientJiraSvn.Core.Models;
 
-public record IssueInfo
+public record JiraIssue
 {
     #region Main Property
 

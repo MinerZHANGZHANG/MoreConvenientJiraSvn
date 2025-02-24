@@ -9,7 +9,7 @@ namespace MoreConvenientJiraSvn.App.Views.Pages
     /// </summary>
     public partial class HostedServiceSettingPage : Page
     {
-        private HostedServiceSettingViewModel _viewModel;
+        private readonly HostedServiceSettingViewModel _viewModel;
         public HostedServiceSettingPage()
         {
             _viewModel = ViewModelsManager.GetViewModel<HostedServiceSettingViewModel>();

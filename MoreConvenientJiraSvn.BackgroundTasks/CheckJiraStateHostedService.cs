@@ -89,7 +89,7 @@ public class CheckJiraStateHostedService: TimedHostedService
         return taskLog.IsSucccess;
     }
 
-    public static List<BackgroundTaskMessage> GetIssueChangeMessages(List<IssueDiff> IssueDiffs, JiraFilter jiraFilter)
+    public static List<BackgroundTaskMessage> GetIssueChangeMessages(List<IssueDiff> IssueDiffs, JiraIssueFilter jiraFilter)
     {
         List<BackgroundTaskMessage> messageList = [];
 
@@ -100,7 +100,7 @@ public class CheckJiraStateHostedService: TimedHostedService
             {
                 BackgroundTaskMessage message = new()
                 {
-                    Info = $"Jira:[{jiraFilter.Name}]过滤器里新增了一条数据，JiraId{IssueDiffs[i].New.IssueKey}",
+                    Info = $"Jira:[{jiraFilter.Name}]过滤器里新增了一条数据，IssueKey{IssueDiffs[i].New.IssueKey}",
                     Level = InfoLevel.Normal,
                 };
                 messageList.Add(message);

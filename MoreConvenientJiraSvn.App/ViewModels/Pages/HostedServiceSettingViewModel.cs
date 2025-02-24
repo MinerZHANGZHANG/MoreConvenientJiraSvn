@@ -51,7 +51,7 @@ public partial class HostedServiceSettingViewModel(SettingService settingService
     public async Task InitViewModel()
     {
         HostedServiceConfig = _settingService.FindSetting<BackgroundTaskConfig>() ?? new();
-        _settingService.OnConfigChanged += _settingService_OnConfigChanged;
+        _settingService.OnConfigChanged += SettingService_OnConfigChanged;
 
         await InitJiraStateCheckSettingAsync();
         InitSqlCheckSetting();
@@ -60,9 +60,9 @@ public partial class HostedServiceSettingViewModel(SettingService settingService
         _isInit = true;
     }
 
-    private void _settingService_OnConfigChanged(object? sender, ConfigChangedArgs e)
+    private void SettingService_OnConfigChanged(object? sender, ConfigChangedArgs e)
     {
-        if (e.Config is IEnumerable<SvnPath> svnPaths)
+        if (e.Config is IEnumerable<SvnPath>)
         {
             InitSvnDownloadSetting();
         }

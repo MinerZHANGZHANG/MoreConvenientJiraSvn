@@ -2,7 +2,7 @@
 
 namespace MoreConvenientJiraSvn.Core.Models;
 
-public record LocalJiraSetting
+public record JiraIssueLocalInfoSetting
 {
     [BsonId]
     public ObjectId Id { get; set; } = ObjectId.Empty;

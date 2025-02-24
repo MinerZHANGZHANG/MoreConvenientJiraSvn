@@ -13,18 +13,11 @@
     Title="Jira本地化"
     Width="1280"
     Height="720"
-    d:DataContext="{d:DesignInstance Type=viewModel:Jira2LocalDirViewModel}"
+    d:DataContext="{d:DesignInstance Type=viewModel:JiraIssueBrowseViewModel}"
     Style="{StaticResource MaterialDesignWindow}"
     mc:Ignorable="d">
     <Window.Resources>
         <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <materialDesign:BundledTheme
-                    BaseTheme="Light"
-                    PrimaryColor="DeepPurple"
-                    SecondaryColor="Lime" />
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml" />
-            </ResourceDictionary.MergedDictionaries>
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
             <convert:EnumToVisibilityConverter x:Key="EnumToVisibilityConverter" />
             <Style BasedOn="{StaticResource MaterialDesignBody1TextBlock}" TargetType="TextBlock">
@@ -95,8 +88,7 @@
     </Window.Resources>
 
     <materialDesign:DrawerHost
-        HorizontalAlignment="Center"
-        VerticalAlignment="Center"
+        HorizontalAlignment="Right"
         BorderBrush="{DynamicResource MaterialDesignDivider}"
         BorderThickness="2"
         BottomDrawerBackground="{DynamicResource SecondaryHueLightBrush}"
@@ -111,7 +103,7 @@
             </Style>
         </materialDesign:DrawerHost.Style>
         <materialDesign:DrawerHost.LeftDrawerContent>
-            <StackPanel Width="400" Margin="16,16,16,16">
+            <StackPanel Width="512" Margin="16,16,16,16">
                 <ListBox
                     ItemsSource="{Binding Transitions}"
                     SelectedValue="{Binding SelectedTransition}"
@@ -160,7 +152,7 @@
 
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="720" />
+                <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
@@ -171,7 +163,7 @@
             <DockPanel
                 Grid.Row="0"
                 Grid.Column="0"
-                Margin="16">
+                Margin="8">
 
                 <!--  Jira search bar  -->
                 <DockPanel
@@ -181,6 +173,7 @@
                     <ComboBox
                         x:Name="SelectTypeComboBox"
                         MinWidth="64"
+                        Margin="0,0,16,0"
                         DockPanel.Dock="Left"
                         ItemsSource="{Binding JiraQueryTypes}"
                         SelectedItem="{Binding SelectedJiraQueryType}">
@@ -190,13 +183,13 @@
                             </DataTemplate>
                         </ComboBox.ItemTemplate>
                     </ComboBox>
-                    <Grid MinWidth="256" HorizontalAlignment="Stretch">
+                    <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
 
                         <ComboBox
-                            Width="240"
+                            Width="256"
                             ItemsSource="{Binding JiraFilters}"
                             SelectedItem="{Binding SelectedFilter}"
                             Visibility="{Binding IsUseTextToSearch, Converter={x:Static convert:InverseBooleanToVisibilityConverter.Instance}}">
@@ -208,12 +201,11 @@
                         </ComboBox>
 
                         <TextBox
-                            Width="240"
+                            Width="256"
                             Text="{Binding JiraQueryText}"
                             Visibility="{Binding IsUseTextToSearch, Converter={StaticResource BooleanToVisibilityConverter}}" />
                     </Grid>
                     <Button
-                        x:Name="JiraSearchButton"
                         MinWidth="128"
                         HorizontalAlignment="Right"
                         Command="{Binding QueryJiraInfoCommand}"
@@ -232,7 +224,6 @@
                     HorizontalScrollBarVisibility="Auto"
                     IsReadOnly="True"
                     ItemsSource="{Binding JiraInfoList}"
-                    ScrollViewer.HorizontalScrollBarVisibility="Visible"
                     ScrollViewer.VerticalScrollBarVisibility="Visible"
                     SelectedItem="{Binding SelectedJiraInfo}"
                     SelectionChanged="DataGrid_SelectionChanged"
@@ -264,7 +255,7 @@
             <Grid
                 Grid.Row="0"
                 Grid.Column="1"
-                Margin="16">
+                Margin="8">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
@@ -487,42 +478,31 @@
                                     <TextBlock
                                         Grid.Row="1"
                                         Grid.Column="0"
-                                        Grid.ColumnSpan="2"
-                                        Text="{Binding SvnLogVersionRangeText}" />
+                                        Margin="8"
+                                        Text="开始日期" />
+                                    <DatePicker
+                                        Grid.Row="1"
+                                        Grid.Column="1"
+                                        Margin="8" />
                                     <TextBlock
                                         Grid.Row="1"
                                         Grid.Column="2"
-                                        Grid.ColumnSpan="2"
-                                        Text="{Binding SvnLogTimeRangeText}" />
+                                        Margin="8"
+                                        Text="到期日期" />
+                                    <DatePicker
+                                        Grid.Row="1"
+                                        Grid.Column="3"
+                                        Margin="8" />
 
-                                    <Button
+                                    <TextBlock
                                         Grid.Row="2"
                                         Grid.Column="0"
-                                        Margin="8"
-                                        Command="{Binding DownloadPrevSvnLogByAmountCommand}"
-                                        CommandParameter="100"
-                                        Content="Prev 100" />
-                                    <Button
-                                        Grid.Row="2"
-                                        Grid.Column="1"
-                                        Margin="8"
-                                        Command="{Binding DownloadNextSvnLogByAmountCommand}"
-                                        CommandParameter="100"
-                                        Content="Next 100" />
-                                    <Button
-                                        Grid.Row="2"
-                                        Grid.Column="2"
-                                        Margin="8"
-                                        Command="{Binding DownloadPrevSvnLogByDateCommand}"
-                                        CommandParameter="1"
-                                        Content="Prev 1 Day" />
+                                        Grid.ColumnSpan="3"
+                                        Text="{Binding SvnLogVersionRangeText}" />
                                     <Button
                                         Grid.Row="2"
                                         Grid.Column="3"
-                                        Margin="8"
-                                        Command="{Binding DownloadNextSvnLogByDateCommand}"
-                                        CommandParameter="1"
-                                        Content="Next 1 Day" />
+                                        Content="更新" />
                                 </Grid>
 
                                 <DataGrid
