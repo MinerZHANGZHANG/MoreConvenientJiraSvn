@@ -1,13 +1,14 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using LiteDB;
-using Microsoft.Extensions.DependencyInjection;
 using MoreConvenientJiraSvn.Core.Enums;
 using MoreConvenientJiraSvn.Core.Models;
 using MoreConvenientJiraSvn.Service;
 using MoreConvenientJiraSvn.Core.Utils;
 using System.Windows;
 using MoreConvenientJiraSvn.Core.Interfaces;
+using MaterialDesignThemes.Wpf;
+using System.Collections.ObjectModel;
 
 namespace MoreConvenientJiraSvn.App.ViewModels;
 
@@ -25,15 +26,17 @@ public partial class SvnJiraLinkViewModel(SvnService svnService, IRepository rep
     private SvnConfig _config = new();
 
     [ObservableProperty]
-    private List<SvnPath> _svnPaths = [];
+    private ObservableCollection<SvnPath> _svnPaths = [];
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(PageTipText))]
     [NotifyPropertyChangedFor(nameof(SelectPathTipText))]
     [NotifyPropertyChangedFor(nameof(SelectPathStateText))]
     private SvnPath? _selectedPath;
+
     [ObservableProperty]
-    private List<SvnLog> _selectedSvnLogs = [];
+    private ObservableCollection<SvnLog> _selectedPathSvnLogs = [];
+
     [ObservableProperty]
     private JiraSvnPathRelation _selectPathRelation = new();
 
@@ -41,15 +44,20 @@ public partial class SvnJiraLinkViewModel(SvnService svnService, IRepository rep
     [NotifyPropertyChangedFor(nameof(PageTipText))]
     private IEnumerable<SvnLog> _currentPageSvnLogs = [];
 
+    public SnackbarMessageQueue SnackbarMessageQueue { get; } = new SnackbarMessageQueue(TimeSpan.FromSeconds(2d));
+
+    private event EventHandler<SvnPath>? _selectedSvnPathChanged;
+
+
     public string PageTipText => $"{_svnLogPaginator?.CurrentPageIndex ?? 0} / {_svnLogPaginator?.GetPagesCount() ?? 0}";
     public string SelectPathTipText => $"SVN路径：{SelectedPath?.FullPathName}";
     public string SelectPathStateText
     {
         get
         {
-            if (SelectedSvnLogs.Count > 0)
+            if (SelectedPathSvnLogs.Count > 0)
             {
-                return $"已下载Log：版本号[{SelectedSvnLogs.Min(l => l.Revision)}——{SelectedSvnLogs.Max(l => l.Revision)}] | 日期[{SelectedSvnLogs.Min(l => l.DateTime)}——{SelectedSvnLogs.Max(l => l.DateTime)}]";
+                return $"已下载Log：版本号[{SelectedPathSvnLogs.Min(l => l.Revision)}——{SelectedPathSvnLogs.Max(l => l.Revision)}] | 日期[{SelectedPathSvnLogs.Min(l => l.DateTime)}——{SelectedPathSvnLogs.Max(l => l.DateTime)}]";
             }
             else
             {
@@ -62,43 +70,56 @@ public partial class SvnJiraLinkViewModel(SvnService svnService, IRepository rep
     private DateTime _beginQueryDateTime;
     [ObservableProperty]
     private DateTime _endQueryDateTime;
+
     private const int _singleQueryMaxLogCount = 65535;
 
     private PaginationHelper<SvnLog>? _svnLogPaginator;
     private const int _pageSize = 5;
 
-    [ObservableProperty]
-    private bool _isShowTip = false;
-    [ObservableProperty]
-    private string _showTipMessage = string.Empty;
+    private CancellationTokenSource? _cancellationTokenSource;
     #endregion
 
     public void InitViewModel()
     {
         Config = _svnService.SvnConfig ?? new();
-        SvnPaths =[.. _svnService.SvnPaths];
+        SvnPaths = [.. _svnService.SvnPaths];
+
+        _selectedSvnPathChanged += SvnJiraLinkViewModel_SelectedSvnPathChanged;
     }
 
-    public void RefreshSvnLog()
+    public void InvokeSelectedSvnPathEvent(object? sender)
     {
-        if (SelectedPath != null)
+        if (SelectedPath == null)
         {
-            SelectedSvnLogs = [.. _repository.Find<SvnLog>(Query.EQ(nameof(SvnLog.SvnPath), SelectedPath.Path)).OrderByDescending(s=>s.DateTime)];
-            SelectPathRelation = _repository.FindOne<JiraSvnPathRelation>(Query.EQ(nameof(JiraSvnPathRelation.SvnPath), SelectedPath.Path))??new();
+            return;
+        }
+        _selectedSvnPathChanged?.Invoke(sender, SelectedPath);
+    }
 
-            _svnLogPaginator = new PaginationHelper<SvnLog>(SelectedSvnLogs, _pageSize);
-            CurrentPageSvnLogs = _svnLogPaginator.GetCurrentItems();
+    private void SvnJiraLinkViewModel_SelectedSvnPathChanged(object? sender, SvnPath e)
+    {
+        _cancellationTokenSource?.Cancel();
 
-            if (SelectedSvnLogs.Count > 0)
-            {
-                BeginQueryDateTime = SelectedSvnLogs.Max(l => l.DateTime);
-                EndQueryDateTime = DateTime.Now;
-            }
-            else
-            {
-                BeginQueryDateTime = DateTime.Now.AddDays(-7);
-                EndQueryDateTime = DateTime.Now;
-            }
+        RefreshSvnLog(e);
+    }
+
+    public void RefreshSvnLog(SvnPath svnPath)
+    {
+        SelectedPathSvnLogs = [.. _repository.Find<SvnLog>(Query.EQ(nameof(SvnLog.SvnPath), svnPath.Path)).OrderByDescending(s => s.DateTime)];
+        SelectPathRelation = _repository.FindOne<JiraSvnPathRelation>(Query.EQ(nameof(JiraSvnPathRelation.SvnPath), svnPath.Path)) ?? new();
+
+        _svnLogPaginator = new PaginationHelper<SvnLog>(SelectedPathSvnLogs, _pageSize);
+        CurrentPageSvnLogs = _svnLogPaginator.GetCurrentItems();
+
+        if (SelectedPathSvnLogs.Count > 0)
+        {
+            BeginQueryDateTime = SelectedPathSvnLogs.Max(l => l.DateTime);
+            EndQueryDateTime = DateTime.Now;
+        }
+        else
+        {
+            BeginQueryDateTime = DateTime.Now.AddDays(-7);
+            EndQueryDateTime = DateTime.Now;
         }
     }
 
@@ -119,26 +140,23 @@ public partial class SvnJiraLinkViewModel(SvnService svnService, IRepository rep
         if (SelectedPath != null)
         {
             IEnumerable<SvnLog> querySvnLog = [];
+            _cancellationTokenSource = new();
             await Task.Run(async () =>
             {
                 bool isHaveJiraId = SelectedPath.SvnPathType == SvnPathType.Code || SelectedPath.SvnPathType == SvnPathType.Document;
-                querySvnLog =await _svnService.GetSvnLogsAsync(SelectedPath.Path, BeginQueryDateTime, EndQueryDateTime, isNeedExtractJiraId: isHaveJiraId, maxNumber: _singleQueryMaxLogCount);
+                querySvnLog = await _svnService.GetSvnLogsAsync(SelectedPath.Path, BeginQueryDateTime, EndQueryDateTime, _singleQueryMaxLogCount, isHaveJiraId, _cancellationTokenSource.Token);
             });
             if (querySvnLog != null && querySvnLog.Any())
             {
                 _repository.Upsert(querySvnLog);
-                SelectedSvnLogs = [.. SelectedSvnLogs.Union(querySvnLog)];
+                SelectedPathSvnLogs = [.. SelectedPathSvnLogs.Union(querySvnLog)];
 
-                ShowTipMessage = $"查询成功，获取数据量{querySvnLog.Count()}";
-                IsShowTip = true;
+                ShowMessageSnack($"查询成功，获取数据量{querySvnLog.Count()}");
             }
             else
             {
-                ShowTipMessage = $"未查询到数据，请修改范围或稍后重试";
-                IsShowTip = true;
+                ShowMessageSnack($"未查询到数据，请修改范围或稍后重试");
             }
-            await Task.Delay(3000);
-            IsShowTip = false;
         }
     }
 
@@ -180,5 +198,9 @@ public partial class SvnJiraLinkViewModel(SvnService svnService, IRepository rep
         }
     }
 
+    private void ShowMessageSnack(string message)
+    {
+        SnackbarMessageQueue.Enqueue(message, "关闭", () => SnackbarMessageQueue.Clear(), true);
+    }
 
 }

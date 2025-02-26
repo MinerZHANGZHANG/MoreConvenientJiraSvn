@@ -11,19 +11,12 @@
     xmlns:viewModel="clr-namespace:MoreConvenientJiraSvn.App.ViewModels"
     Title="Svn关联Jira"
     Width="1280"
-    Height="744"
+    Height="720"
     d:DataContext="{d:DesignInstance Type=viewModel:SvnJiraLinkViewModel}"
     Style="{StaticResource MaterialDesignWindow}"
     mc:Ignorable="d">
     <Window.Resources>
         <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <materialDesign:BundledTheme
-                    BaseTheme="Light"
-                    PrimaryColor="DeepPurple"
-                    SecondaryColor="Lime" />
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml" />
-            </ResourceDictionary.MergedDictionaries>
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
             <Style BasedOn="{StaticResource MaterialDesignBody1TextBlock}" TargetType="TextBlock">
                 <Setter Property="Margin" Value="2" />
@@ -39,7 +32,7 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="720" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
@@ -50,7 +43,7 @@
         <DockPanel
             Grid.Row="0"
             Grid.Column="0"
-            Margin="16,16,16,16">
+            Margin="8">
             <DataGrid
                 AutoGenerateColumns="False"
                 CanUserAddRows="False"
@@ -88,7 +81,7 @@
         <Grid
             Grid.Row="0"
             Grid.Column="1"
-            Margin="16">
+            Margin="8">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
@@ -103,9 +96,7 @@
                         Margin="0,0,0,-50"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Top"
-                        IsActive="{Binding IsShowTip}"
-                        Message="{Binding ShowTipMessage}"
-                        MessageQueue="{materialDesign:MessageQueue}" />
+                        MessageQueue="{Binding SnackbarMessageQueue}" />
                     <TextBlock Margin="4" Text="{Binding SelectPathTipText}" />
                     <TextBlock Margin="4" Text="{Binding SelectPathStateText}" />
                     <control:ConfigLine Margin="8" ConfigName="关联Jira版本">
@@ -125,17 +116,16 @@
                         </DockPanel>
                     </control:ConfigLine>
                     <DockPanel>
+                        <TextBlock Text="开始日期" />
                         <DatePicker
                             Width="160"
                             Margin="8,0,8,0"
-                            materialDesign:HintAssist.Hint="开始日期"
                             SelectedDate="{Binding BeginQueryDateTime}"
                             Style="{StaticResource MaterialDesignFloatingHintDatePicker}" />
-                        <TextBlock Text="——" />
+                        <TextBlock Text="结束日期" />
                         <DatePicker
                             Width="160"
                             Margin="8,0,8,0"
-                            materialDesign:HintAssist.Hint="结束日期"
                             SelectedDate="{Binding EndQueryDateTime}"
                             Style="{StaticResource MaterialDesignFloatingHintDatePicker}" />
                         <Button
@@ -154,7 +144,6 @@
                 IsExpanded="True">
                 <DockPanel LastChildFill="True">
                     <DataGrid
-                        Height="394"
                         AutoGenerateColumns="False"
                         CanUserAddRows="False"
                         DockPanel.Dock="Top"
@@ -194,8 +183,8 @@
                     </DataGrid>
                     <StackPanel
                         HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        DockPanel.Dock="Top"
+                        VerticalAlignment="Bottom"
+                        DockPanel.Dock="Bottom"
                         Orientation="Horizontal">
                         <Button
                             Margin="4"

@@ -279,11 +279,11 @@
                                             DockPanel.Dock="Left"
                                             IsReadOnly="True"
                                             Style="{StaticResource MaterialDesignTextBox}"
-                                            Text="{Binding LocalJiraSetting.ParentDir}" />
+                                            Text="{Binding JiraIssueLocalInfoSetting.ParentDir}" />
                                         <Button
                                             Width="60"
                                             HorizontalAlignment="Right"
-                                            Command="{Binding SetLocalDirForJiraInfoCommand}"
+                                            Command="{Binding SelecetLocalInfoDirectoryCommand}"
                                             Content="选择"
                                             DockPanel.Dock="Right" />
                                     </DockPanel>
@@ -295,7 +295,7 @@
                                             HorizontalAlignment="Left"
                                             DockPanel.Dock="Left"
                                             IsReadOnly="False"
-                                            Text="{Binding LocalJiraSetting.UserName}" />
+                                            Text="{Binding JiraIssueLocalInfoSetting.UserName}" />
                                         <Button
                                             Width="60"
                                             HorizontalAlignment="Right"
@@ -315,8 +315,8 @@
                             Header="本地存档"
                             IsExpanded="True">
                             <WrapPanel>
-                                <TextBlock Text="{Binding SelectedJiraLocalInfo.LocalDir}" />
-                                <Button Command="{Binding UseSelectedToCreateLocalJiraCommand}" Content="{Binding LocalJiraOperationText}" />
+                                <TextBlock Text="{Binding SelectedJiraIssueLocalInfo.LocalDir}" />
+                                <Button Command="{Binding OpenOrCreateJiraIssueDirectoryCommand}" Content="{Binding LocalJiraOperationText}" />
                                 <Button Command="{Binding CopyCommitTextCommand}" Content="复制提交信息" />
                                 <Button Command="{Binding CopyAnnotationTextCommand}" Content="复制注释信息" />
                                 <Button Command="{Binding OpenWebPageCommand}" Content="打开Jira网页" />
@@ -340,7 +340,7 @@
                                         <TextBox
                                             IsReadOnly="True"
                                             Style="{StaticResource MaterialDesignFilledTextBox}"
-                                            Text="{Binding SelectedJiraInfo.IssueKey, Mode=OneWay}" />
+                                            Text="{Binding SelectedJiraIssue.IssueKey, Mode=OneWay}" />
                                     </StackPanel>
                                 </Border>
                                 <Border Style="{StaticResource StackPanelStyle}">
@@ -349,7 +349,7 @@
                                         <TextBox
                                             IsReadOnly="True"
                                             Style="{StaticResource MaterialDesignFilledTextBox}"
-                                            Text="{Binding SelectedJiraInfo.Summary, Mode=OneWay}"
+                                            Text="{Binding SelectedJiraIssue.Summary, Mode=OneWay}"
                                             TextWrapping="Wrap" />
                                     </StackPanel>
                                 </Border>
@@ -359,7 +359,7 @@
                                         <TextBox
                                             IsReadOnly="True"
                                             Style="{StaticResource MaterialDesignFilledTextBox}"
-                                            Text="{Binding SelectedJiraInfo.StatusName, Mode=OneWay}" />
+                                            Text="{Binding SelectedJiraIssue.StatusName, Mode=OneWay}" />
                                     </StackPanel>
                                 </Border>
                                 <Border Style="{StaticResource StackPanelStyle}">
@@ -470,8 +470,7 @@
                                         Grid.ColumnSpan="3"
                                         Margin="4"
                                         DisplayMemberPath="FullPathName"
-                                        IsEnabled="{Binding IsNotQuerySvnLoging}"
-                                        ItemsSource="{Binding RelatSvnPaths}"
+                                        ItemsSource="{Binding IssueRelatedSvnPaths}"
                                         SelectedItem="{Binding SelectedSvnPath}"
                                         SelectionChanged="ComboBox_SelectionChanged" />
 
@@ -483,7 +482,8 @@
                                     <DatePicker
                                         Grid.Row="1"
                                         Grid.Column="1"
-                                        Margin="8" />
+                                        Margin="8"
+                                        SelectedDate="{Binding BeginDate}" />
                                     <TextBlock
                                         Grid.Row="1"
                                         Grid.Column="2"
@@ -492,16 +492,18 @@
                                     <DatePicker
                                         Grid.Row="1"
                                         Grid.Column="3"
-                                        Margin="8" />
+                                        Margin="8"
+                                        SelectedDate="{Binding EndDate}" />
 
                                     <TextBlock
                                         Grid.Row="2"
                                         Grid.Column="0"
                                         Grid.ColumnSpan="3"
-                                        Text="{Binding SvnLogVersionRangeText}" />
+                                        Text="{Binding SvnLogTimeRangeText}" />
                                     <Button
                                         Grid.Row="2"
                                         Grid.Column="3"
+                                        Command="{Binding LoadSvnLogFromServerCommand}"
                                         Content="更新" />
                                 </Grid>
 
@@ -514,7 +516,7 @@
                                     HorizontalGridLinesBrush="Gray"
                                     HorizontalScrollBarVisibility="Auto"
                                     IsReadOnly="True"
-                                    ItemsSource="{Binding SelectedJiraSvnLogs}"
+                                    ItemsSource="{Binding SelectedIssueSvnLogs}"
                                     ScrollViewer.HorizontalScrollBarVisibility="Visible"
                                     ScrollViewer.VerticalScrollBarVisibility="Visible"
                                     SelectionMode="Extended"

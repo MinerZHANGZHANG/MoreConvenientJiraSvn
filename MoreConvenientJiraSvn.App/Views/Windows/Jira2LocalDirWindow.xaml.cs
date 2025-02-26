@@ -31,17 +31,17 @@ public partial class Jira2LocalDirWindow : Window
         await this._viewModel.InitViewModelAsync();
     }
 
-    private void DataGrid_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+    private void DataGrid_SelectionChanged(object sender,SelectionChangedEventArgs e)
     {
-        this._viewModel.SelectedIssueChanged();
+        this._viewModel.InvokeSelectedJiraIssueEvent(sender);
     }
 
-    private void ComboBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+    private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         this._viewModel.LoadSvnLogByFromLocal();
     }
 
-    private void ListBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+    private void ListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (sender is ListBox listBox && listBox.DataContext is JiraField field)
         {

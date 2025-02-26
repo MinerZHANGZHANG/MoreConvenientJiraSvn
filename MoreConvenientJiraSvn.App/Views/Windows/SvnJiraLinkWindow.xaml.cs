@@ -31,7 +31,7 @@ public partial class SvnJiraLinkWindow : Window
 
     private void DataGrid_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
     {
-        this._viewModel.RefreshSvnLog();
+        this._viewModel.InvokeSelectedSvnPathEvent(sender);
     }
 
     

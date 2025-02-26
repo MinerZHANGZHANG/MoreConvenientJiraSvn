@@ -60,7 +60,7 @@ public partial class JiraIssueBrowseViewModel(JiraService jiraService, SvnServic
     public bool HasJiraBeSelected => SelectedJiraIssue != null;
 
     private event EventHandler<JiraIssue>? _selectedIssueChanged;
-    private SnackbarMessageQueue _messageQueue  = new(TimeSpan.FromSeconds(2d));
+    public SnackbarMessageQueue MessageQueue { get; }  = new(TimeSpan.FromSeconds(2d));
 
     #endregion
 
@@ -120,7 +120,7 @@ public partial class JiraIssueBrowseViewModel(JiraService jiraService, SvnServic
 
     private void ShowMessageSnack(string message)
     {
-        _messageQueue.Enqueue(message, "关闭", () => _messageQueue.Clear(), true);
+        MessageQueue.Enqueue(message, "关闭", () => MessageQueue.Clear(), true);
     }
 
     #endregion
