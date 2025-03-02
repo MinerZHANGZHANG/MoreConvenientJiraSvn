@@ -5,8 +5,6 @@ VisualStudioVersion = 17.12.35209.166
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MoreConvenientJiraSvn.Core", "MoreConvenientJiraSvn.Core\MoreConvenientJiraSvn.Core.csproj", "{5F60230F-94FB-4A29-91C0-23D206A14792}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MoreConvenientJiraSvn.Plugin", "MoreConvenientJiraSvn.Plugin\MoreConvenientJiraSvn.Plugin.csproj", "{FC33896F-FF8B-427B-943E-DEF75FB33CF1}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MoreConvenientJiraSvn.AntlrUtil", "AntlrUtil\MoreConvenientJiraSvn.AntlrUtil.csproj", "{B49FC2FB-3B12-4281-8C99-7DFC9681A2D4}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MoreConvenientJiraSvn.Infrastructure", "MoreConvenientJiraSvn.Infrastructure\MoreConvenientJiraSvn.Infrastructure.csproj", "{B0319228-3CF9-478C-9CB2-B8D0D0FA1AFE}"
@@ -47,10 +45,6 @@ Global
 		{5F60230F-94FB-4A29-91C0-23D206A14792}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5F60230F-94FB-4A29-91C0-23D206A14792}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5F60230F-94FB-4A29-91C0-23D206A14792}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FC33896F-FF8B-427B-943E-DEF75FB33CF1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FC33896F-FF8B-427B-943E-DEF75FB33CF1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FC33896F-FF8B-427B-943E-DEF75FB33CF1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FC33896F-FF8B-427B-943E-DEF75FB33CF1}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B49FC2FB-3B12-4281-8C99-7DFC9681A2D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B49FC2FB-3B12-4281-8C99-7DFC9681A2D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B49FC2FB-3B12-4281-8C99-7DFC9681A2D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
