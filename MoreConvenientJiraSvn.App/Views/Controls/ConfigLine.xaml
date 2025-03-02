@@ -9,6 +9,7 @@
     x:Name="ConfigLineControl"
     d:DesignHeight="30"
     d:DesignWidth="520"
+    Foreground="Black"
     mc:Ignorable="d">
 
     <UserControl.Resources>
@@ -36,6 +37,6 @@
             Width="300"
             Margin="32,0,8,0"
             HorizontalAlignment="Right"
-            Content="{Binding InputContent, ElementName=ConfigLineControl}" />
+            Content="{Binding InputContent, RelativeSource={RelativeSource AncestorType=UserControl}}" />
     </DockPanel>
 </UserControl>

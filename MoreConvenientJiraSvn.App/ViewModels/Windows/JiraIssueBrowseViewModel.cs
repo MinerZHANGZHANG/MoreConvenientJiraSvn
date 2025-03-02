@@ -54,7 +54,7 @@ public partial class JiraIssueBrowseViewModel(JiraService jiraService, SvnServic
     [NotifyCanExecuteChangedFor(nameof(OpenWebPageCommand))]
     private JiraIssue? _selectedJiraIssue;
 
-    public IReadOnlyList<JiraIssueQueryType> JiraIssueQueryTypes = Enum.GetValues<JiraIssueQueryType>();
+    public IReadOnlyList<JiraIssueQueryType> JiraIssueQueryTypes { get; } = Enum.GetValues<JiraIssueQueryType>();
     public bool IsUseTextToSearch => SelectedJiraIssueQueryType != JiraIssueQueryType.Filter;
     public bool HaveQueryText => !string.IsNullOrEmpty(JiraIssueQueryText);
     public bool HasJiraBeSelected => SelectedJiraIssue != null;

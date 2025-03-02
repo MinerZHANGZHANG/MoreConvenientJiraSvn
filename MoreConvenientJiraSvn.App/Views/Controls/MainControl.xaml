@@ -45,21 +45,13 @@
                     Binding="{Binding Level}"
                     Header="级别" />
                 <DataGridTextColumn
-                    Width="2*"
-                    Binding="{Binding SourceName}"
-                    Header="来源" />
-                <DataGridTextColumn
                     Width="5*"
                     Binding="{Binding Info}"
                     Header="信息" />
-                <DataGridTextColumn
-                    Width="2*"
-                    Binding="{Binding Time}"
-                    Header="时间" />
                 <DataGridTemplateColumn Width="64" Header="编辑">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Button Command="{Binding EditCommand}" Content="编辑" />
+                            <Button Content="编辑" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>

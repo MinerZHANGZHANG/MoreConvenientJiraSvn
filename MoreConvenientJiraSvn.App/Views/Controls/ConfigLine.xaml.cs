@@ -14,6 +14,7 @@ public partial class ConfigLine : UserControl
     public ConfigLine()
     {
         InitializeComponent();
+
     }
 
     public static readonly DependencyProperty ConfigNameProperty =
@@ -23,7 +24,7 @@ public partial class ConfigLine : UserControl
         DependencyProperty.Register(nameof(ShowConfigDescriptionCommand), typeof(ICommand), typeof(ConfigLine), new PropertyMetadata(null));
 
     public static readonly DependencyProperty InputContentProperty =
-        DependencyProperty.Register(nameof(InputContent), typeof(object), typeof(ConfigLine), new PropertyMetadata(null));
+        DependencyProperty.Register(nameof(InputContent), typeof(UIElement), typeof(ConfigLine), new PropertyMetadata(null));
 
     public static readonly DependencyProperty IsButtonVisibleProperty =
         DependencyProperty.Register(nameof(IsButtonVisible), typeof(bool), typeof(ConfigLine), new PropertyMetadata(true));
@@ -40,9 +41,9 @@ public partial class ConfigLine : UserControl
         set => SetValue(ConfigNameProperty, value);
     }
 
-    public object InputContent
+    public UIElement InputContent
     {
-        get { return GetValue(InputContentProperty); }
+        get { return (UIElement)GetValue(InputContentProperty); }
         set { SetValue(InputContentProperty, value); }
     }
 

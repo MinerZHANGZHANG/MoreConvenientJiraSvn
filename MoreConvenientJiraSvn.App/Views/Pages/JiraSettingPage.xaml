@@ -32,7 +32,6 @@
                             Foreground="Black"
                             KeyUp="TextBox_KeyUp"
                             LostFocus="TextBox_LostFocus"
-                            Style="{StaticResource CustomMaterialTextBoxStyle}"
                             Text="{Binding JiraConfig.BaseUrl, UpdateSourceTrigger=PropertyChanged}" />
                     </control:ConfigLine>
                     <control:ConfigLine
@@ -43,7 +42,6 @@
                             Foreground="Black"
                             KeyUp="TextBox_KeyUp"
                             LostFocus="TextBox_LostFocus"
-                            Style="{StaticResource CustomMaterialTextBoxStyle}"
                             Text="{Binding JiraConfig.ApiToken, UpdateSourceTrigger=PropertyChanged}" />
                     </control:ConfigLine>
                 </StackPanel>
@@ -62,7 +60,6 @@
                         <TextBox
                             IsEnabled="False"
                             IsReadOnly="True"
-                            Style="{StaticResource CustomMaterialTextBoxStyle}"
                             Text="{Binding JiraConfig.UserName}" />
                     </control:ConfigLine>
                     <control:ConfigLine
@@ -72,7 +69,6 @@
                         <TextBox
                             IsEnabled="False"
                             IsReadOnly="True"
-                            Style="{StaticResource CustomMaterialTextBoxStyle}"
                             Text="{Binding JiraConfig.Email}" />
                     </control:ConfigLine>
                     <control:ConfigLine
@@ -82,7 +78,6 @@
                         <TextBox
                             IsEnabled="False"
                             IsReadOnly="True"
-                            Style="{StaticResource CustomMaterialTextBoxStyle}"
                             Text="{Binding JiraConfig.TokenExpiringTime}" />
                     </control:ConfigLine>
                 </StackPanel>

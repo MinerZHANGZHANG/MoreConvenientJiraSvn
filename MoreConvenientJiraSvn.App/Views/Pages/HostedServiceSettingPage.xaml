@@ -102,7 +102,6 @@
                                 Grid.Column="0"
                                 Foreground="Black"
                                 IsEnabled="False"
-                                Style="{StaticResource CustomMaterialTextBoxStyle}"
                                 Text="{Binding LastCheckJiraExectionTimeText}" />
                             <Button
                                 Grid.Column="1"
@@ -150,7 +149,6 @@
                                 Grid.Column="0"
                                 Foreground="Black"
                                 IsEnabled="False"
-                                Style="{StaticResource CustomMaterialTextBoxStyle}"
                                 Text="{Binding LastCheckSqlExectionTimeText}" />
                             <Button
                                 Grid.Column="1"
@@ -234,7 +232,6 @@
                                 Grid.Column="0"
                                 Foreground="Black"
                                 IsEnabled="False"
-                                Style="{StaticResource CustomMaterialTextBoxStyle}"
                                 Text="{Binding LastDownloadSvnExectionTimeText}" />
                             <Button
                                 Grid.Column="1"

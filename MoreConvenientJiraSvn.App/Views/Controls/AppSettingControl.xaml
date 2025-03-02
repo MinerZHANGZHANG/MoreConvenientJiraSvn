@@ -15,7 +15,6 @@
             Margin="8"
             ConfigName="本地数据大小"
             DockPanel.Dock="Top"
-            Foreground="Black"
             IsButtonVisible="False">
             <StackPanel Orientation="Horizontal">
                 <TextBox
@@ -23,7 +22,6 @@
                     Margin="0,0,16,0"
                     HorizontalAlignment="Right"
                     IsEnabled="False"
-                    Style="{StaticResource CustomMaterialTextBoxStyle}"
                     Text="{Binding LocalDataSizeText, Mode=OneWay}" />
                 <Button
                     Width="96"
@@ -39,12 +37,14 @@
             DockPanel.Dock="Top"
             Foreground="Black"
             IsButtonVisible="False">
-            <ComboBox
-                DisplayMemberPath="Description"
-                ItemsSource="{Binding LogRemindLevels}"
-                SelectedValue="{Binding SelectedRemindLevel}"
-                SelectedValuePath="Value"
-                SelectionChanged="ComboBox_SelectionChanged" />
+            <local:ConfigLine.InputContent>
+                <ComboBox
+                    DisplayMemberPath="Description"
+                    ItemsSource="{Binding LogRemindLevels}"
+                    SelectedValue="{Binding SelectedRemindLevel}"
+                    SelectedValuePath="Value"
+                    SelectionChanged="ComboBox_SelectionChanged" />
+            </local:ConfigLine.InputContent>
         </local:ConfigLine>
 
         <local:ConfigLine

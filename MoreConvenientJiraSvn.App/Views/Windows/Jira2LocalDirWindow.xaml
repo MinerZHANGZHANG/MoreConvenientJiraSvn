@@ -171,12 +171,11 @@
                     HorizontalAlignment="Stretch"
                     DockPanel.Dock="Top">
                     <ComboBox
-                        x:Name="SelectTypeComboBox"
                         MinWidth="64"
                         Margin="0,0,16,0"
                         DockPanel.Dock="Left"
-                        ItemsSource="{Binding JiraQueryTypes}"
-                        SelectedItem="{Binding SelectedJiraQueryType}">
+                        ItemsSource="{Binding JiraIssueQueryTypes}"
+                        SelectedItem="{Binding SelectedJiraIssueQueryType}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Converter={x:Static convert:JiraQueryTypeToStringConverter.Instance}}" />
@@ -190,8 +189,8 @@
 
                         <ComboBox
                             Width="256"
-                            ItemsSource="{Binding JiraFilters}"
-                            SelectedItem="{Binding SelectedFilter}"
+                            ItemsSource="{Binding JiraIssueFilters}"
+                            SelectedItem="{Binding SelectedJiraIssueFilter}"
                             Visibility="{Binding IsUseTextToSearch, Converter={x:Static convert:InverseBooleanToVisibilityConverter.Instance}}">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
@@ -202,7 +201,7 @@
 
                         <TextBox
                             Width="256"
-                            Text="{Binding JiraQueryText}"
+                            Text="{Binding JiraIssueQueryText}"
                             Visibility="{Binding IsUseTextToSearch, Converter={StaticResource BooleanToVisibilityConverter}}" />
                     </Grid>
                     <Button
@@ -223,9 +222,9 @@
                     HorizontalGridLinesBrush="Gray"
                     HorizontalScrollBarVisibility="Auto"
                     IsReadOnly="True"
-                    ItemsSource="{Binding JiraInfoList}"
+                    ItemsSource="{Binding JiraIssueList}"
                     ScrollViewer.VerticalScrollBarVisibility="Visible"
-                    SelectedItem="{Binding SelectedJiraInfo}"
+                    SelectedItem="{Binding SelectedJiraIssue}"
                     SelectionChanged="DataGrid_SelectionChanged"
                     SelectionMode="Extended"
                     SelectionUnit="FullRow"
@@ -368,7 +367,7 @@
                                         <TextBox
                                             IsReadOnly="True"
                                             Style="{StaticResource MaterialDesignFilledTextBox}"
-                                            Text="{Binding SelectedJiraInfo.PriorityName, Mode=OneWay}" />
+                                            Text="{Binding SelectedJiraIssue.PriorityName, Mode=OneWay}" />
                                     </StackPanel>
                                 </Border>
                                 <Border Style="{StaticResource StackPanelStyle}">
@@ -377,7 +376,7 @@
                                         <TextBox
                                             IsReadOnly="True"
                                             Style="{StaticResource MaterialDesignFilledTextBox}"
-                                            Text="{Binding SelectedJiraInfo.CreatorName, Mode=OneWay}" />
+                                            Text="{Binding SelectedJiraIssue.CreatorName, Mode=OneWay}" />
                                     </StackPanel>
                                 </Border>
                                 <Border Style="{StaticResource StackPanelStyle}">
@@ -386,7 +385,7 @@
                                         <TextBox
                                             IsReadOnly="True"
                                             Style="{StaticResource MaterialDesignFilledTextBox}"
-                                            Text="{Binding SelectedJiraInfo.IssueTypeName, Mode=OneWay}" />
+                                            Text="{Binding SelectedJiraIssue.IssueTypeName, Mode=OneWay}" />
                                     </StackPanel>
                                 </Border>
                                 <Border Style="{StaticResource StackPanelStyle}">
@@ -395,7 +394,7 @@
                                         <TextBox
                                             IsReadOnly="True"
                                             Style="{StaticResource MaterialDesignFilledTextBox}"
-                                            Text="{Binding SelectedJiraInfo.VersionsText, Mode=OneWay}"
+                                            Text="{Binding SelectedJiraIssue.VersionsText, Mode=OneWay}"
                                             TextWrapping="Wrap" />
                                     </StackPanel>
                                 </Border>
@@ -405,7 +404,7 @@
                                         <TextBox
                                             IsReadOnly="True"
                                             Style="{StaticResource MaterialDesignFilledTextBox}"
-                                            Text="{Binding SelectedJiraInfo.ResolutionName, Mode=OneWay}" />
+                                            Text="{Binding SelectedJiraIssue.ResolutionName, Mode=OneWay}" />
                                     </StackPanel>
                                 </Border>
                                 <Border Style="{StaticResource StackPanelStyle}">
@@ -414,7 +413,7 @@
                                         <TextBox
                                             IsReadOnly="True"
                                             Style="{StaticResource MaterialDesignFilledTextBox}"
-                                            Text="{Binding SelectedJiraInfo.TesterNamesString, Mode=OneWay}" />
+                                            Text="{Binding SelectedJiraIssue.TesterNamesString, Mode=OneWay}" />
                                     </StackPanel>
                                 </Border>
                                 <Border Style="{StaticResource StackPanelStyle}">
@@ -423,7 +422,7 @@
                                         <TextBox
                                             IsReadOnly="True"
                                             Style="{StaticResource MaterialDesignFilledTextBox}"
-                                            Text="{Binding SelectedJiraInfo.DeveloperNamesString, Mode=OneWay}"
+                                            Text="{Binding SelectedJiraIssue.DeveloperNamesString, Mode=OneWay}"
                                             TextWrapping="Wrap" />
                                     </StackPanel>
                                 </Border>

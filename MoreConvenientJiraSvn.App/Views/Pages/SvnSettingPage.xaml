@@ -36,7 +36,6 @@
                             Foreground="Black"
                             KeyUp="TextBox_KeyUp"
                             LostFocus="TextBox_LostFocus"
-                            Style="{StaticResource CustomMaterialTextBoxStyle}"
                             Text="{Binding SvnConfig.UserName, UpdateSourceTrigger=PropertyChanged}" />
                     </control:ConfigLine>
                     <control:ConfigLine
@@ -47,7 +46,6 @@
                             Foreground="Black"
                             KeyUp="TextBox_KeyUp"
                             LostFocus="TextBox_LostFocus"
-                            Style="{StaticResource CustomMaterialTextBoxStyle}"
                             Text="{Binding SvnConfig.UserPassword, UpdateSourceTrigger=PropertyChanged}" />
                     </control:ConfigLine>
                 </StackPanel>
