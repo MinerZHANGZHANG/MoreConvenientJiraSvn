@@ -43,6 +43,10 @@ on:
     tags:  
       - 'v*.*.*'
 
+permissions:  
+  contents: write            
+  deployments: write         
+
 jobs:
 
   build:
@@ -79,20 +83,17 @@ jobs:
     - name: Restore dependencies  
       run: dotnet restore 
 
-    - name: Build  
-      run: dotnet build --configuration Release
-    
-    - name: Pack  
-      run: dotnet pack --configuration Release --output ./artifacts 
+    - name: Publish  
+      run: dotnet publish --configuration Release --output ./artifacts
 
     - name: Create Release  
       id: create_release  
       uses: softprops/action-gh-release@v1  
       with:  
-        tag: ${{ github.ref }}  
+        tag_name: ${{ github.ref }}  
         name: Release ${{ github.ref }}  
         body: |   
-          自动生成的发布包  
+          Auto publish
       env:  
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
 
