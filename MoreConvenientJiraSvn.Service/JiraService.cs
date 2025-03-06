@@ -28,11 +28,14 @@ namespace MoreConvenientJiraSvn.Service
 
             _jiraConfig = _settingService.FindSetting<JiraConfig>() ?? new();
             _settingService.OnConfigChanged += RefreshJiraCilent_OnConfigChanged;
+
+            _jiraClient.InitHttpClient(_jiraConfig);
         }
 
 
         public async Task<List<JiraIssueFilter>> GetCurrentUserFavouriteFilterAsync()
         {
+            _logService.Debug($"{nameof(GetCurrentUserFavouriteFilterAsync)}");
             List<JiraIssueFilter> result = await _jiraClient.GetUserFavouriteFilterAsync();
 
             return result;

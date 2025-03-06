@@ -70,20 +70,22 @@ public partial class HostedServiceSettingViewModel(SettingService settingService
 
     private void InitSqlCheckSetting()
     {
-        LastCheckSqlExectionTimeText = _repository
-            .Find<BackgroundTaskLog>(Query.EQ(nameof(BackgroundTaskLog.TaskName), nameof(CheckSqlHostedService)))
-            .Max(l => l.StartTime)
-            .ToString("yyyy-MM-dd HH:mm:ss");
+        var logs = _repository
+            .Find<BackgroundTaskLog>(Query.EQ(nameof(BackgroundTaskLog.TaskName), nameof(CheckSqlHostedService)));
+        LastCheckJiraExectionTimeText = logs.Any()
+              ? logs.Max(l => l.StartTime).ToString("yyyy-MM-dd HH:mm:ss")
+              : "None";
 
         CheckSqlDirectories = [.. HostedServiceConfig.CheckSqlDirectoies];
     }
 
     private async Task InitJiraStateCheckSettingAsync()
     {
-        LastCheckJiraExectionTimeText = _repository
-            .Find<BackgroundTaskLog>(Query.EQ(nameof(BackgroundTaskLog.TaskName), nameof(CheckJiraStateHostedService)))
-            .Max(l => l.StartTime)
-            .ToString("yyyy-MM-dd HH:mm:ss");
+        var logs = _repository
+            .Find<BackgroundTaskLog>(Query.EQ(nameof(BackgroundTaskLog.TaskName), nameof(CheckJiraStateHostedService)));
+        LastCheckJiraExectionTimeText = logs.Any()
+              ? logs.Max(l => l.StartTime).ToString("yyyy-MM-dd HH:mm:ss")
+              : "None";
 
         var allFilters = (await _jiraService.GetCurrentUserFavouriteFilterAsync());
         JiraFilterItems = [.. allFilters.Select(f => new CheckComboxItem() { Name = f.Name })];
@@ -99,10 +101,11 @@ public partial class HostedServiceSettingViewModel(SettingService settingService
 
     private void InitSvnDownloadSetting()
     {
-        LastDownloadSvnExectionTimeText = _repository
-            .Find<BackgroundTaskLog>(Query.EQ(nameof(BackgroundTaskLog.TaskName), nameof(DownloadSvnLogHostedService)))
-            .Max(l => l.StartTime)
-            .ToString("yyyy-MM-dd HH:mm:ss");
+        var logs = _repository
+            .Find<BackgroundTaskLog>(Query.EQ(nameof(BackgroundTaskLog.TaskName), nameof(DownloadSvnLogHostedService)));
+        LastCheckJiraExectionTimeText = logs.Any()
+              ? logs.Max(l => l.StartTime).ToString("yyyy-MM-dd HH:mm:ss")
+              : "None";
 
         var svnPaths = _settingService.FindSettings<SvnPath>() ?? [];
         SvnPathItems = [.. svnPaths.Select(p => new CheckComboxItem() { Name = p.PathName })];

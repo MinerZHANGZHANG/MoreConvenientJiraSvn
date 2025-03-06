@@ -62,10 +62,10 @@ public record JiraIssue
 
     #region Custom Property
 
-    [IssueJsonMapping("customfield_12813 ", "value")]
+    [IssueJsonMapping("customfield_12813", "value")]
     public string DeveloperClassName { get; set; } = string.Empty;
 
-    [IssueJsonMapping("customfield_10514 ", "displayName")]
+    [IssueJsonMapping("customfield_10514", "displayName")]
     public List<string> DeveloperNames { get; set; } = [];
     public string DeveloperNamesString
     {
