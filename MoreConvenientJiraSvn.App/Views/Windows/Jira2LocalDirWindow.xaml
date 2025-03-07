@@ -232,7 +232,7 @@
                     <DataGrid.Columns>
                         <DataGridTextColumn
                             Width="*"
-                            Binding="{Binding JiraId}"
+                            Binding="{Binding IssueKey}"
                             Header="编号" />
                         <DataGridTextColumn
                             Width="3*"
@@ -244,7 +244,7 @@
                             Header="类型" />
                         <DataGridTextColumn
                             Width="1.5*"
-                            Binding="{Binding FixVersionNameText}"
+                            Binding="{Binding FixVersionsText}"
                             Header="修复版本" />
                     </DataGrid.Columns>
                 </DataGrid>
@@ -273,7 +273,7 @@
                                 <control:ConfigLine Margin="8" ConfigName="默认地址">
                                     <DockPanel>
                                         <TextBox
-                                            MinWidth="160"
+                                            Width="200"
                                             HorizontalAlignment="Left"
                                             DockPanel.Dock="Left"
                                             IsReadOnly="True"
@@ -284,19 +284,19 @@
                                             HorizontalAlignment="Right"
                                             Command="{Binding SelecetLocalInfoDirectoryCommand}"
                                             Content="选择"
-                                            DockPanel.Dock="Right" />
+                                            DockPanel.Dock="Left" />
                                     </DockPanel>
                                 </control:ConfigLine>
                                 <control:ConfigLine Margin="8" ConfigName="注释时的用户名">
                                     <DockPanel>
                                         <TextBox
-                                            MinWidth="160"
+                                            Width="200"
                                             HorizontalAlignment="Left"
                                             DockPanel.Dock="Left"
                                             IsReadOnly="False"
                                             Text="{Binding JiraIssueLocalInfoSetting.UserName}" />
                                         <Button
-                                            Width="60"
+                                            Width="60"                                            
                                             HorizontalAlignment="Right"
                                             Command="{Binding SetUserNameForJiraInfoCommand}"
                                             Content="设置"
@@ -394,7 +394,7 @@
                                         <TextBox
                                             IsReadOnly="True"
                                             Style="{StaticResource MaterialDesignFilledTextBox}"
-                                            Text="{Binding SelectedJiraIssue.VersionsText, Mode=OneWay}"
+                                            Text="{Binding SelectedJiraIssue.FixVersionsText, Mode=OneWay}"
                                             TextWrapping="Wrap" />
                                     </StackPanel>
                                 </Border>

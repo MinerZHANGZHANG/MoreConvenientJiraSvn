@@ -59,8 +59,9 @@ public partial class JiraIssueBrowseViewModel
             return;
         }
         JiraIssueLocalInfoSetting.ParentDir = selectedPath;
-        //JiraIssueLocalInfoSetting = JiraIssueLocalInfoSetting with { ParentDir = selectedPath };
         _settingService.UpsertSetting(JiraIssueLocalInfoSetting);
+
+        OnPropertyChanged(nameof(JiraIssueLocalInfoSetting));
     }
 
     [RelayCommand]
@@ -95,7 +96,7 @@ public partial class JiraIssueBrowseViewModel
 
     private string GetDefaultCommitString(JiraIssue issue)
     {
-        StringBuilder commitTextBuilder = new($"版本：{issue.VersionsText}\r\n");
+        StringBuilder commitTextBuilder = new($"版本：{issue.FixVersionsText}\r\n");
         if (!string.IsNullOrEmpty(issue.ParentIssueKey))
         {
             commitTextBuilder.AppendLine($"需求编号：{issue.ParentIssueKey}");

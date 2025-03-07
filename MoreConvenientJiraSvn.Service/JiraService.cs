@@ -54,7 +54,7 @@ namespace MoreConvenientJiraSvn.Service
 
         public async Task<List<JiraIssue>> GetIssuesByFilterAsync(JiraIssueFilter jiraFilter, int maxRequestCount = 200)
         {
-            List<JiraIssue> issueInfos = [];
+            List<JiraIssue> issues = [];
             int start = 0;
             int total = 1;
             int requestCount = 0;
@@ -72,10 +72,10 @@ namespace MoreConvenientJiraSvn.Service
                 start = issuePageInfo.StartAt + issuePageInfo.MaxResults;
                 total = issuePageInfo.Total;
 
-                issueInfos.AddRange(issuePageInfo.IssueInfos);
+                issues.AddRange(issuePageInfo.IssueInfos);
             }
 
-            return issueInfos;
+            return issues;
         }
 
         public async Task<List<IssueDiff>> GetIssuesDiffByFilterAsync(JiraIssueFilter jiraFilter, int maxRequestCount = 200)
@@ -135,11 +135,11 @@ namespace MoreConvenientJiraSvn.Service
 
         public IEnumerable<SvnPath> GetRelatSvnPath(JiraIssue IssueInfo)
         {
-            if (IssueInfo.Versions.Count == 0)
+            if (IssueInfo.FixVersions.Count == 0)
             {
                 return [];
             }
-            var relations = _repository.Find<JiraSvnPathRelation>(Query.In(nameof(JiraSvnPathRelation.Version), IssueInfo.Versions.Select(v => new BsonValue(v))));
+            var relations = _repository.Find<JiraSvnPathRelation>(Query.In(nameof(JiraSvnPathRelation.Version), IssueInfo.FixVersions.Select(v => new BsonValue(v))));
             var svnPaths = _repository.Find<SvnPath>(Query.In(nameof(SvnPath.Path), relations.Select(v => new BsonValue(v.SvnPath))));
 
             return svnPaths;

@@ -42,15 +42,15 @@ public record JiraIssue
     public string PriorityName { get; set; } = string.Empty;
     [IssueJsonMapping("issuetype", "name")]
     public string IssueTypeName { get; set; } = string.Empty;
-    [IssueJsonMapping("versions", "name")]
-    public List<string> Versions { get; set; } = [];
-    public string VersionsText
+    [IssueJsonMapping("fixVersions", "name")]
+    public List<string> FixVersions { get; set; } = [];
+    public string FixVersionsText
     {
         get
         {
-            if (Versions != null && Versions.Any())
+            if (FixVersions != null && FixVersions.Count != 0)
             {
-                return string.Join(",", Versions);
+                return string.Join(",", FixVersions);
             }
             return string.Empty;
         }
@@ -79,7 +79,7 @@ public record JiraIssue
         }
     }
 
-    [IssueJsonMapping("customfield_10603")]
+    [IssueJsonMapping("customfield_10603", "displayName")]
     public List<string> ReviewerNames { get; set; } = [];
     public string ReviewerNamesString
     {

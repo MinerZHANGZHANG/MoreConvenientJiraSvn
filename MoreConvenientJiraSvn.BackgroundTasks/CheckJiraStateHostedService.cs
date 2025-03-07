@@ -111,8 +111,8 @@ public class CheckJiraStateHostedService: TimedHostedService
         // Issue's version change
         for (int i = IssueDiffs.Count - 1; i >= 0; i--)
         {
-            string? oldVersionText = IssueDiffs[i].Old?.VersionsText;
-            string? newVersionText = IssueDiffs[i].New.VersionsText;
+            string? oldVersionText = IssueDiffs[i].Old?.FixVersionsText;
+            string? newVersionText = IssueDiffs[i].New.FixVersionsText;
             if (oldVersionText != newVersionText)
             {
                 BackgroundTaskMessage message = new()

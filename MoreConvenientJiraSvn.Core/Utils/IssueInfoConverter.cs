@@ -109,13 +109,21 @@ public static class IssueInfoConverter
                 && targetElement.Value.ValueKind != JsonValueKind.Undefined
                 && targetElement.Value.ValueKind != JsonValueKind.Null)
             {
-                if (targetElement.Value.TryGetProperty(propertyMap.Value.Key, out var childElement))
+                try
+                {
+                    if (targetElement.Value.TryGetProperty(propertyMap.Value.Key, out var childElement))
                 {
                     targetElement = childElement;
                 }
                 else
                 {
                     targetElement = null;
+                }
+                }
+                catch (Exception)
+                {
+
+                    throw;
                 }
             }
 
@@ -133,13 +141,21 @@ public static class IssueInfoConverter
                 && targetElement.Value.ValueKind != JsonValueKind.Undefined
                 && propertyMap.Value.PropertyInfo.PropertyType != typeof(List<string>))
             {
-                if (targetElement.Value.TryGetProperty(propertyMap.Value.ChildKey, out var childElement))
+                try
                 {
-                    targetElement = childElement;
+                    if (targetElement.Value.TryGetProperty(propertyMap.Value.ChildKey, out var childElement))
+                    {
+                        targetElement = childElement;
+                    }
+                    else
+                    {
+                        targetElement = null;
+                    }
                 }
-                else
+                catch (Exception)
                 {
-                    targetElement = null;
+
+                    throw;
                 }
             }
 
@@ -156,20 +172,37 @@ public static class IssueInfoConverter
                 List<string?> listResult = [];
                 foreach (var item in targetElement.Value.EnumerateArray())
                 {
-                    if (propertyMap.Value.ChildKey == null)
+                    try
                     {
-                        listResult.Add(item.GetString());
+                        if (propertyMap.Value.ChildKey == null)
+                        {
+                            listResult.Add(item.GetString());
+                        }
+                        else if (item.TryGetProperty(propertyMap.Value.ChildKey, out var arrayChildElement))
+                        {
+                            listResult.Add(arrayChildElement.GetString());
+                        }
                     }
-                    else if (item.TryGetProperty(propertyMap.Value.ChildKey, out var arrayChildElement))
+                    catch (Exception)
                     {
-                        listResult.Add(arrayChildElement.GetString());
+
+                        throw;
                     }
                 }
                 propertyMap.Value.PropertyInfo.SetValue(IssueInfo, listResult);
             }
-            else if(propertyMap.Value.PropertyInfo.PropertyType == typeof(string))
+            else if (propertyMap.Value.PropertyInfo.PropertyType == typeof(string))
             {
-                propertyMap.Value.PropertyInfo.SetValue(IssueInfo, targetElement?.GetString());
+                try
+                {
+                    propertyMap.Value.PropertyInfo.SetValue(IssueInfo, targetElement?.GetString());
+
+                }
+                catch (Exception)
+                {
+
+                    throw;
+                }
             }
             else if (propertyMap.Value.PropertyInfo.PropertyType == typeof(double) && targetElement?.TryGetDouble(out var doubleResult) == true)
             {
