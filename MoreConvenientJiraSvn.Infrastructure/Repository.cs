@@ -1,5 +1,6 @@
 ﻿using LiteDB;
 using MoreConvenientJiraSvn.Core.Interfaces;
+using System.Linq.Expressions;
 
 namespace MoreConvenientJiraSvn.Infrastructure;
 
@@ -41,6 +42,12 @@ public class Repository(LiteDatabase db) : IRepository
     public IEnumerable<T> Find<T>(BsonExpression expression) where T : new()
     {
         var result = _db.GetCollection<T>().Find(expression);
+        return result ?? [];
+    }
+
+    public IEnumerable<T> Find<T>(Expression<Func<T, bool>> predicate) where T : new()
+    {
+        var result = _db.GetCollection<T>().Find(predicate);
         return result ?? [];
     }
 

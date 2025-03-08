@@ -69,6 +69,7 @@ public class DownloadSvnLogHostedService : TimedHostedService
                     {
                         Info = $"成功获取SVN日志并保存,路径:{path.Path}({pathBeginTime}->{pathEndTime}) 数量:{updateLogTotal}",
                         Level = InfoLevel.Normal,
+                        LogId = taskLog.Id,
                     });
                 }
                 catch (Exception ex)
@@ -77,13 +78,13 @@ public class DownloadSvnLogHostedService : TimedHostedService
                     {
                         Info = $"获取SVN日志并保存的过程中出错：路径:{path.Path}({pathBeginTime}->{pathEndTime}) 错误:{ex.Message}",
                         Level = InfoLevel.Error,
+                        LogId = taskLog.Id,
                     });
                 }
             }
 
             taskLog.IsSucccess = updatePathCount == svnPaths.Count();
             taskLog.Summary = $"SVN日志更新完成，成功更新了{updatePathCount}个路径";
-            taskLog.MessageIds = taskMessages.Select(x => x.Id);
         }
         else
         {

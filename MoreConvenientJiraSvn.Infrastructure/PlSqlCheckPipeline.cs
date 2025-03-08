@@ -22,7 +22,7 @@ public class PlSqlCheckPipeline : IPlSqlCheckPipeline
     private PlSqlLexer? lexer;
     private CommonTokenStream? tokenStream;
     private PlSqlParser? parser;
-    
+
     public PlSqlCheckPipeline()
     {
 

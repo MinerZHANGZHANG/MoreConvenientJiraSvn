@@ -1,10 +1,5 @@
 ﻿using MoreConvenientJiraSvn.App.Views.Windows;
 using MoreConvenientJiraSvn.Core.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace MoreConvenientJiraSvn.App

@@ -114,7 +114,6 @@ public class JiraClient : IJiraClient
                 issues.Add(issue);
             }
 
-            result.IssueInfos = issues;
             result.StartAt = startAtElement.GetInt32();
             result.Total = totalElement.GetInt32();
             result.MaxResults = maxResultsElement.GetInt32();
@@ -184,9 +183,9 @@ public class JiraClient : IJiraClient
         {
             foreach (JsonElement element in doc.RootElement.EnumerateArray())
             {
-                if(cancellationToken.IsCancellationRequested)
+                if (cancellationToken.IsCancellationRequested)
                 {
-                    return results; 
+                    return results;
                 }
 
                 var filter = new JiraIssueFilter()

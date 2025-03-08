@@ -15,7 +15,7 @@ public partial class Jira2LocalDirWindow : Window
     {
         InitializeComponent();
         this._viewModel = ViewModelsManager.GetViewModel<JiraIssueBrowseViewModel>();
-        
+
         this.DataContext = _viewModel;
         this.Loaded += Jira2LocalDirWindow_Loaded;
         this.Closed += Jira2LocalDirWindow_Closed;
@@ -31,7 +31,7 @@ public partial class Jira2LocalDirWindow : Window
         await this._viewModel.InitViewModelAsync();
     }
 
-    private void DataGrid_SelectionChanged(object sender,SelectionChangedEventArgs e)
+    private void DataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         this._viewModel.InvokeSelectedJiraIssueEvent(sender);
     }

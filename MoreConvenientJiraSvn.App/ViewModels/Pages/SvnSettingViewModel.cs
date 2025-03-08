@@ -1,12 +1,12 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MaterialDesignThemes.Wpf;
+using MoreConvenientJiraSvn.Core.Enums;
 using MoreConvenientJiraSvn.Core.Models;
-using MoreConvenientJiraSvn.Service;
 using MoreConvenientJiraSvn.Core.Utils;
+using MoreConvenientJiraSvn.Service;
 using System.Collections.ObjectModel;
 using System.Windows;
-using MoreConvenientJiraSvn.Core.Enums;
-using MaterialDesignThemes.Wpf;
 
 namespace MoreConvenientJiraSvn.App.ViewModels;
 

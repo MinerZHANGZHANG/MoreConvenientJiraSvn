@@ -13,7 +13,7 @@ public partial class JiraSettingViewModel : ObservableObject
     [ObservableProperty]
     private JiraConfig _jiraConfig = new();
 
-    public JiraSettingViewModel(SettingService settingService,JiraService jiraService)
+    public JiraSettingViewModel(SettingService settingService, JiraService jiraService)
     {
         _settingService = settingService;
         _jiraService = jiraService;

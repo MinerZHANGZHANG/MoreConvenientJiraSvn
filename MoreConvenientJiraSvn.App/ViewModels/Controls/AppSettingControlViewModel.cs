@@ -4,13 +4,8 @@ using MoreConvenientJiraSvn.App.Properties;
 using MoreConvenientJiraSvn.Core.Enums;
 using MoreConvenientJiraSvn.Core.Models;
 using MoreConvenientJiraSvn.Core.Utils;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace MoreConvenientJiraSvn.App.ViewModels

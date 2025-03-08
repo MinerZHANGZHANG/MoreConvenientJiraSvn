@@ -34,5 +34,5 @@ public partial class SvnJiraLinkWindow : Window
         this._viewModel.InvokeSelectedSvnPathEvent(sender);
     }
 
-    
+
 }

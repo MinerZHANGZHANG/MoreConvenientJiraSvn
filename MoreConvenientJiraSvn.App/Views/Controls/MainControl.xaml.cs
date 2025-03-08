@@ -13,4 +13,9 @@ public partial class MainControl : UserControl
         DataContext = ViewModelsManager.GetViewModel<MainControlViewModel>();
         InitializeComponent();
     }
+
+    private void Button_Click(object sender, System.Windows.RoutedEventArgs e)
+    {
+
+    }
 }

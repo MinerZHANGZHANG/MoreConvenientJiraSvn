@@ -19,7 +19,7 @@
 
 	<ItemGroup>
 		<None Remove="Resources\Images\Logo.png" />
-		<None Remove="Resources\Screens\SplashScreen.png" />
+		<None Remove="Resources\Screens\TempSplashScreen.png" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -46,6 +46,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <SplashScreen Include="Resources\Screens\TempSplashScreen.png" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<Compile Update="Properties\Settings.Designer.cs">
 			<DesignTimeSharedInput>True</DesignTimeSharedInput>
 			<AutoGen>True</AutoGen>
@@ -64,10 +68,6 @@
 			<Generator>SettingsSingleFileGenerator</Generator>
 			<LastGenOutput>Settings.Designer.cs</LastGenOutput>
 		</None>
-	</ItemGroup>
-
-	<ItemGroup>
-		<SplashScreen Include="Resources\Screens\SplashScreen.png" />
 	</ItemGroup>
 
 	<ItemGroup>

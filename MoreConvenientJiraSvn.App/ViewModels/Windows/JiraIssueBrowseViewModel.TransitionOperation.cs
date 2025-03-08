@@ -1,12 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using MoreConvenientJiraSvn.Core.Models;
-using MoreConvenientJiraSvn.Service;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MoreConvenientJiraSvn.App.ViewModels;
 

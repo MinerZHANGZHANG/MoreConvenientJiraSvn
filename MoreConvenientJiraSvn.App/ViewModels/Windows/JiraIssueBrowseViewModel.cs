@@ -1,17 +1,11 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using LiteDB;
 using MaterialDesignThemes.Wpf;
-using Microsoft.Win32;
 using MoreConvenientJiraSvn.Core.Enums;
 using MoreConvenientJiraSvn.Core.Interfaces;
 using MoreConvenientJiraSvn.Core.Models;
 using MoreConvenientJiraSvn.Service;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.IO;
-using System.Text;
 using System.Windows;
 
 
@@ -60,7 +54,7 @@ public partial class JiraIssueBrowseViewModel(JiraService jiraService, SvnServic
     public bool HasJiraBeSelected => SelectedJiraIssue != null;
 
     private event EventHandler<JiraIssue>? _selectedIssueChanged;
-    public SnackbarMessageQueue MessageQueue { get; }  = new(TimeSpan.FromSeconds(2d));
+    public SnackbarMessageQueue MessageQueue { get; } = new(TimeSpan.FromSeconds(2d));
 
     #endregion
 

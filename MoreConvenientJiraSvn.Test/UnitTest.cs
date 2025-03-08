@@ -1,6 +1,4 @@
-﻿using NUnit.Framework;
-
-namespace MoreConvenientJiraSvn.Test
+﻿namespace MoreConvenientJiraSvn.Test
 {
     public class Tests
     {

@@ -1,9 +1,6 @@
 ﻿using LiteDB;
 using MoreConvenientJiraSvn.Core.Interfaces;
 using MoreConvenientJiraSvn.Core.Models;
-using MoreConvenientJiraSvn.Service;
-using System.Net.Http.Headers;
-using System.Text.Json;
 
 namespace MoreConvenientJiraSvn.Service
 {
@@ -28,22 +25,12 @@ namespace MoreConvenientJiraSvn.Service
 
             _jiraConfig = _settingService.FindSetting<JiraConfig>() ?? new();
             _settingService.OnConfigChanged += RefreshJiraCilent_OnConfigChanged;
-
-            _jiraClient.InitHttpClient(_jiraConfig);
         }
 
 
         public async Task<List<JiraIssueFilter>> GetCurrentUserFavouriteFilterAsync()
         {
-            _logService.Debug($"{nameof(GetCurrentUserFavouriteFilterAsync)}");
-            List<JiraIssueFilter> result = [];
-            try
-            {
-                result = await _jiraClient.GetUserFavouriteFilterAsync();
-            }
-            catch (Exception ex)
-            {
-            }
+            List<JiraIssueFilter> result = await _jiraClient.GetUserFavouriteFilterAsync();
 
             return result;
         }
@@ -61,7 +48,7 @@ namespace MoreConvenientJiraSvn.Service
 
         public async Task<List<JiraIssue>> GetIssuesByFilterAsync(JiraIssueFilter jiraFilter, int maxRequestCount = 200)
         {
-            List<JiraIssue> issues = [];
+            List<JiraIssue> issueInfos = [];
             int start = 0;
             int total = 1;
             int requestCount = 0;
@@ -79,10 +66,10 @@ namespace MoreConvenientJiraSvn.Service
                 start = issuePageInfo.StartAt + issuePageInfo.MaxResults;
                 total = issuePageInfo.Total;
 
-                issues.AddRange(issuePageInfo.IssueInfos);
+                issueInfos.AddRange(issuePageInfo.IssueInfos);
             }
 
-            return issues;
+            return issueInfos;
         }
 
         public async Task<List<IssueDiff>> GetIssuesDiffByFilterAsync(JiraIssueFilter jiraFilter, int maxRequestCount = 200)
