@@ -23,4 +23,5 @@ public record SvnLog
     public string? SubIssueJiraId { get; set; }
 
     #endregion
+
 }

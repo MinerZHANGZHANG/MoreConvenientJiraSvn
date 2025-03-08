@@ -29,6 +29,8 @@ public class SvnService : IDisposable
         _svnPaths = _settingService.FindSettings<SvnPath>() ?? [];
 
         _settingService.OnConfigChanged += RefreshSvnClient_OnConfigChanged;
+
+        _svnClient.InitSvnClient(_svnConfig);
     }
 
     private void RefreshSvnClient_OnConfigChanged(object? sender, ConfigChangedArgs e)

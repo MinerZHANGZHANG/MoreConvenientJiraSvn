@@ -151,6 +151,9 @@ public partial class SvnJiraLinkViewModel(SvnService svnService, IRepository rep
                 _repository.Upsert(querySvnLog);
                 SelectedPathSvnLogs = [.. SelectedPathSvnLogs.Union(querySvnLog)];
 
+                _svnLogPaginator = new PaginationHelper<SvnLog>(SelectedPathSvnLogs, _pageSize);
+                CurrentPageSvnLogs = _svnLogPaginator.GetCurrentItems();
+
                 ShowMessageSnack($"查询成功，获取数据量{querySvnLog.Count()}");
             }
             else

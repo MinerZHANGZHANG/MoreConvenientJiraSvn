@@ -36,7 +36,14 @@ namespace MoreConvenientJiraSvn.Service
         public async Task<List<JiraIssueFilter>> GetCurrentUserFavouriteFilterAsync()
         {
             _logService.Debug($"{nameof(GetCurrentUserFavouriteFilterAsync)}");
-            List<JiraIssueFilter> result = await _jiraClient.GetUserFavouriteFilterAsync();
+            List<JiraIssueFilter> result = [];
+            try
+            {
+                result = await _jiraClient.GetUserFavouriteFilterAsync();
+            }
+            catch (Exception ex)
+            {
+            }
 
             return result;
         }
