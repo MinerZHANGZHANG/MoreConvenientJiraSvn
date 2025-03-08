@@ -40,8 +40,8 @@ name: .NET Core Desktop
 
 on:
   push:
-    tags:  
-      - 'v*.*.*'
+    branches:  
+      - release
 
 permissions:  
   contents: write            
@@ -53,16 +53,12 @@ jobs:
 
     strategy:
       matrix:
-        configuration: [Debug, Release]
+        configuration: [Release]
 
     runs-on: windows-latest  # For a list of available runner types, refer to
                              # https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on
 
     env:
-      Solution_Name: MoreConvenientJiraSvn.sln                         # Replace with your solution name, i.e. MyWpfApp.sln.
-      Test_Project_Path: MoreConvenientJiraSvn.Test.csproj                 # Replace with the path to your test project, i.e. MyWpfApp.Tests\MyWpfApp.Tests.csproj.
-      # Wap_Project_Directory: your-wap-project-directory-name    # Replace with the Wap project directory relative to the solution, i.e. MyWpfApp.Package.
-      #Wap_Project_Path: your-wap-project-path                   # Replace with the path to your Wap project, i.e. MyWpf.App.Package\MyWpfApp.Package.wapproj.
 
     steps:
     - name: Checkout
@@ -70,37 +66,40 @@ jobs:
       with:
         fetch-depth: 0
 
-    # Install the .NET Core workload
     - name: Install .NET Core
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.0.x
 
-    # Add  MSBuild to the PATH: https://github.com/microsoft/setup-msbuild
     - name: Setup MSBuild.exe
       uses: microsoft/setup-msbuild@v2
 
     - name: Restore dependencies  
       run: dotnet restore 
 
+    - name: Build
+      run: dotnet build
+
+    - name: Test
+      run: dotnet test --logger trx --results-directory "TestResults-MoreConvenientJiraSvn-${{ github.run_attempt }}"
+
     - name: Publish  
-      run: dotnet publish --configuration Release --output ./artifacts
+      run: dotnet publish ./MoreConvenientJiraSvn.App/MoreConvenientJiraSvn.App.csproj -c Release -p:PublishDir=./artifacts -p:PublishProfile=./MoreConvenientJiraSvn.App/Properties/PublishProfiles/FolderProfile
 
-    - name: Create Release  
-      id: create_release  
-      uses: softprops/action-gh-release@v1  
-      with:  
-        tag_name: ${{ github.ref }}  
-        name: Release ${{ github.ref }}  
-        body: |   
-          Auto publish
-      env:  
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
+    # https://github.com/actions/upload-artifact
+    - name: Upload test result
+      uses: actions/upload-artifact@v4
+      with:
+        name: TestResults-MoreConvenientJiraSvn-${{ github.run_attempt }}
+        path: TestResults-MoreConvenientJiraSvn-${{ github.run_attempt }}
+        retention-days: 90
+      if: ${{ always() }}
 
-    - name: Upload Release Assets  
-      uses: softprops/action-gh-release@v1  
-      with:  
-        tag: ${{ github.ref }}  
-        files: ./artifacts/*  
-      env:  
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload publish result
+      uses: actions/upload-artifact@v4
+      with:
+        name: MoreConvenientJiraSvn-${{ github.run_attempt }}
+        path: ./MoreConvenientJiraSvn.App/artifacts
+        retention-days: 90
+
+
