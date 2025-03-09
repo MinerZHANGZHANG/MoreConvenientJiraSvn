@@ -16,13 +16,6 @@
     d:DesignWidth="1080"
     mc:Ignorable="d">
 
-    <!--<Control.Resources>
-        <convert:EnumDescriptionConverter x:Key="EnumDescriptionConverter" />
-        <SolidColorBrush x:Key="NormalColor" Color="Gray" />
-        <SolidColorBrush x:Key="WarningColor" Color="Orange" />
-        <SolidColorBrush x:Key="ErrorColor" Color="Red" />
-    </Control.Resources>-->
-
     <DockPanel>
         <!--  Top title  -->
         <StackPanel

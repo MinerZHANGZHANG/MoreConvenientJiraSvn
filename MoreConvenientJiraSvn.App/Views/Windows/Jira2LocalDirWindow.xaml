@@ -317,6 +317,9 @@
                                 Command="{x:Static materialDesign:DrawerHost.OpenDrawerCommand}"
                                 CommandParameter="{x:Static Dock.Left}"
                                 Content="修改Jira状态" />
+                            <materialDesign:Badged Badge="3">
+                                <Button Content="查询相关缺陷" />
+                            </materialDesign:Badged>
                         </WrapPanel>
                     </Expander>
 
@@ -429,7 +432,36 @@
                         DockPanel.Dock="Top"
                         Header="关联Jira">
                         <DockPanel Margin="8">
-                            <ListBox />
+                            <ListView DockPanel.Dock="Top" ItemsSource="{Binding JiraIssueList}">
+                                <ListView.View>
+                                    <GridView>
+                                        <GridViewColumn DisplayMemberBinding="{Binding IssueKey}" Header="编号" />
+                                        <GridViewColumn DisplayMemberBinding="{Binding Summary}" Header="描述" />
+                                        <GridViewColumn DisplayMemberBinding="{Binding StatusName}" Header="状态" />
+                                        <GridViewColumn Header="操作">
+                                            <GridViewColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <DockPanel>
+                                                        <Button
+                                                            Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}"
+                                                            CommandParameter="{Binding IssueId}"
+                                                            Content="打开网页"
+                                                            DockPanel.Dock="Left"
+                                                            Style="{StaticResource MaterialDesignOutlinedButton}" />
+                                                        <Button
+                                                            Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}"
+                                                            CommandParameter="{Binding IssueId}"
+                                                            Content="填入查询"
+                                                            DockPanel.Dock="Left"
+                                                            Style="{StaticResource MaterialDesignOutlinedButton}" />
+                                                    </DockPanel>
+
+                                                </DataTemplate>
+                                            </GridViewColumn.CellTemplate>
+                                        </GridViewColumn>
+                                    </GridView>
+                                </ListView.View>
+                            </ListView>
                         </DockPanel>
                     </Expander>
 
