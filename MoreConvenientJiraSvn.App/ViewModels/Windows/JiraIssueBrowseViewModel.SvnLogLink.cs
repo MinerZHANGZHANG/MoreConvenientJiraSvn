@@ -85,12 +85,23 @@ public partial class JiraIssueBrowseViewModel
         }
 
         _cancellationTokenSource = new();
-        SelectedIssueSvnLogs = [.. await _svnService.GetSvnLogsAsync(SelectedSvnPath.Path,
+
+        try
+        {
+            var svnLogs = await _svnService.GetSvnLogsAsync(SelectedSvnPath.Path,
                                                             BeginDate,
                                                             EndDate,
                                                             1000,
                                                             SelectedSvnPath.IsNeedExtractJiraId,
-                                                            _cancellationTokenSource.Token)];
+                                                            _cancellationTokenSource.Token);
+            SelectedIssueSvnLogs = [.. SelectedIssueSvnLogs.UnionBy(svnLogs, l => l.Revision)];
+
+            MessageQueue.Enqueue($"刷新Log成功，查找到{svnLogs.Count}条数据");
+        }
+        catch (Exception ex)
+        {
+            MessageQueue.Enqueue($"刷新Log失败: {ex.Message}");
+        }
     }
 
 }

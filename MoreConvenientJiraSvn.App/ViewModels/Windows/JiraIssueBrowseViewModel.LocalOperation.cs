@@ -71,7 +71,7 @@ public partial class JiraIssueBrowseViewModel
         _settingService.UpsertSetting(JiraIssueLocalInfoSetting);
     }
 
-    [RelayCommand(CanExecute = nameof(HasJiraBeSelected))]
+    [RelayCommand(CanExecute = nameof(HasIssueBeSelected))]
     public void CopyCommitText()
     {
         if (SelectedJiraIssue == null)
@@ -82,11 +82,11 @@ public partial class JiraIssueBrowseViewModel
         try
         {
             Clipboard.SetText(GetDefaultCommitString(SelectedJiraIssue));
-            MessageBox.Show("复制成功!");
+            MessageQueue.Enqueue("复制成功!");
         }
         catch
         {
-            MessageBox.Show("复制失败...");
+            MessageQueue.Enqueue("复制失败...请重试");
         }
     }
 
@@ -111,7 +111,7 @@ public partial class JiraIssueBrowseViewModel
         return commitTextBuilder.ToString();
     }
 
-    [RelayCommand(CanExecute = nameof(HasJiraBeSelected))]
+    [RelayCommand(CanExecute = nameof(HasIssueBeSelected))]
     public void CopyAnnotationText()
     {
         if (SelectedJiraIssue == null)
@@ -122,40 +122,16 @@ public partial class JiraIssueBrowseViewModel
         {
             var text = $"// {DateTime.Today:yyyy-MM-dd} {JiraIssueLocalInfoSetting.UserName} {SelectedJiraIssue.IssueKey} {SelectedJiraIssue.Summary}";
             Clipboard.SetText(text);
-            MessageBox.Show("复制成功!");
+            MessageQueue.Enqueue("复制成功!");
         }
         catch
         {
-            MessageBox.Show("复制失败...");
+            MessageQueue.Enqueue("复制失败...请重试");
         }
 
     }
 
-    [RelayCommand(CanExecute = nameof(HasJiraBeSelected))]
-    public void OpenWebPage()
-    {
-        if (SelectedJiraIssue == null)
-        {
-            return;
-        }
-
-        string? url = $"{_jiraService.JiraConfig.BaseUrl}browse/{SelectedJiraIssue.IssueKey}";
-        if (string.IsNullOrEmpty(url))
-        {
-            return;
-        }
-
-        try
-        {
-            Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"无法打开网页: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
-        }
-    }
-
-    [RelayCommand(CanExecute = nameof(HasJiraBeSelected))]
+    [RelayCommand(CanExecute = nameof(HasIssueBeSelected))]
     public async Task OpenOrCreateJiraIssueDirectoryAsync()
     {
         if (SelectedJiraIssue == null)
@@ -177,13 +153,13 @@ public partial class JiraIssueBrowseViewModel
     {
         if (string.IsNullOrEmpty(JiraIssueLocalInfoSetting.ParentDir))
         {
-            MessageBox.Show("请先设置本地Jira信息存储位置");
+            MessageQueue.Enqueue("请先设置本地Jira信息存储位置");
             return;
         }
 
         if (!Directory.Exists(JiraIssueLocalInfoSetting.ParentDir))
         {
-            MessageBox.Show("未设置有效的本地Jira信息存储路径");
+            MessageQueue.Enqueue("未设置有效的本地Jira信息存储路径");
             return;
         }
 
@@ -192,7 +168,7 @@ public partial class JiraIssueBrowseViewModel
         string[] directories = Directory.GetDirectories(JiraIssueLocalInfoSetting.ParentDir);
         if (directories.Contains(dirName))
         {
-            MessageBox.Show($"{JiraIssueLocalInfoSetting.ParentDir}目录下已有一个{dirName}文件夹");
+            MessageQueue.Enqueue($"{JiraIssueLocalInfoSetting.ParentDir}目录下已有一个{dirName}文件夹");
 
             SelectedJiraIssueLocalInfo = new() { IssueKey = SelectedJiraIssue.IssueKey, LocalDir = fullDirName };
             _repository.Upsert(SelectedJiraIssueLocalInfo);
@@ -243,7 +219,7 @@ public partial class JiraIssueBrowseViewModel
         SelectedJiraIssueLocalInfo = new() { IssueKey = SelectedJiraIssue.IssueKey, LocalDir = fullDirName };
         _repository.Upsert(SelectedJiraIssueLocalInfo);
 
-        MessageBox.Show($"创建[{fullDirName}]文件夹成功!");
+        MessageQueue.Enqueue($"创建[{fullDirName}]文件夹成功!");
 
     }
 
@@ -271,7 +247,7 @@ public partial class JiraIssueBrowseViewModel
         }
         catch (Exception ex)
         {
-            MessageBox.Show(ex.Message);
+            MessageQueue.Enqueue($"打开本地路径失败，{ex.Message}");
         }
     }
 }

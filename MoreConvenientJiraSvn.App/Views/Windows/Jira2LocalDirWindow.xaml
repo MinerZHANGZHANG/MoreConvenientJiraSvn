@@ -159,6 +159,17 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
+            <materialDesign:Snackbar
+                Grid.Row="0"
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                Height="64"
+                Margin="0,0,0,-64"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Top"
+                Panel.ZIndex="1"
+                MessageQueue="{Binding MessageQueue}" />
+
             <!--  Left jira title  -->
             <DockPanel
                 Grid.Row="0"
@@ -305,20 +316,23 @@
                     <Expander
                         Margin="6"
                         DockPanel.Dock="Top"
-                        Header="本地存档"
+                        Header="常用设置"
                         IsExpanded="True">
-                        <WrapPanel>
+                        <WrapPanel Margin="0,6,0,6">
                             <TextBlock Text="{Binding SelectedJiraIssueLocalInfo.LocalDir}" />
                             <Button Command="{Binding OpenOrCreateJiraIssueDirectoryCommand}" Content="{Binding LocalJiraOperationText}" />
                             <Button Command="{Binding CopyCommitTextCommand}" Content="复制提交信息" />
                             <Button Command="{Binding CopyAnnotationTextCommand}" Content="复制注释信息" />
-                            <Button Command="{Binding OpenWebPageCommand}" Content="打开Jira网页" />
+                            <Button
+                                Command="{Binding OpenWebPageCommand}"
+                                CommandParameter="{Binding SelectedJiraIssue.IssueKey}"
+                                Content="打开Jira网页" />
                             <Button
                                 Command="{x:Static materialDesign:DrawerHost.OpenDrawerCommand}"
                                 CommandParameter="{x:Static Dock.Left}"
                                 Content="修改Jira状态" />
-                            <materialDesign:Badged Badge="3">
-                                <Button Content="查询相关缺陷" />
+                            <materialDesign:Badged Badge="{Binding ChildJiraIssues.Count}">
+                                <Button Command="{Binding OnlyDisplayCurrentJiraIssuesCommand}" Content="仅查看相关Jira" />
                             </materialDesign:Badged>
                         </WrapPanel>
                     </Expander>
@@ -432,7 +446,7 @@
                         DockPanel.Dock="Top"
                         Header="关联Jira">
                         <DockPanel Margin="8">
-                            <ListView DockPanel.Dock="Top" ItemsSource="{Binding JiraIssueList}">
+                            <ListView DockPanel.Dock="Top" ItemsSource="{Binding ChildJiraIssues}">
                                 <ListView.View>
                                     <GridView>
                                         <GridViewColumn DisplayMemberBinding="{Binding IssueKey}" Header="编号" />
@@ -443,15 +457,9 @@
                                                 <DataTemplate>
                                                     <DockPanel>
                                                         <Button
-                                                            Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}"
+                                                            Command="{Binding DataContext.OpenWebPageCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                             CommandParameter="{Binding IssueId}"
                                                             Content="打开网页"
-                                                            DockPanel.Dock="Left"
-                                                            Style="{StaticResource MaterialDesignOutlinedButton}" />
-                                                        <Button
-                                                            Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}"
-                                                            CommandParameter="{Binding IssueId}"
-                                                            Content="填入查询"
                                                             DockPanel.Dock="Left"
                                                             Style="{StaticResource MaterialDesignOutlinedButton}" />
                                                     </DockPanel>

@@ -25,3 +25,16 @@ public record SvnLog
     #endregion
 
 }
+
+public class SvnLogEqualityComparer : IEqualityComparer<SvnLog>
+{
+    public bool Equals(SvnLog? x, SvnLog? y)
+    {
+        return x?.Revision == y?.Revision;
+    }
+
+    public int GetHashCode(SvnLog obj)
+    {
+        return obj.Id.GetHashCode();
+    }
+}

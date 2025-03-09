@@ -41,7 +41,7 @@ public partial class JiraIssueBrowseViewModel(JiraService jiraService, SvnServic
     [ObservableProperty]
     private ObservableCollection<JiraIssue>? _jiraIssueList;
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(HasJiraBeSelected))]
+    [NotifyPropertyChangedFor(nameof(HasIssueBeSelected))]
     [NotifyCanExecuteChangedFor(nameof(OpenOrCreateJiraIssueDirectoryCommand))]
     [NotifyCanExecuteChangedFor(nameof(CopyCommitTextCommand))]
     [NotifyCanExecuteChangedFor(nameof(CopyAnnotationTextCommand))]
@@ -51,7 +51,7 @@ public partial class JiraIssueBrowseViewModel(JiraService jiraService, SvnServic
     public IReadOnlyList<JiraIssueQueryType> JiraIssueQueryTypes { get; } = Enum.GetValues<JiraIssueQueryType>();
     public bool IsUseTextToSearch => SelectedJiraIssueQueryType != JiraIssueQueryType.Filter;
     public bool HaveQueryText => !string.IsNullOrEmpty(JiraIssueQueryText);
-    public bool HasJiraBeSelected => SelectedJiraIssue != null;
+    public bool HasIssueBeSelected => SelectedJiraIssue != null;
 
     private event EventHandler<JiraIssue>? _selectedIssueChanged;
     public SnackbarMessageQueue MessageQueue { get; } = new(TimeSpan.FromSeconds(2d));
@@ -86,25 +86,30 @@ public partial class JiraIssueBrowseViewModel(JiraService jiraService, SvnServic
                 {
                     break;
                 }
-                JiraIssueList = [jiraIssue];
+                RefreshCurrentJiraIssues([jiraIssue]);
                 break;
             case JiraIssueQueryType.Jql:
                 if (string.IsNullOrEmpty(JiraIssueQueryText))
                 {
                     break;
                 }
-                JiraIssueList = [.. await _jiraService.GetIssuesByJqlAsync(JiraIssueQueryText)];
+                RefreshCurrentJiraIssues(await _jiraService.GetIssuesByJqlAsync(JiraIssueQueryText));
                 break;
             case JiraIssueQueryType.Filter:
                 if (SelectedJiraIssueFilter == null)
                 {
                     break;
                 }
-                JiraIssueList = [.. await _jiraService.GetIssuesByFilterAsync(SelectedJiraIssueFilter)];
+                RefreshCurrentJiraIssues(await _jiraService.GetIssuesByFilterAsync(SelectedJiraIssueFilter));
                 break;
             default:
                 break;
         }
+    }
+
+    public void RefreshCurrentJiraIssues(IEnumerable<JiraIssue> issues)
+    {
+        JiraIssueList = [.. issues];
     }
 
     public void InvokeSelectedJiraIssueEvent(object? sender)

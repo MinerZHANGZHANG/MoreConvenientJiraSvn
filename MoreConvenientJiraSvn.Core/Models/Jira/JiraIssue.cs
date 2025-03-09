@@ -131,8 +131,8 @@ public record JiraIssue
 
     #region jira JSQL
 
-    public string JSql_ChildrenIssues => $"parent={IssueKey}";
-    public string JSql_ChildrenIssuesLimitFields => $"parent={IssueKey}&fields=key,summary,status";
+    public string ChildrenIssuesJql => $"parent={IssueKey}";
+    public string ChildrenIssuesLimitFieldsJql => $"parent={IssueKey}&fields=key,summary,status";
 
     #endregion
 
