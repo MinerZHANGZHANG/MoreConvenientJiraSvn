@@ -1,18 +1,17 @@
 ﻿using MoreConvenientJiraSvn.Core.Enums;
 using MoreConvenientJiraSvn.Core.Interfaces;
 using MoreConvenientJiraSvn.Core.Models;
-using MoreConvenientJiraSvn.Core.Utils;
 using MoreConvenientJiraSvn.Service;
 
 
 namespace MoreConvenientJiraSvn.BackgroundTask;
 
-public class CheckJiraStateHostedService: TimedHostedService
+public class CheckJiraStateHostedService : TimedHostedService
 {
-    private readonly IRepository _repository ;
+    private readonly IRepository _repository;
 
     private readonly JiraService _jiraService;
-    private readonly LogService _logService ;
+    private readonly LogService _logService;
     private readonly SettingService _settingService;
 
     public CheckJiraStateHostedService(IRepository repository, SvnService svnService, JiraService jiraService, LogService logService, SettingService settingService)
@@ -42,14 +41,14 @@ public class CheckJiraStateHostedService: TimedHostedService
             IsSucccess = false,
         };
         var taskMessages = new List<BackgroundTaskMessage>();
-       
+
         try
         {
             var filters = await _jiraService.GetNeedRefreshFavouriteFilterAsync();
             foreach (var filter in filters)
             {
                 var issueInfos = await _jiraService.GetIssuesDiffByFilterAsync(filter);
-                var issueMessages = GetIssueChangeMessages(issueInfos, filter);
+                var issueMessages = GetIssueChangeMessages(issueInfos, filter, taskLog);
                 taskMessages.AddRange(issueMessages);
             }
 
@@ -64,7 +63,6 @@ public class CheckJiraStateHostedService: TimedHostedService
                     taskLog.Level = InfoLevel.Warning;
                 }
 
-                taskLog.MessageIds = taskMessages.Select(m => m.Id);
                 taskLog.Summary = $"过滤器[{string.Join("|", filters.Select(f => f.Name))}]相关的Jira存在{taskMessages.Count}处需要注意的变动，请查看首页";
             }
             else
@@ -89,7 +87,7 @@ public class CheckJiraStateHostedService: TimedHostedService
         return taskLog.IsSucccess;
     }
 
-    public static List<BackgroundTaskMessage> GetIssueChangeMessages(List<IssueDiff> IssueDiffs, JiraIssueFilter jiraFilter)
+    public static List<BackgroundTaskMessage> GetIssueChangeMessages(List<IssueDiff> IssueDiffs, JiraIssueFilter jiraFilter, BackgroundTaskLog taskLog)
     {
         List<BackgroundTaskMessage> messageList = [];
 
@@ -102,6 +100,7 @@ public class CheckJiraStateHostedService: TimedHostedService
                 {
                     Info = $"Jira:[{jiraFilter.Name}]过滤器里新增了一条数据，IssueKey{IssueDiffs[i].New.IssueKey}",
                     Level = InfoLevel.Normal,
+                    LogId = taskLog.Id
                 };
                 messageList.Add(message);
                 IssueDiffs.RemoveAt(i);

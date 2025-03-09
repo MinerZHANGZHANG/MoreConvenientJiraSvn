@@ -1,14 +1,14 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using LiteDB;
-using MoreConvenientJiraSvn.Core.Enums;
-using MoreConvenientJiraSvn.Core.Models;
-using MoreConvenientJiraSvn.Service;
-using MoreConvenientJiraSvn.Core.Utils;
-using System.Windows;
-using MoreConvenientJiraSvn.Core.Interfaces;
 using MaterialDesignThemes.Wpf;
+using MoreConvenientJiraSvn.Core.Enums;
+using MoreConvenientJiraSvn.Core.Interfaces;
+using MoreConvenientJiraSvn.Core.Models;
+using MoreConvenientJiraSvn.Core.Utils;
+using MoreConvenientJiraSvn.Service;
 using System.Collections.ObjectModel;
+using System.Windows;
 
 namespace MoreConvenientJiraSvn.App.ViewModels;
 
@@ -150,9 +150,6 @@ public partial class SvnJiraLinkViewModel(SvnService svnService, IRepository rep
             {
                 _repository.Upsert(querySvnLog);
                 SelectedPathSvnLogs = [.. SelectedPathSvnLogs.Union(querySvnLog)];
-
-                _svnLogPaginator = new PaginationHelper<SvnLog>(SelectedPathSvnLogs, _pageSize);
-                CurrentPageSvnLogs = _svnLogPaginator.GetCurrentItems();
 
                 ShowMessageSnack($"查询成功，获取数据量{querySvnLog.Count()}");
             }

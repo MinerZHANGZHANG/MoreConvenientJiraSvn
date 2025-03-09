@@ -3,13 +3,9 @@ using CommunityToolkit.Mvvm.Input;
 using LiteDB;
 using Microsoft.Win32;
 using MoreConvenientJiraSvn.Core.Models;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace MoreConvenientJiraSvn.App.ViewModels;

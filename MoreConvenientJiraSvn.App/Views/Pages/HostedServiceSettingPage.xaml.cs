@@ -1,5 +1,4 @@
 ﻿using MoreConvenientJiraSvn.App.ViewModels;
-using System.Threading.Tasks;
 using System.Windows.Controls;
 
 namespace MoreConvenientJiraSvn.App.Views.Pages

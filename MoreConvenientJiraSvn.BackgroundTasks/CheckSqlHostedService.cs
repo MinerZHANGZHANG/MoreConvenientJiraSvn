@@ -1,13 +1,12 @@
-﻿using MoreConvenientJiraSvn.Core.Interfaces;
+﻿using MoreConvenientJiraSvn.Core.Enums;
+using MoreConvenientJiraSvn.Core.Interfaces;
 using MoreConvenientJiraSvn.Core.Models;
-using MoreConvenientJiraSvn.Core.Utils;
-using MoreConvenientJiraSvn.Core.Enums;
 using MoreConvenientJiraSvn.Service;
 using System.IO;
 
 namespace MoreConvenientJiraSvn.BackgroundTask;
 
-public class CheckSqlHostedService: TimedHostedService
+public class CheckSqlHostedService : TimedHostedService
 {
     private readonly IRepository _repository;
     private readonly IPlSqlCheckPipeline _plSqlCheckPipeline;
@@ -84,9 +83,9 @@ public class CheckSqlHostedService: TimedHostedService
                     {
                         Info = $"[{i.FilePath}]存在问题:{i.Message}",
                         Level = i.Level,
+                        LogId = taskLog.Id
                     }));
 
-                    taskLog.MessageIds = taskMessages.Select(m => m.Id);
                     taskLog.Summary = $"找到{fileInfos.Count}个Sql文件，检测完成，发现{sqlIssues.Count}个问题";
                     taskLog.Level = sqlIssues.Any(i => i.Level == InfoLevel.Error)
                                       ? InfoLevel.Error

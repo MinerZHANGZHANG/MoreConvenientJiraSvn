@@ -7,20 +7,19 @@
     xmlns:local="clr-namespace:MoreConvenientJiraSvn.App.Views.Controls"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:model="clr-namespace:MoreConvenientJiraSvn.Core.Models;assembly=MoreConvenientJiraSvn.Core"
     xmlns:viewModel="clr-namespace:MoreConvenientJiraSvn.App.ViewModels"
+    x:Name="TheMainControl"
     d:DataContext="{d:DesignInstance Type=viewModel:MainControlViewModel}"
-    d:DesignHeight="512"
-    d:DesignWidth="800"
+    d:DesignHeight="720"
+    d:DesignWidth="1080"
     mc:Ignorable="d">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
-
+    <DockPanel>
         <!--  Top title  -->
-        <StackPanel Orientation="Horizontal">
+        <StackPanel
+            MinHeight="40"
+            DockPanel.Dock="Top"
+            Orientation="Horizontal">
             <TextBlock
                 Margin="16,0,16,0"
                 VerticalAlignment="Center"
@@ -34,35 +33,63 @@
         </StackPanel>
 
         <!--  Center grid  -->
-        <DataGrid
-            Grid.Row="1"
-            AutoGenerateColumns="False"
-            CanUserAddRows="False"
-            ItemsSource="{Binding PluginMessages}">
-            <DataGrid.Columns>
-                <DataGridTextColumn
-                    Width="*"
-                    Binding="{Binding Level}"
-                    Header="级别" />
-                <DataGridTextColumn
-                    Width="5*"
-                    Binding="{Binding Info}"
-                    Header="信息" />
-                <DataGridTemplateColumn Width="64" Header="编辑">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <Button Content="编辑" />
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <materialDesign:DataGridComboBoxColumn />
-            </DataGrid.Columns>
-        </DataGrid>
+        <ListView
+            Height="528"
+            DockPanel.Dock="Top"
+            ItemsSource="{Binding BackgroundTaskLogs}"
+            SelectedItem="{Binding SelectedBackgroundTaskLog}">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn
+                        Width="90"
+                        DisplayMemberBinding="{Binding Level}"
+                        Header="级别" />
+                    <GridViewColumn
+                        Width="128"
+                        DisplayMemberBinding="{Binding DisplayStartTime}"
+                        Header="时间" />
+                    <GridViewColumn
+                        Width="670"
+                        DisplayMemberBinding="{Binding Summary}"
+                        Header="描述" />
+                    <GridViewColumn Width="128" Header="操作">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button
+                                    Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}"
+                                    Content="查看详情"
+                                    Style="{StaticResource MaterialDesignOutlinedButton}">
+                                    <Button.CommandParameter>
+                                        <StackPanel Margin="16">
+                                            <ListView ItemsSource="{Binding BackgroundTaskMessages}">
+                                                <ListView.View>
+                                                    <GridView>
+                                                        <GridViewColumn DisplayMemberBinding="{Binding Level}" Header="级别" />
+                                                        <GridViewColumn DisplayMemberBinding="{Binding Info}" Header="信息" />
+                                                    </GridView>
+                                                </ListView.View>
+                                            </ListView>
+                                            <Button
+                                                HorizontalAlignment="Center"
+                                                Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
+                                                Content="关闭"
+                                                IsCancel="True"
+                                                Style="{StaticResource MaterialDesignFlatButton}" />
+                                        </StackPanel>
+                                    </Button.CommandParameter>
+                                </Button>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
 
         <!--  bottom button  -->
         <StackPanel
-            Grid.Row="2"
+            MinHeight="40"
             HorizontalAlignment="Center"
+            DockPanel.Dock="Bottom"
             Orientation="Horizontal">
             <Button
                 Width="128"
@@ -91,5 +118,5 @@
                 Content="For排版"
                 Style="{StaticResource MaterialDesignFlatButton}" />
         </StackPanel>
-    </Grid>
+    </DockPanel>
 </UserControl>

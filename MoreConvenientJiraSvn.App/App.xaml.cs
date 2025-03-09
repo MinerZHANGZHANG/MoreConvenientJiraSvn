@@ -1,14 +1,14 @@
 ﻿using LiteDB;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using MoreConvenientJiraSvn.Service;
 using MoreConvenientJiraSvn.App.Properties;
 using MoreConvenientJiraSvn.App.ViewModels;
-using System.Windows;
-using Application = System.Windows.Application;
+using MoreConvenientJiraSvn.BackgroundTask;
 using MoreConvenientJiraSvn.Core.Interfaces;
 using MoreConvenientJiraSvn.Infrastructure;
-using MoreConvenientJiraSvn.BackgroundTask;
+using MoreConvenientJiraSvn.Service;
+using System.Windows;
+using Application = System.Windows.Application;
 
 namespace MoreConvenientJiraSvn.App
 {

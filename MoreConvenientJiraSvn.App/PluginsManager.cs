@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using System.Reflection;
 using System.Windows;
 
 namespace MoreConvenientJiraSvn.App
