@@ -40,7 +40,7 @@ public partial class JiraIssueBrowseViewModel
     public bool HasSvnLog => SelectedIssueSvnLogs.Count > 0;
 
     public string SvnLogVersionRangeText => $"版本:{OldestSvnLog?.Revision.ToString() ?? "无"} -> {NewestSvnLog?.Revision.ToString() ?? "无"}";
-    public string SvnLogTimeRangeText => $"日期:{OldestSvnLog?.DateTime.ToString("yy-MM-dd HH:mm") ?? "无"} -> {NewestSvnLog?.DateTime.ToString("yy-MM-dd HH:mm") ?? "无"}";
+    public string SvnLogTimeRangeText => $"现有数据日期:{OldestSvnLog?.DateTime.ToString("yy-MM-dd HH:mm") ?? "无"} -> {NewestSvnLog?.DateTime.ToString("yy-MM-dd HH:mm") ?? "无"}";
 
     private CancellationTokenSource? _cancellationTokenSource;
 

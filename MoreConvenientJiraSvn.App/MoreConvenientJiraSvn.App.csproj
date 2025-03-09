@@ -11,9 +11,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="artifacts\**" />
 	  <Compile Remove="Views\Components\**" />
+	  <EmbeddedResource Remove="artifacts\**" />
 	  <EmbeddedResource Remove="Views\Components\**" />
+	  <None Remove="artifacts\**" />
 	  <None Remove="Views\Components\**" />
+	  <Page Remove="artifacts\**" />
 	  <Page Remove="Views\Components\**" />
 	</ItemGroup>
 

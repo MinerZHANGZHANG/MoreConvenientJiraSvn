@@ -26,6 +26,14 @@ public static class EnumHelper
                           : value?.ToString() ?? string.Empty;
     }
 
+    public static string GetEnumValueDescription(Type type, object value) 
+    {
+        FieldInfo? field = type?.GetField(value.ToString() ?? string.Empty);
+        return field?.GetCustomAttributes(typeof(DescriptionAttribute), false)
+                      ?.FirstOrDefault() is DescriptionAttribute attribute
+                          ? attribute.Description
+                          : value?.ToString() ?? string.Empty;
+    }
 
     //public static ToolTipIcon ConvertEnumToIcon(InfoLevel level)
     //{

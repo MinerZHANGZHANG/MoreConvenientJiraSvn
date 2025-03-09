@@ -36,7 +36,7 @@ public partial class MainControlViewModel : ObservableObject
     public void RefreshMessage()
     {
         DateTime lastQueryTime = DateTime.Now.AddDays(-7);
-        BackgroundTaskLogs = [.. _repository.Find<BackgroundTaskLog>(l => l.StartTime >= lastQueryTime)];
+        BackgroundTaskLogs = [.. _repository.Find<BackgroundTaskLog>(l => l.StartTime >= lastQueryTime).OrderByDescending(l => l.StartTime)];
 
         foreach (var log in BackgroundTaskLogs)
         {

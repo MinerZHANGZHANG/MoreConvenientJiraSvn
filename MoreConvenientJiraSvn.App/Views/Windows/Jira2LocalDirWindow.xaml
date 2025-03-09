@@ -251,305 +251,299 @@
             </DockPanel>
 
             <!--  Right jira detail  -->
-            <Grid
+            <ScrollViewer
                 Grid.Row="0"
                 Grid.Column="1"
-                Margin="8">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <ScrollViewer
-                    Grid.Row="0"
-                    HorizontalScrollBarVisibility="Disabled"
-                    VerticalScrollBarVisibility="Auto">
-                    <DockPanel>
-                        <!--  Common setting  -->
-                        <Expander
-                            Margin="6"
-                            DockPanel.Dock="Top"
-                            Header="公共设置">
-                            <StackPanel>
-                                <control:ConfigLine Margin="8" ConfigName="默认地址">
-                                    <DockPanel>
-                                        <TextBox
-                                            Width="200"
-                                            HorizontalAlignment="Left"
-                                            DockPanel.Dock="Left"
-                                            IsReadOnly="True"
-                                            Style="{StaticResource MaterialDesignTextBox}"
-                                            Text="{Binding JiraIssueLocalInfoSetting.ParentDir}" />
-                                        <Button
-                                            Width="60"
-                                            HorizontalAlignment="Right"
-                                            Command="{Binding SelecetLocalInfoDirectoryCommand}"
-                                            Content="选择"
-                                            DockPanel.Dock="Left" />
-                                    </DockPanel>
-                                </control:ConfigLine>
-                                <control:ConfigLine Margin="8" ConfigName="注释时的用户名">
-                                    <DockPanel>
-                                        <TextBox
-                                            Width="200"
-                                            HorizontalAlignment="Left"
-                                            DockPanel.Dock="Left"
-                                            IsReadOnly="False"
-                                            Text="{Binding JiraIssueLocalInfoSetting.UserName}" />
-                                        <Button
-                                            Width="60"                                            
-                                            HorizontalAlignment="Right"
-                                            Command="{Binding SetUserNameForJiraInfoCommand}"
-                                            Content="设置"
-                                            DockPanel.Dock="Right" />
-                                    </DockPanel>
-                                </control:ConfigLine>
-                            </StackPanel>
-
-                        </Expander>
-
-                        <!--  Local Operation  -->
-                        <Expander
-                            Margin="6"
-                            DockPanel.Dock="Top"
-                            Header="本地存档"
-                            IsExpanded="True">
-                            <WrapPanel>
-                                <TextBlock Text="{Binding SelectedJiraIssueLocalInfo.LocalDir}" />
-                                <Button Command="{Binding OpenOrCreateJiraIssueDirectoryCommand}" Content="{Binding LocalJiraOperationText}" />
-                                <Button Command="{Binding CopyCommitTextCommand}" Content="复制提交信息" />
-                                <Button Command="{Binding CopyAnnotationTextCommand}" Content="复制注释信息" />
-                                <Button Command="{Binding OpenWebPageCommand}" Content="打开Jira网页" />
-                                <Button
-                                    Command="{x:Static materialDesign:DrawerHost.OpenDrawerCommand}"
-                                    CommandParameter="{x:Static Dock.Left}"
-                                    Content="修改Jira状态" />
-                            </WrapPanel>
-                        </Expander>
-
-                        <!--  Jira info  -->
-                        <Expander
-                            Margin="6"
-                            DockPanel.Dock="Top"
-                            Header="Jira信息"
-                            IsExpanded="True">
-                            <WrapPanel>
-                                <Border Style="{StaticResource StackPanelStyle}">
-                                    <StackPanel>
-                                        <TextBlock FontWeight="Bold" Text="Jira ID:" />
-                                        <TextBox
-                                            IsReadOnly="True"
-                                            Style="{StaticResource MaterialDesignFilledTextBox}"
-                                            Text="{Binding SelectedJiraIssue.IssueKey, Mode=OneWay}" />
-                                    </StackPanel>
-                                </Border>
-                                <Border Style="{StaticResource StackPanelStyle}">
-                                    <StackPanel>
-                                        <TextBlock FontWeight="Bold" Text="Summary:" />
-                                        <TextBox
-                                            IsReadOnly="True"
-                                            Style="{StaticResource MaterialDesignFilledTextBox}"
-                                            Text="{Binding SelectedJiraIssue.Summary, Mode=OneWay}"
-                                            TextWrapping="Wrap" />
-                                    </StackPanel>
-                                </Border>
-                                <Border Style="{StaticResource StackPanelStyle}">
-                                    <StackPanel>
-                                        <TextBlock FontWeight="Bold" Text="Status:" />
-                                        <TextBox
-                                            IsReadOnly="True"
-                                            Style="{StaticResource MaterialDesignFilledTextBox}"
-                                            Text="{Binding SelectedJiraIssue.StatusName, Mode=OneWay}" />
-                                    </StackPanel>
-                                </Border>
-                                <Border Style="{StaticResource StackPanelStyle}">
-                                    <StackPanel>
-                                        <TextBlock FontWeight="Bold" Text="Priority:" />
-                                        <TextBox
-                                            IsReadOnly="True"
-                                            Style="{StaticResource MaterialDesignFilledTextBox}"
-                                            Text="{Binding SelectedJiraIssue.PriorityName, Mode=OneWay}" />
-                                    </StackPanel>
-                                </Border>
-                                <Border Style="{StaticResource StackPanelStyle}">
-                                    <StackPanel>
-                                        <TextBlock FontWeight="Bold" Text="Creator:" />
-                                        <TextBox
-                                            IsReadOnly="True"
-                                            Style="{StaticResource MaterialDesignFilledTextBox}"
-                                            Text="{Binding SelectedJiraIssue.CreatorName, Mode=OneWay}" />
-                                    </StackPanel>
-                                </Border>
-                                <Border Style="{StaticResource StackPanelStyle}">
-                                    <StackPanel>
-                                        <TextBlock FontWeight="Bold" Text="Issue Type:" />
-                                        <TextBox
-                                            IsReadOnly="True"
-                                            Style="{StaticResource MaterialDesignFilledTextBox}"
-                                            Text="{Binding SelectedJiraIssue.IssueTypeName, Mode=OneWay}" />
-                                    </StackPanel>
-                                </Border>
-                                <Border Style="{StaticResource StackPanelStyle}">
-                                    <StackPanel>
-                                        <TextBlock FontWeight="Bold" Text="Fix Versions:" />
-                                        <TextBox
-                                            IsReadOnly="True"
-                                            Style="{StaticResource MaterialDesignFilledTextBox}"
-                                            Text="{Binding SelectedJiraIssue.FixVersionsText, Mode=OneWay}"
-                                            TextWrapping="Wrap" />
-                                    </StackPanel>
-                                </Border>
-                                <Border Style="{StaticResource StackPanelStyle}">
-                                    <StackPanel>
-                                        <TextBlock FontWeight="Bold" Text="Resolution:" />
-                                        <TextBox
-                                            IsReadOnly="True"
-                                            Style="{StaticResource MaterialDesignFilledTextBox}"
-                                            Text="{Binding SelectedJiraIssue.ResolutionName, Mode=OneWay}" />
-                                    </StackPanel>
-                                </Border>
-                                <Border Style="{StaticResource StackPanelStyle}">
-                                    <StackPanel>
-                                        <TextBlock FontWeight="Bold" Text="Tester:" />
-                                        <TextBox
-                                            IsReadOnly="True"
-                                            Style="{StaticResource MaterialDesignFilledTextBox}"
-                                            Text="{Binding SelectedJiraIssue.TesterNamesString, Mode=OneWay}" />
-                                    </StackPanel>
-                                </Border>
-                                <Border Style="{StaticResource StackPanelStyle}">
-                                    <StackPanel>
-                                        <TextBlock FontWeight="Bold" Text="Developers:" />
-                                        <TextBox
-                                            IsReadOnly="True"
-                                            Style="{StaticResource MaterialDesignFilledTextBox}"
-                                            Text="{Binding SelectedJiraIssue.DeveloperNamesString, Mode=OneWay}"
-                                            TextWrapping="Wrap" />
-                                    </StackPanel>
-                                </Border>
-                            </WrapPanel>
-                        </Expander>
-
-                        <!--  Link Jira  -->
-                        <Expander
-                            Margin="6"
-                            DockPanel.Dock="Top"
-                            Header="关联Jira">
-                            <DockPanel Margin="8">
-                                <ListBox />
-                            </DockPanel>
-                        </Expander>
-
-                        <!--  Svn logs  -->
-                        <Expander
-                            Margin="6"
-                            DockPanel.Dock="Top"
-                            Header="Svn信息">
-                            <DockPanel Margin="8">
-                                <Grid DockPanel.Dock="Top">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition />
-                                        <ColumnDefinition />
-                                        <ColumnDefinition />
-                                        <ColumnDefinition />
-                                    </Grid.ColumnDefinitions>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition />
-                                        <RowDefinition />
-                                        <RowDefinition />
-                                    </Grid.RowDefinitions>
-
-                                    <TextBlock
-                                        Grid.Row="0"
-                                        Grid.Column="0"
-                                        Margin="4"
-                                        Text="所选Svn路径" />
-                                    <ComboBox
-                                        Grid.Row="0"
-                                        Grid.Column="1"
-                                        Grid.ColumnSpan="3"
-                                        Margin="4"
-                                        DisplayMemberPath="FullPathName"
-                                        ItemsSource="{Binding IssueRelatedSvnPaths}"
-                                        SelectedItem="{Binding SelectedSvnPath}"
-                                        SelectionChanged="ComboBox_SelectionChanged" />
-
-                                    <TextBlock
-                                        Grid.Row="1"
-                                        Grid.Column="0"
-                                        Margin="8"
-                                        Text="开始日期" />
-                                    <DatePicker
-                                        Grid.Row="1"
-                                        Grid.Column="1"
-                                        Margin="8"
-                                        SelectedDate="{Binding BeginDate}" />
-                                    <TextBlock
-                                        Grid.Row="1"
-                                        Grid.Column="2"
-                                        Margin="8"
-                                        Text="到期日期" />
-                                    <DatePicker
-                                        Grid.Row="1"
-                                        Grid.Column="3"
-                                        Margin="8"
-                                        SelectedDate="{Binding EndDate}" />
-
-                                    <TextBlock
-                                        Grid.Row="2"
-                                        Grid.Column="0"
-                                        Grid.ColumnSpan="3"
-                                        Text="{Binding SvnLogTimeRangeText}" />
+                Margin="8"
+                HorizontalScrollBarVisibility="Disabled"
+                VerticalScrollBarVisibility="Auto">
+                <DockPanel>
+                    <!--  Common setting  -->
+                    <Expander
+                        Margin="6"
+                        DockPanel.Dock="Top"
+                        Header="公共设置">
+                        <StackPanel>
+                            <control:ConfigLine Margin="8" ConfigName="默认地址">
+                                <DockPanel>
+                                    <TextBox
+                                        Width="200"
+                                        HorizontalAlignment="Left"
+                                        DockPanel.Dock="Left"
+                                        IsReadOnly="True"
+                                        Style="{StaticResource MaterialDesignTextBox}"
+                                        Text="{Binding JiraIssueLocalInfoSetting.ParentDir}" />
                                     <Button
-                                        Grid.Row="2"
-                                        Grid.Column="3"
-                                        Command="{Binding LoadSvnLogFromServerCommand}"
-                                        Content="更新" />
-                                </Grid>
+                                        Width="60"
+                                        HorizontalAlignment="Right"
+                                        Command="{Binding SelecetLocalInfoDirectoryCommand}"
+                                        Content="选择"
+                                        DockPanel.Dock="Left" />
+                                </DockPanel>
+                            </control:ConfigLine>
+                            <control:ConfigLine Margin="8" ConfigName="注释时的用户名">
+                                <DockPanel>
+                                    <TextBox
+                                        Width="200"
+                                        HorizontalAlignment="Left"
+                                        DockPanel.Dock="Left"
+                                        IsReadOnly="False"
+                                        Text="{Binding JiraIssueLocalInfoSetting.UserName}" />
+                                    <Button
+                                        Width="60"
+                                        HorizontalAlignment="Right"
+                                        Command="{Binding SetUserNameForJiraInfoCommand}"
+                                        Content="设置"
+                                        DockPanel.Dock="Right" />
+                                </DockPanel>
+                            </control:ConfigLine>
+                        </StackPanel>
 
-                                <DataGrid
-                                    AutoGenerateColumns="False"
-                                    CanUserAddRows="False"
-                                    DockPanel.Dock="Bottom"
-                                    Foreground="Black"
-                                    GridLinesVisibility="Horizontal"
-                                    HorizontalGridLinesBrush="Gray"
-                                    HorizontalScrollBarVisibility="Auto"
-                                    IsReadOnly="True"
-                                    ItemsSource="{Binding SelectedIssueSvnLogs}"
-                                    ScrollViewer.HorizontalScrollBarVisibility="Visible"
-                                    ScrollViewer.VerticalScrollBarVisibility="Visible"
-                                    SelectionMode="Extended"
-                                    SelectionUnit="FullRow"
-                                    VerticalScrollBarVisibility="Auto">
-                                    <DataGrid.Columns>
-                                        <DataGridTextColumn
-                                            Width="1*"
-                                            Binding="{Binding Revision}"
-                                            Header="版本" />
-                                        <DataGridTextColumn
-                                            Width="1*"
-                                            Binding="{Binding Operation}"
-                                            Header="操作类型" />
-                                        <DataGridTextColumn
-                                            Width="1*"
-                                            Binding="{Binding Author}"
-                                            Header="作者" />
-                                        <DataGridTextColumn
-                                            Width="1*"
-                                            Binding="{Binding DateTime}"
-                                            Header="更新日期" />
-                                        <DataGridTextColumn
-                                            Width="3*"
-                                            Binding="{Binding Message}"
-                                            Header="信息" />
-                                    </DataGrid.Columns>
-                                </DataGrid>
-                            </DockPanel>
-                        </Expander>
+                    </Expander>
 
-                    </DockPanel>
-                </ScrollViewer>
-            </Grid>
+                    <!--  Local Operation  -->
+                    <Expander
+                        Margin="6"
+                        DockPanel.Dock="Top"
+                        Header="本地存档"
+                        IsExpanded="True">
+                        <WrapPanel>
+                            <TextBlock Text="{Binding SelectedJiraIssueLocalInfo.LocalDir}" />
+                            <Button Command="{Binding OpenOrCreateJiraIssueDirectoryCommand}" Content="{Binding LocalJiraOperationText}" />
+                            <Button Command="{Binding CopyCommitTextCommand}" Content="复制提交信息" />
+                            <Button Command="{Binding CopyAnnotationTextCommand}" Content="复制注释信息" />
+                            <Button Command="{Binding OpenWebPageCommand}" Content="打开Jira网页" />
+                            <Button
+                                Command="{x:Static materialDesign:DrawerHost.OpenDrawerCommand}"
+                                CommandParameter="{x:Static Dock.Left}"
+                                Content="修改Jira状态" />
+                        </WrapPanel>
+                    </Expander>
+
+                    <!--  Jira info  -->
+                    <Expander
+                        Margin="6"
+                        DockPanel.Dock="Top"
+                        Header="Jira信息"
+                        IsExpanded="True">
+                        <WrapPanel>
+                            <Border Style="{StaticResource StackPanelStyle}">
+                                <StackPanel>
+                                    <TextBlock FontWeight="Bold" Text="Jira ID:" />
+                                    <TextBox
+                                        IsReadOnly="True"
+                                        Style="{StaticResource MaterialDesignFilledTextBox}"
+                                        Text="{Binding SelectedJiraIssue.IssueKey, Mode=OneWay}" />
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource StackPanelStyle}">
+                                <StackPanel>
+                                    <TextBlock FontWeight="Bold" Text="Summary:" />
+                                    <TextBox
+                                        IsReadOnly="True"
+                                        Style="{StaticResource MaterialDesignFilledTextBox}"
+                                        Text="{Binding SelectedJiraIssue.Summary, Mode=OneWay}"
+                                        TextWrapping="Wrap" />
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource StackPanelStyle}">
+                                <StackPanel>
+                                    <TextBlock FontWeight="Bold" Text="Status:" />
+                                    <TextBox
+                                        IsReadOnly="True"
+                                        Style="{StaticResource MaterialDesignFilledTextBox}"
+                                        Text="{Binding SelectedJiraIssue.StatusName, Mode=OneWay}" />
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource StackPanelStyle}">
+                                <StackPanel>
+                                    <TextBlock FontWeight="Bold" Text="Priority:" />
+                                    <TextBox
+                                        IsReadOnly="True"
+                                        Style="{StaticResource MaterialDesignFilledTextBox}"
+                                        Text="{Binding SelectedJiraIssue.PriorityName, Mode=OneWay}" />
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource StackPanelStyle}">
+                                <StackPanel>
+                                    <TextBlock FontWeight="Bold" Text="Creator:" />
+                                    <TextBox
+                                        IsReadOnly="True"
+                                        Style="{StaticResource MaterialDesignFilledTextBox}"
+                                        Text="{Binding SelectedJiraIssue.CreatorName, Mode=OneWay}" />
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource StackPanelStyle}">
+                                <StackPanel>
+                                    <TextBlock FontWeight="Bold" Text="Issue Type:" />
+                                    <TextBox
+                                        IsReadOnly="True"
+                                        Style="{StaticResource MaterialDesignFilledTextBox}"
+                                        Text="{Binding SelectedJiraIssue.IssueTypeName, Mode=OneWay}" />
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource StackPanelStyle}">
+                                <StackPanel>
+                                    <TextBlock FontWeight="Bold" Text="Fix Versions:" />
+                                    <TextBox
+                                        IsReadOnly="True"
+                                        Style="{StaticResource MaterialDesignFilledTextBox}"
+                                        Text="{Binding SelectedJiraIssue.FixVersionsText, Mode=OneWay}"
+                                        TextWrapping="Wrap" />
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource StackPanelStyle}">
+                                <StackPanel>
+                                    <TextBlock FontWeight="Bold" Text="Resolution:" />
+                                    <TextBox
+                                        IsReadOnly="True"
+                                        Style="{StaticResource MaterialDesignFilledTextBox}"
+                                        Text="{Binding SelectedJiraIssue.ResolutionName, Mode=OneWay}" />
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource StackPanelStyle}">
+                                <StackPanel>
+                                    <TextBlock FontWeight="Bold" Text="Tester:" />
+                                    <TextBox
+                                        IsReadOnly="True"
+                                        Style="{StaticResource MaterialDesignFilledTextBox}"
+                                        Text="{Binding SelectedJiraIssue.TesterNamesString, Mode=OneWay}" />
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource StackPanelStyle}">
+                                <StackPanel>
+                                    <TextBlock FontWeight="Bold" Text="Developers:" />
+                                    <TextBox
+                                        IsReadOnly="True"
+                                        Style="{StaticResource MaterialDesignFilledTextBox}"
+                                        Text="{Binding SelectedJiraIssue.DeveloperNamesString, Mode=OneWay}"
+                                        TextWrapping="Wrap" />
+                                </StackPanel>
+                            </Border>
+                        </WrapPanel>
+                    </Expander>
+
+                    <!--  Link Jira  -->
+                    <Expander
+                        Margin="6"
+                        DockPanel.Dock="Top"
+                        Header="关联Jira">
+                        <DockPanel Margin="8">
+                            <ListBox />
+                        </DockPanel>
+                    </Expander>
+
+                    <!--  Svn logs  -->
+                    <Expander
+                        Margin="6"
+                        DockPanel.Dock="Top"
+                        Header="Svn信息">
+                        <DockPanel Margin="8">
+                            <Grid DockPanel.Dock="Top">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+
+                                <TextBlock
+                                    Grid.Row="0"
+                                    Grid.Column="0"
+                                    Margin="4"
+                                    Text="所选Svn路径" />
+                                <ComboBox
+                                    Grid.Row="0"
+                                    Grid.Column="1"
+                                    Grid.ColumnSpan="3"
+                                    Margin="4"
+                                    DisplayMemberPath="FullPathName"
+                                    ItemsSource="{Binding IssueRelatedSvnPaths}"
+                                    SelectedItem="{Binding SelectedSvnPath}"
+                                    SelectionChanged="ComboBox_SelectionChanged" />
+
+                                <TextBlock
+                                    Grid.Row="1"
+                                    Grid.Column="0"
+                                    Margin="8"
+                                    Text="开始日期" />
+                                <DatePicker
+                                    Grid.Row="1"
+                                    Grid.Column="1"
+                                    Margin="8"
+                                    SelectedDate="{Binding BeginDate}" />
+                                <TextBlock
+                                    Grid.Row="1"
+                                    Grid.Column="2"
+                                    Margin="8"
+                                    Text="到期日期" />
+                                <DatePicker
+                                    Grid.Row="1"
+                                    Grid.Column="3"
+                                    Margin="8"
+                                    SelectedDate="{Binding EndDate}" />
+
+                                <TextBlock
+                                    Grid.Row="2"
+                                    Grid.Column="0"
+                                    Grid.ColumnSpan="3"
+                                    Text="{Binding SvnLogTimeRangeText}" />
+                                <Button
+                                    Grid.Row="2"
+                                    Grid.Column="3"
+                                    Command="{Binding LoadSvnLogFromServerCommand}"
+                                    Content="更新" />
+                            </Grid>
+
+                            <DataGrid
+                                AutoGenerateColumns="False"
+                                CanUserAddRows="False"
+                                DockPanel.Dock="Bottom"
+                                Foreground="Black"
+                                GridLinesVisibility="Horizontal"
+                                HorizontalGridLinesBrush="Gray"
+                                HorizontalScrollBarVisibility="Auto"
+                                IsReadOnly="True"
+                                ItemsSource="{Binding SelectedIssueSvnLogs}"
+                                ScrollViewer.HorizontalScrollBarVisibility="Visible"
+                                ScrollViewer.VerticalScrollBarVisibility="Visible"
+                                SelectionMode="Extended"
+                                SelectionUnit="FullRow"
+                                VerticalScrollBarVisibility="Auto">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn
+                                        Width="1*"
+                                        Binding="{Binding Revision}"
+                                        Header="版本" />
+                                    <DataGridTextColumn
+                                        Width="1*"
+                                        Binding="{Binding Operation}"
+                                        Header="操作类型" />
+                                    <DataGridTextColumn
+                                        Width="1*"
+                                        Binding="{Binding Author}"
+                                        Header="作者" />
+                                    <DataGridTextColumn
+                                        Width="1*"
+                                        Binding="{Binding DateTime}"
+                                        Header="更新日期" />
+                                    <DataGridTextColumn
+                                        Width="3*"
+                                        Binding="{Binding Message}"
+                                        Header="信息" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </DockPanel>
+                    </Expander>
+
+                </DockPanel>
+            </ScrollViewer>
+
 
         </Grid>
     </materialDesign:DrawerHost>
