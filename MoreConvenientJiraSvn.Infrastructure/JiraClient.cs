@@ -13,6 +13,7 @@ public class JiraClient : IJiraClient
     private const string UserTokenUri = "rest/pat/latest/tokens";
     private const string FavouriteFilterUri = $"rest/api/2/filter/favourite";
     private const string IssueUri = $"rest/api/2/issue";
+    private const string IssueJqlUri = $"rest/api/2/search?jql=";
     private JiraConfig? _config;
     private HttpClient? _httpClient;
 
@@ -126,6 +127,66 @@ public class JiraClient : IJiraClient
         result.ErrorMessage = "Failed to extract issue info from json";
         return result;
     }
+
+    public async Task<IssuePageInfo> GetIssuesAsyncByJql(string jql, int startAt = 0, CancellationToken cancellationToken = default)
+    {
+        IssuePageInfo result = new()
+        {
+            IssueInfos = [],
+            MaxResults = 0,
+            StartAt = startAt,
+            Total = 0
+        };
+        List<JiraIssue> issues = [];
+        StringBuilder errorMsgBuilder = new();
+
+        if (_httpClient == null || string.IsNullOrEmpty(jql) || cancellationToken.IsCancellationRequested)
+        {
+            return result;
+        }
+
+        var response = await _httpClient.GetAsync($"{IssueJqlUri}{jql}&startAt={startAt}", cancellationToken);
+        response.EnsureSuccessStatusCode();
+
+        var jsonResponse = await response.Content.ReadAsStringAsync(cancellationToken);
+        using JsonDocument doc = JsonDocument.Parse(jsonResponse);
+        JsonElement root = doc.RootElement;
+
+        if (root.TryGetProperty("startAt", out var startAtElement)
+            && root.TryGetProperty("maxResults", out var maxResultsElement)
+            && root.TryGetProperty("total", out var totalElement)
+            && root.TryGetProperty("issues", out var issuesElement)
+            && issuesElement.ValueKind == JsonValueKind.Array)
+        {
+            foreach (var issueElement in issuesElement.EnumerateArray())
+            {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return result;
+                }
+
+                var jsonString = issueElement.GetRawText();
+                if (!IssueInfoConverter.TryGetIssueInfoFromJson(jsonString, out var issue, out var errorMsg) || issue == null)
+                {
+                    errorMsgBuilder.AppendLine($"{errorMsg}:[{jsonString}]");
+                    continue;
+                }
+                issues.Add(issue);
+            }
+
+            result.IssueInfos = issues;
+            result.StartAt = startAtElement.GetInt32();
+            result.Total = totalElement.GetInt32();
+            result.MaxResults = maxResultsElement.GetInt32();
+            result.ErrorMessage = errorMsgBuilder.ToString();
+
+            return result;
+        }
+
+        result.ErrorMessage = "Failed to extract issue info from json";
+        return result;
+    }
+
 
     public async Task<List<JiraTransition>> GetTransitionsByIssueId(string issueId, CancellationToken cancellationToken = default)
     {

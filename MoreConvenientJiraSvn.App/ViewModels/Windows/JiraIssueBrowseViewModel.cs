@@ -60,7 +60,7 @@ public partial class JiraIssueBrowseViewModel(JiraService jiraService, SvnServic
     public bool HasJiraBeSelected => SelectedJiraIssue != null;
 
     private event EventHandler<JiraIssue>? _selectedIssueChanged;
-    public SnackbarMessageQueue MessageQueue { get; }  = new(TimeSpan.FromSeconds(2d));
+    public SnackbarMessageQueue MessageQueue { get; } = new(TimeSpan.FromSeconds(2d));
 
     #endregion
 
@@ -94,8 +94,12 @@ public partial class JiraIssueBrowseViewModel(JiraService jiraService, SvnServic
                 }
                 JiraIssueList = [jiraIssue];
                 break;
-            case JiraIssueQueryType.Sql:
-                MessageBox.Show("暂不支持");
+            case JiraIssueQueryType.Jql:
+                if (string.IsNullOrEmpty(JiraIssueQueryText))
+                {
+                    break;
+                }
+                JiraIssueList = [.. await _jiraService.GetIssuesByJqlAsync(JiraIssueQueryText)];
                 break;
             case JiraIssueQueryType.Filter:
                 if (SelectedJiraIssueFilter == null)

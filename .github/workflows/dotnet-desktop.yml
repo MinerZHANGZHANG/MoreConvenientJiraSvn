@@ -88,15 +88,15 @@ jobs:
     - name: Upload test result
       uses: actions/upload-artifact@v4
       with:
-        name: TestResults-MoreConvenientJiraSvn-${{ github.run_attempt }}
-        path: TestResults-MoreConvenientJiraSvn-${{ github.run_attempt }}
+        name: TestResults-MoreConvenientJiraSvn-${{ github.run_number }}
+        path: TestResults-MoreConvenientJiraSvn-${{ github.run_number }}
         retention-days: 90
       if: ${{ always() }}
 
     - name: Upload publish result
       uses: actions/upload-artifact@v4
       with:
-        name: MoreConvenientJiraSvn-${{ github.run_attempt }}
+        name: MoreConvenientJiraSvn-${{ github.run_number }}
         path: ./MoreConvenientJiraSvn.App/artifacts
         retention-days: 90
 

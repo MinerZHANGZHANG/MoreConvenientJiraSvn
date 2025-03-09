@@ -15,6 +15,8 @@ public interface IJiraClient
 
     Task<IssuePageInfo> GetIssuesAsyncByUrl(string searchUrl, int startAt = 0, CancellationToken cancellationToken = default);
 
+    Task<IssuePageInfo> GetIssuesAsyncByJql(string jql, int startAt = 0, CancellationToken cancellationToken = default);
+
     Task<List<JiraTransition>> GetTransitionsByIssueId(string issueId, CancellationToken cancellationToken = default);
 
 }
