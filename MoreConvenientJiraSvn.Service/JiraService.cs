@@ -98,6 +98,32 @@ namespace MoreConvenientJiraSvn.Service
             return [];
         }
 
+        public async Task<List<JiraIssue>> GetIssuesByJqlAsync(string jql, int maxRequestCount = 200)
+        {
+            List<JiraIssue> issues = [];
+            int start = 0;
+            int total = 1;
+            int requestCount = 0;
+
+            while (start < total)
+            {
+                if (requestCount++ > maxRequestCount)
+                {
+                    break;
+                }
+
+                _logService.Debug($"{nameof(GetIssuesByJqlAsync)} [{jql}&startAt={start}]");
+                var issuePageInfo = await _jiraClient.GetIssuesAsyncByJql(jql, start);
+
+                start = issuePageInfo.StartAt + issuePageInfo.MaxResults;
+                total = issuePageInfo.Total;
+
+                issues.AddRange(issuePageInfo.IssueInfos);
+            }
+
+            return issues;
+        }
+
         private async void RefreshJiraCilent_OnConfigChanged(object? sender, ConfigChangedArgs e)
         {
             if (e.Config is not JiraConfig config)

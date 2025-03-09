@@ -88,8 +88,12 @@ public partial class JiraIssueBrowseViewModel(JiraService jiraService, SvnServic
                 }
                 JiraIssueList = [jiraIssue];
                 break;
-            case JiraIssueQueryType.Sql:
-                MessageBox.Show("暂不支持");
+            case JiraIssueQueryType.Jql:
+                if (string.IsNullOrEmpty(JiraIssueQueryText))
+                {
+                    break;
+                }
+                JiraIssueList = [.. await _jiraService.GetIssuesByJqlAsync(JiraIssueQueryText)];
                 break;
             case JiraIssueQueryType.Filter:
                 if (SelectedJiraIssueFilter == null)
