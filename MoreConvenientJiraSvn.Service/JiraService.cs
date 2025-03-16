@@ -8,6 +8,7 @@ namespace MoreConvenientJiraSvn.Service
     {
         private readonly IRepository _repository;
         private readonly IJiraClient _jiraClient;
+        private readonly IHtmlConvert _htmlConvert;
 
         private readonly LogService _logService;
         private readonly SettingService _settingService;
@@ -15,10 +16,11 @@ namespace MoreConvenientJiraSvn.Service
         private JiraConfig _jiraConfig;
         public JiraConfig JiraConfig => _jiraConfig;
 
-        public JiraService(IRepository repository, IJiraClient jiraClient, SettingService settingService, LogService logService)
+        public JiraService(IRepository repository, IJiraClient jiraClient, IHtmlConvert htmlConvert, SettingService settingService, LogService logService)
         {
             _repository = repository;
             _jiraClient = jiraClient;
+            _htmlConvert = htmlConvert;
 
             _settingService = settingService;
             _logService = logService;
@@ -169,18 +171,33 @@ namespace MoreConvenientJiraSvn.Service
 
         #region upload
 
+        public async Task<List<JiraTransition>> GetTransitionsByIssueId(string issueId)
+        {
+            List<JiraTransition> results = await _jiraClient.GetTransitionsByIssueId(issueId);
+
+            return results;
+        }
+
+        public async Task<List<JiraField>> GetFieldInfoFromTransitionAndIssueId(string issueId, JiraTransition jiraTransition, CancellationToken cancellationToken)
+        {
+            var formString = await _jiraClient.GetTransitionFormAsync(issueId, jiraTransition.TransitionId, cancellationToken);
+            var jiraFields = await _htmlConvert.ConvertHtmlToJiraFieldsAsync(formString, cancellationToken);
+
+            return jiraFields;
+        }
+
         //private List<JiraOperation> InitializeOperations()
         //{
         //    #region options
 
         //    FieldOption[] uploadStateOpions = [
-        //        new (){ OptionId = "-1", OptionName = "无" },
-        //        new (){ OptionId = "17113", OptionName = "文档" },
-        //        new (){ OptionId = "17114", OptionName = "脚本" },
-        //        new (){ OptionId = "17117", OptionName = "脚本（包含视图、报表）" },
-        //        new (){ OptionId = "17115", OptionName = "文档&脚本" },
-        //        new (){ OptionId = "17118", OptionName = "文档&脚本（包含视图、报表）" },
-        //        new (){ OptionId = "17116", OptionName = "不提交任何内容" },
+        //        new (){ OptionId = "-1", OptionValue = "无" },
+        //        new (){ OptionId = "17113", OptionValue = "文档" },
+        //        new (){ OptionId = "17114", OptionValue = "脚本" },
+        //        new (){ OptionId = "17117", OptionValue = "脚本（包含视图、报表）" },
+        //        new (){ OptionId = "17115", OptionValue = "文档&脚本" },
+        //        new (){ OptionId = "17118", OptionValue = "文档&脚本（包含视图、报表）" },
+        //        new (){ OptionId = "17116", OptionValue = "不提交任何内容" },
         //        ];
 
         //    #endregion
@@ -189,67 +206,67 @@ namespace MoreConvenientJiraSvn.Service
 
         //    var summaryField = new JiraFieldModel
         //    {
-        //        FieldName = "概要",
-        //        FieldId = "summary",
+        //        Name = "概要",
+        //        Id = "summary",
         //        Type = FieldType.TextBox,
 
-        //        FieldValue = string.Empty,
+        //        Value = string.Empty,
         //    };
 
         //    var componentsField = new JiraFieldModel
         //    {
-        //        FieldName = "模块",
-        //        FieldId = "components",
+        //        Name = "模块",
+        //        Id = "components",
         //        Type = FieldType.ListBox,
 
         //        Options = [],
-        //        SelectedValues = []
+        //        FieldValues = []
         //    };
 
         //    var developDescriptionField = new JiraFieldModel
         //    {
-        //        FieldName = "开发说明（原因分析/解决方案等）",
-        //        FieldId = "customfield_10910",
+        //        Name = "开发说明（原因分析/解决方案等）",
+        //        Id = "customfield_10910",
         //        Type = FieldType.BigTextBox,
 
-        //        FieldValue = string.Empty,
+        //        Value = string.Empty,
         //    };
 
         //    var testSuggestionField = new JiraFieldModel
         //    {
-        //        FieldName = "测试建议",
-        //        FieldId = "customfield_11700",
+        //        Name = "测试建议",
+        //        Id = "customfield_11700",
         //        Type = FieldType.BigTextBox,
 
-        //        FieldValue = string.Empty,
+        //        Value = string.Empty,
         //    };
 
         //    var uploadStateField = new JiraFieldModel
         //    {
-        //        FieldName = "文档/脚本是否提交★",
-        //        FieldId = "customfield_11003",
+        //        Name = "文档/脚本是否提交★",
+        //        Id = "customfield_11003",
         //        Type = FieldType.ComboBox,
 
         //        Options = uploadStateOpions,
-        //        SelectedValues = []
+        //        FieldValues = []
         //    };
 
         //    var descriptionField = new JiraFieldModel
         //    {
-        //        FieldName = "描述",
-        //        FieldId = "description",
+        //        Name = "描述",
+        //        Id = "description",
         //        Type = FieldType.BigTextBox,
 
-        //        FieldValue = string.Empty,
+        //        Value = string.Empty,
         //    };
 
         //    var expectedHangOverDateField = new JiraFieldModel
         //    {
-        //        FieldName = "预计移交日期",
-        //        FieldId = "customfield_13202",
+        //        Name = "预计移交日期",
+        //        Id = "customfield_13202",
         //        Type = FieldType.DatePicker,
 
-        //        FieldValue = string.Empty,
+        //        Value = string.Empty,
         //    };
 
         //    #endregion

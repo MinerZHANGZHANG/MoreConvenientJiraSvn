@@ -9,6 +9,7 @@
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:model="clr-namespace:MoreConvenientJiraSvn.Core.Models;assembly=MoreConvenientJiraSvn.Core"
+    xmlns:style="clr-namespace:MoreConvenientJiraSvn.App.Styles"
     xmlns:viewModel="clr-namespace:MoreConvenientJiraSvn.App.ViewModels"
     Title="Jira本地化"
     Width="1280"
@@ -29,61 +30,6 @@
                 <Setter Property="Margin" Value="6" />
                 <Setter Property="Padding" Value="6" />
             </Style>
-            <DataTemplate x:Key="ComboBoxTemplate" DataType="{x:Type model:JiraField}">
-                <StackPanel DataContext="{Binding ElementName=ContentControl, Path=DataContext}" Orientation="Vertical">
-                    <TextBlock MinWidth="120" Text="{Binding FieldName}" />
-                    <ComboBox
-                        MinWidth="120"
-                        DisplayMemberPath="{Binding OptionName}"
-                        ItemsSource="{Binding Options}"
-                        SelectedItem="{Binding FieldValue}" />
-                </StackPanel>
-            </DataTemplate>
-            <DataTemplate x:Key="TextBoxTemplate" DataType="{x:Type model:JiraField}">
-                <StackPanel DataContext="{Binding ElementName=ContentControl, Path=DataContext}" Orientation="Vertical">
-                    <TextBlock MinWidth="120" Text="{Binding FieldName}" />
-                    <TextBox MinWidth="120" Text="{Binding FieldValue}" />
-                </StackPanel>
-            </DataTemplate>
-            <DataTemplate x:Key="BigTextBoxTemplate" DataType="{x:Type model:JiraField}">
-                <StackPanel DataContext="{Binding ElementName=ContentControl, Path=DataContext}" Orientation="Vertical">
-                    <TextBlock MinWidth="120" Text="{Binding FieldName}" />
-                    <TextBox
-                        MinWidth="120"
-                        MinHeight="60"
-                        Padding="4"
-                        AcceptsReturn="True"
-                        Style="{StaticResource MaterialDesignOutlinedTextBox}"
-                        Text="{Binding FieldValue}"
-                        TextWrapping="Wrap"
-                        VerticalScrollBarVisibility="Auto" />
-                </StackPanel>
-            </DataTemplate>
-            <DataTemplate x:Key="ListBoxTemplate" DataType="{x:Type model:JiraField}">
-                <StackPanel DataContext="{Binding ElementName=ContentControl, Path=DataContext}" Orientation="Vertical">
-                    <TextBlock MinWidth="120" Text="{Binding FieldName}" />
-                    <!--<ListBox
-                        MinWidth="120"
-                        ItemsSource="{Binding Options}"
-                        SelectionChanged="ListBox_SelectionChanged"
-                        SelectionMode="Multiple">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate DataType="{x:Type model:FieldOption}">
-                                <TextBlock Text="{Binding OptionName}" />
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>-->
-                </StackPanel>
-            </DataTemplate>
-            <DataTemplate x:Key="DatePickerTemplate" DataType="{x:Type model:JiraField}">
-                <StackPanel DataContext="{Binding ElementName=ContentControl, Path=DataContext}" Orientation="Vertical">
-                    <TextBlock MinWidth="120" Text="{Binding FieldName}" />
-                    <DatePicker
-                        MinWidth="120"
-                        SelectedDate="{Binding FieldValue}"
-                        SelectedDateFormat="Short" />
-                </StackPanel>
-            </DataTemplate>
         </ResourceDictionary>
     </Window.Resources>
 
@@ -108,33 +54,14 @@
                     ItemsSource="{Binding Transitions}"
                     SelectedValue="{Binding SelectedTransition}"
                     Style="{StaticResource MaterialDesignChoiceChipSecondaryListBox}" />
-                <ItemsControl ItemsSource="{Binding FieldModels}">
+                <ItemsControl ItemsSource="{Binding JiraFields}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate DataType="{x:Type model:JiraField}">
-                            <ContentControl x:Name="ContentControl" Margin="4,8,4,8">
-                                <ContentControl.Style>
-                                    <Style TargetType="ContentControl">
-                                        <Setter Property="DataContext" Value="{Binding}" />
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Type}" Value="ComboBox">
-                                                <Setter Property="ContentTemplate" Value="{StaticResource ComboBoxTemplate}" />
-                                            </DataTrigger>
-                                            <DataTrigger Binding="{Binding Type}" Value="TextBox">
-                                                <Setter Property="ContentTemplate" Value="{StaticResource TextBoxTemplate}" />
-                                            </DataTrigger>
-                                            <DataTrigger Binding="{Binding Type}" Value="BigTextBox">
-                                                <Setter Property="ContentTemplate" Value="{StaticResource BigTextBoxTemplate}" />
-                                            </DataTrigger>
-                                            <DataTrigger Binding="{Binding Type}" Value="ListBox">
-                                                <Setter Property="ContentTemplate" Value="{StaticResource ListBoxTemplate}" />
-                                            </DataTrigger>
-                                            <DataTrigger Binding="{Binding Type}" Value="DatePicker">
-                                                <Setter Property="ContentTemplate" Value="{StaticResource DatePickerTemplate}" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </ContentControl.Style>
-                            </ContentControl>
+                            <ContentControl
+                                x:Name="ContentControl"
+                                Margin="4,8,4,8"
+                                Content="{Binding}"
+                                ContentTemplateSelector="{StaticResource JiraFieldTemplateSelector}" />
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>

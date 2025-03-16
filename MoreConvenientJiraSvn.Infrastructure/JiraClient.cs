@@ -4,6 +4,7 @@ using MoreConvenientJiraSvn.Core.Utils;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 
 namespace MoreConvenientJiraSvn.Infrastructure;
 
@@ -14,6 +15,9 @@ public class JiraClient : IJiraClient
     private const string FavouriteFilterUri = $"rest/api/2/filter/favourite";
     private const string IssueUri = $"rest/api/2/issue";
     private const string IssueJqlUri = $"rest/api/2/search?jql=";
+    private const string IssueEditFormUri = $"secure/CommentAssignIssue!default.jspa?inline=true&decorator=dialog";// &id={issueId}&action={transitionId}"
+
+
     private JiraConfig? _config;
     private HttpClient? _httpClient;
 
@@ -186,7 +190,6 @@ public class JiraClient : IJiraClient
         return result;
     }
 
-
     public async Task<List<JiraTransition>> GetTransitionsByIssueId(string issueId, CancellationToken cancellationToken = default)
     {
         List<JiraTransition> results = [];
@@ -326,4 +329,16 @@ public class JiraClient : IJiraClient
         return jiraConfig with { UserName = name, Email = email, TokenExpiringTime = tokenExprireTime };
     }
 
+    public async Task<string> GetTransitionFormAsync(string issueId, string transitionId, CancellationToken cancellationToken = default)
+    {
+        if (_httpClient == null)
+        {
+            return string.Empty;
+        }
+
+        var response = await _httpClient.GetAsync($"{IssueEditFormUri}&id={issueId}&action={transitionId}", cancellationToken);
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadAsStringAsync(cancellationToken);
+    }
 }

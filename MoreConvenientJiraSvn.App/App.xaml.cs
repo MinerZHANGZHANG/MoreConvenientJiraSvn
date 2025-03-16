@@ -30,6 +30,7 @@ namespace MoreConvenientJiraSvn.App
             services.AddSingleton<IJiraClient, JiraClient>();
             services.AddSingleton<IPlSqlCheckPipeline, PlSqlCheckPipeline>();
             services.AddSingleton<ISubversionClient, SubversionClient>();
+            services.AddSingleton<IHtmlConvert, HtmlConvert>();
 
             services.AddSingleton<LogService>();
             services.AddSingleton<SettingService>();

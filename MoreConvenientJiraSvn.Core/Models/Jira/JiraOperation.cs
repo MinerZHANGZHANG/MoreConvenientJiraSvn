@@ -1,37 +1,44 @@
-﻿using MoreConvenientJiraSvn.Core.Enums;
-using System.Collections.ObjectModel;
+﻿
 
 namespace MoreConvenientJiraSvn.Core.Models;
 
-public record JiraOperation
+public abstract class JiraField
 {
-    public required string OperationName { get; set; }
-    public required string OperationId { get; set; }
-
-    public ObservableCollection<JiraField> Fields { get; set; } = [];
+    public required string Id { get; set; }
+    public required string Name { get; set; }
+    public required bool IsRequired { get; set; }
+    public string? Description { get; set; }
+    //public required FieldType Type { get; set; } 
 }
 
-public class JiraField
+public class JiraSelectField : JiraField
 {
-    public required string FieldId { get; set; }
-    public required string FieldName { get; set; }
-    public required FieldType Type { get; set; }
+    public List<JiraFieldOption> Options { get; set; } = [];
+    public JiraFieldOption? Value { get; set; }
+}
 
-    public string? FieldValue { get; set; }
-    public ObservableCollection<string>? SelectedValues { get; set; }
-    public JiraFieldOption[]? Options { get; set; }
+public class JiraTextField : JiraField
+{
+    public string Value { get; set; } = string.Empty;
+}
+
+public class JiraDateField : JiraField
+{
+    public DateTime Value { get; set; }
 }
 
 public record JiraFieldOption
 {
     public required string OptionId { get; set; }
-    public required string OptionName { get; set; }
+    public required string OptionValue { get; set; }
+    public required bool IsSelected { get; set; }
 }
 
 public record JiraTransition
 {
     public required string TransitionId { get; set; }
     public required string TransitionName { get; set; }
+
     public override string ToString()
     {
         return TransitionName;

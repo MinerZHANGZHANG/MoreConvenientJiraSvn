@@ -13,32 +13,42 @@ public partial class JiraIssueBrowseViewModel
     private JiraTransition? _selectedTransition;
 
     [ObservableProperty]
-    private JiraOperation? _selectedOperation;
+    private ObservableCollection<JiraField> _jiraFields = [];
 
-    [ObservableProperty]
-    private ObservableCollection<JiraField> _fieldModels = [];
-
-    private void InitJiraIssueTransitionOperation()
-    {
-
-    }
+    private CancellationTokenSource? _transitionCancellationTokenSource;
 
     partial void OnSelectedTransitionChanged(JiraTransition? value)
     {
-        HandleTransitionChange(value);
+       HandleTransitionChange(value);
     }
 
-    private void HandleTransitionChange(JiraTransition? transition)
+    private void InitJiraIssueTransitionOperation()
     {
-        if (transition == null)
+        _selectedIssueChanged += JiraIssueTransitionOperation_selectedIssueChanged;
+    }
+
+    private async void JiraIssueTransitionOperation_selectedIssueChanged(object? sender, JiraIssue e)
+    {
+        if (SelectedJiraIssue == null)
         {
             return;
         }
+        _transitionCancellationTokenSource?.Cancel();
 
-        //SelectedOperation = _jiraService.Operations.FirstOrDefault(
-        //    o => o.OperationId == transition.TransitionId
-        //    && o.OperationName == transition.TransitionName);
+        Transitions = [.. await _jiraService.GetTransitionsByIssueId(SelectedJiraIssue.IssueId)];
+    }
 
-        //FieldModels = SelectedOperation?.Fields ?? [];
+
+    private async void HandleTransitionChange(JiraTransition? _)
+    {
+        if (SelectedTransition == null || SelectedJiraIssue == null)
+        {
+            return;
+        }
+        _transitionCancellationTokenSource?.Cancel();
+        _transitionCancellationTokenSource = new();
+
+        JiraFields = [.. await _jiraService.GetFieldInfoFromTransitionAndIssueId(SelectedJiraIssue.IssueId, SelectedTransition, _transitionCancellationTokenSource.Token)];
+
     }
 }

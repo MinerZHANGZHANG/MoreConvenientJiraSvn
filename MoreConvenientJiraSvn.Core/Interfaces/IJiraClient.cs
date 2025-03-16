@@ -19,4 +19,6 @@ public interface IJiraClient
 
     Task<List<JiraTransition>> GetTransitionsByIssueId(string issueId, CancellationToken cancellationToken = default);
 
+    Task<string> GetTransitionFormAsync(string issueId, string transitionId, CancellationToken cancellationToken = default);
+
 }
