@@ -1,7 +1,7 @@
 ﻿using MoreConvenientJiraSvn.Core.Attributes;
-using MoreConvenientJiraSvn.Core.Enums;
-using MoreConvenientJiraSvn.Core.Models;
 using System.Text.Json;
+using MoreConvenientJiraSvn.Core.Models;
+using MoreConvenientJiraSvn.Core.Enums;
 
 namespace MoreConvenientJiraSvn.Core.Utils;
 
@@ -27,7 +27,7 @@ public static class IssueInfoConverter
             {
                 var attribute = (IssueJsonMappingAttribute)attributes[0];
                 attribute.PropertyInfo = property;
-                propertyMapDict[attribute.Key] = attribute;
+                propertyMapDict[property.Name] = attribute;
             }
         }
         return propertyMapDict;
@@ -63,7 +63,7 @@ public static class IssueInfoConverter
         }
 
         using JsonDocument doc = JsonDocument.Parse(jsonString);
-        if (doc.RootElement.TryGetProperty(FieldsNodeName, out var fieldsElement))
+        if (!doc.RootElement.TryGetProperty(FieldsNodeName, out var fieldsElement))
         {
             return null;
         }
@@ -93,44 +93,112 @@ public static class IssueInfoConverter
                     break;
             }
 
-            if (propertyMap.Value.ChildKey != null
+            if (propertyMap.Value.Key != null
                 && targetElement != null
-                && propertyMap.Value.PropertyInfo.GetType() != typeof(List<string>))
+                && targetElement.HasValue
+                && targetElement.Value.ValueKind != JsonValueKind.Undefined
+                && targetElement.Value.ValueKind != JsonValueKind.Null)
             {
-                targetElement.Value.TryGetProperty(propertyMap.Value.ChildKey, out var childElement);
-                targetElement = childElement;
+                try
+                {
+                    if (targetElement.Value.TryGetProperty(propertyMap.Value.Key, out var childElement))
+                    {
+                        targetElement = childElement;
+                    }
+                    else
+                    {
+                        targetElement = null;
+                    }
+                }
+                catch (Exception)
+                {
+
+                    throw;
+                }
             }
 
-            if (targetElement == null)
+            if (targetElement == null
+                || !targetElement.HasValue
+                || targetElement.Value.ValueKind == JsonValueKind.Undefined
+                || targetElement.Value.ValueKind == JsonValueKind.Null)
             {
                 continue;
             }
 
-            if (propertyMap.Value.PropertyInfo == typeof(List<string>) && targetElement?.ValueKind == JsonValueKind.Array)
+            if (propertyMap.Value.ChildKey != null
+                && targetElement != null
+                && targetElement.HasValue
+                && targetElement.Value.ValueKind != JsonValueKind.Undefined
+                && propertyMap.Value.PropertyInfo.PropertyType != typeof(List<string>))
+            {
+                try
+                {
+                    if (targetElement.Value.TryGetProperty(propertyMap.Value.ChildKey, out var childElement))
+                    {
+                        targetElement = childElement;
+                    }
+                    else
+                    {
+                        targetElement = null;
+                    }
+                }
+                catch (Exception)
+                {
+
+                    throw;
+                }
+            }
+
+            if (targetElement == null
+                || !targetElement.HasValue
+                || targetElement.Value.ValueKind == JsonValueKind.Undefined
+                || targetElement.Value.ValueKind == JsonValueKind.Null)
+            {
+                continue;
+            }
+            var xx = targetElement?.ToString();
+            if (propertyMap.Value.PropertyInfo.PropertyType == typeof(List<string>) && targetElement?.ValueKind == JsonValueKind.Array)
             {
                 List<string?> listResult = [];
                 foreach (var item in targetElement.Value.EnumerateArray())
                 {
-                    if (propertyMap.Value.ChildKey == null)
+                    try
                     {
-                        listResult.Add(item.GetString());
+                        if (propertyMap.Value.ChildKey == null)
+                        {
+                            listResult.Add(item.GetString());
+                        }
+                        else if (item.TryGetProperty(propertyMap.Value.ChildKey, out var arrayChildElement))
+                        {
+                            listResult.Add(arrayChildElement.GetString());
+                        }
                     }
-                    else if (item.TryGetProperty(propertyMap.Value.ChildKey, out var arrayChildElement))
+                    catch (Exception)
                     {
-                        listResult.Add(arrayChildElement.GetString());
+
+                        throw;
                     }
                 }
                 propertyMap.Value.PropertyInfo.SetValue(IssueInfo, listResult);
             }
-            else if (propertyMap.Value.PropertyInfo == typeof(string))
+            else if (propertyMap.Value.PropertyInfo.PropertyType == typeof(string))
             {
-                propertyMap.Value.PropertyInfo.SetValue(IssueInfo, targetElement?.GetString());
+                try
+                {
+                    propertyMap.Value.PropertyInfo.SetValue(IssueInfo, targetElement?.GetString());
+
+                }
+                catch (Exception)
+                {
+
+                    throw;
+                }
             }
-            else if (propertyMap.Value.PropertyInfo == typeof(double) && targetElement?.TryGetDouble(out var doubleResult) == true)
+            else if (propertyMap.Value.PropertyInfo.PropertyType == typeof(double) && targetElement?.TryGetDouble(out var doubleResult) == true)
             {
                 propertyMap.Value.PropertyInfo.SetValue(IssueInfo, doubleResult);
             }
-            else if (propertyMap.Value.PropertyInfo == typeof(DateTime) && targetElement?.TryGetDateTime(out var dateTiemResult) == true)
+            else if (propertyMap.Value.PropertyInfo.PropertyType == typeof(DateTime) && targetElement?.TryGetDateTime(out var dateTiemResult) == true)
             {
                 propertyMap.Value.PropertyInfo.SetValue(IssueInfo, dateTiemResult);
             }

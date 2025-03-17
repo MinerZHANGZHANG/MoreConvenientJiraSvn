@@ -119,6 +119,7 @@ public class JiraClient : IJiraClient
                 issues.Add(issue);
             }
 
+            result.IssueInfos = issues;
             result.StartAt = startAtElement.GetInt32();
             result.Total = totalElement.GetInt32();
             result.MaxResults = maxResultsElement.GetInt32();
