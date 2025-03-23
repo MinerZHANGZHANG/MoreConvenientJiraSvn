@@ -17,6 +17,12 @@ public class JiraSelectField : JiraField
     public JiraFieldOption? Value { get; set; }
 }
 
+public class JiraMultiSelectField : JiraField
+{
+    public List<JiraFieldOption> Options { get; set; } = [];
+    public List<JiraFieldOption>? Value { get; set; }
+}
+
 public class JiraTextField : JiraField
 {
     public string Value { get; set; } = string.Empty;
@@ -27,11 +33,9 @@ public class JiraDateField : JiraField
     public DateTime Value { get; set; }
 }
 
-public record JiraFieldOption
+public record JiraFieldOption : SelectItem
 {
     public required string OptionId { get; set; }
-    public required string OptionValue { get; set; }
-    public required bool IsSelected { get; set; }
 }
 
 public record JiraTransition

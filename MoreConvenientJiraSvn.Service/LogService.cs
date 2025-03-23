@@ -2,7 +2,7 @@
 
 namespace MoreConvenientJiraSvn.Service
 {
-    public class LogService(IRepository repository, NotificationService notificationService, bool isDebugMode = false)
+    public class LogService(IRepository repository, NotificationService notificationService, bool isDebugMode = true)
     {
         private readonly IRepository _repository = repository;
         private readonly NotificationService _notificationService = notificationService;

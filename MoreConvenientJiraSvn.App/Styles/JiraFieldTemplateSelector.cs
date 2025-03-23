@@ -14,6 +14,7 @@ namespace MoreConvenientJiraSvn.App.Styles
         public required DataTemplate JiraTextTemplate { get; set; }
         public required DataTemplate JiraSelectTemplate { get; set; }
         public required DataTemplate JiraDateTemplate { get; set; }
+        public required DataTemplate JiraMultiSelectTemplate { get; set; }
 
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
@@ -28,6 +29,10 @@ namespace MoreConvenientJiraSvn.App.Styles
             if(item is JiraDateField)
             {
                 return JiraDateTemplate;
+            }
+            if(item is JiraMultiSelectField)
+            {
+                return JiraMultiSelectTemplate;
             }
 
             return base.SelectTemplate(item, container);

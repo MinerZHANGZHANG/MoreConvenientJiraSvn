@@ -42,6 +42,7 @@ namespace MoreConvenientJiraSvn.Service
             }
             catch (Exception ex)
             {
+                _logService.Debug($"Get favourite filter failed! \n\r {ex.Message}");
             }
 
             return result;
