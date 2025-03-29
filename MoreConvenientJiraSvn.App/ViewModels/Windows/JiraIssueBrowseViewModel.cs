@@ -46,6 +46,7 @@ public partial class JiraIssueBrowseViewModel(JiraService jiraService, SvnServic
     [NotifyCanExecuteChangedFor(nameof(CopyCommitTextCommand))]
     [NotifyCanExecuteChangedFor(nameof(CopyAnnotationTextCommand))]
     [NotifyCanExecuteChangedFor(nameof(OpenWebPageCommand))]
+    [NotifyCanExecuteChangedFor(nameof(OnlyDisplayCurrentJiraIssuesCommand))]
     private JiraIssue? _selectedJiraIssue;
 
     public IReadOnlyList<JiraIssueQueryType> JiraIssueQueryTypes { get; } = Enum.GetValues<JiraIssueQueryType>();

@@ -35,7 +35,7 @@ public class HtmlConvert : IHtmlConvert
                 continue;
             }
 
-            var input = div.QuerySelector("input.long-field,textarea.long-field,select.cf-select,fieldset.datepicker-params");
+            var input = div.QuerySelector("input.long-field,textarea.long-field,select.cf-select,select.select,fieldset.datepicker-params");
             if (input == null)
             {
                 continue;
@@ -71,11 +71,13 @@ public class HtmlConvert : IHtmlConvert
 
                 case "SELECT":
                     var options = input.QuerySelectorAll("option");
+                    var isMultiple = input.HasAttribute("multiple");
+
                     List<JiraFieldOption> jiraFieldOptions = [];
                     foreach (var option in options)
                     {
                         var optionId = option.GetAttribute("value");
-                        var optionValue = option.TextContent;
+                        var optionValue = option.TextContent?.Trim();
                         var isSelected = option.GetAttribute("selected") != null;
 
                         if (optionId == null || optionValue == null)
@@ -86,22 +88,39 @@ public class HtmlConvert : IHtmlConvert
                         JiraFieldOption jiraFieldOption = new()
                         {
                             OptionId = optionId,
-                            OptionValue = optionValue,
+                            Name = optionValue,
                             IsSelected = isSelected
                         };
 
                         jiraFieldOptions.Add(jiraFieldOption);
                     }
 
-                    jiraField = new JiraSelectField()
+                    if (!isMultiple)
                     {
-                        Id = fieldId,
-                        Name = label.TextContent,
-                        IsRequired = div.QuerySelector("span.icon-required") != null,
-                        Description = div.QuerySelector("div.description")?.TextContent,
+                        jiraField = new JiraSelectField()
+                        {
+                            Id = fieldId,
+                            Name = label.TextContent,
+                            IsRequired = div.QuerySelector("span.icon-required") != null,
+                            Description = div.QuerySelector("div.description")?.TextContent,
 
-                        Options = jiraFieldOptions
-                    };
+                            Options = jiraFieldOptions
+                        };
+                    }
+                    else
+                    {
+                        jiraField = new JiraMultiSelectField()
+                        {
+                            Id = fieldId,
+                            Name = label.TextContent,
+                            IsRequired = div.QuerySelector("span.icon-required") != null,
+                            Description = div.QuerySelector("div.description")?.TextContent,
+
+                            Options = jiraFieldOptions
+                        };
+
+                    }
+
                     jiraFields.Add(jiraField);
                     break;
 

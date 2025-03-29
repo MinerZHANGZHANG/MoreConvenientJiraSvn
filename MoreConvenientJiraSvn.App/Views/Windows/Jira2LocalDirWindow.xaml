@@ -49,22 +49,23 @@
             </Style>
         </materialDesign:DrawerHost.Style>
         <materialDesign:DrawerHost.LeftDrawerContent>
-            <StackPanel Width="512" Margin="16,16,16,16">
-                <ListBox
-                    ItemsSource="{Binding Transitions}"
-                    SelectedValue="{Binding SelectedTransition}"
-                    Style="{StaticResource MaterialDesignChoiceChipSecondaryListBox}" />
-                <ItemsControl ItemsSource="{Binding JiraFields}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate DataType="{x:Type model:JiraField}">
-                            <ContentControl
-                                x:Name="ContentControl"
-                                Margin="4,8,4,8"
-                                Content="{Binding}"
-                                ContentTemplateSelector="{StaticResource JiraFieldTemplateSelector}" />
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+            <ScrollViewer  Margin="16,16,16,16">
+                <StackPanel Width="512">
+                    <ListBox
+        ItemsSource="{Binding Transitions}"
+        SelectedValue="{Binding SelectedTransition}"
+        Style="{StaticResource MaterialDesignChoiceChipSecondaryListBox}" />
+                    <ItemsControl ItemsSource="{Binding JiraFields}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="{x:Type model:JiraField}">
+                                <ContentControl
+                    x:Name="ContentControl"
+                    Margin="4,8,4,8"
+                    Content="{Binding}"
+                    ContentTemplateSelector="{StaticResource JiraFieldTemplateSelector}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
 
                 <Button
                     Margin="4"
@@ -82,6 +83,7 @@
                     Content="提交"
                     Style="{StaticResource MaterialDesignFlatButton}" />
             </StackPanel>
+            </ScrollViewer>
         </materialDesign:DrawerHost.LeftDrawerContent>
 
         <Grid>

@@ -15,27 +15,28 @@
             <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <materialDesign:AutoSuggestBox
+  materialDesign:TextFieldAssist.HasClearButton="True"
+  DropDownElevation="Dp0"
             x:Name="InputTextBox"
-            Grid.Row="0"
+            Grid.Row="1"
             Grid.Column="0"
             VerticalAlignment="Bottom"
-            DisplayMember="Value"
-            Suggestions="{Binding ItemsSource, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+            />
         <Button
-            Grid.Row="0"
+            Grid.Row="1"
             Grid.Column="1"
             Click="AddButton_Click"
             Content="+" />
-        <ListBox x:Name="ItemsList" ItemsSource="{Binding SelectedItems, RelativeSource={RelativeSource AncestorType=UserControl}}">
+        <ListBox Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" x:Name="SelectedItemsList">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <DockPanel>
-                        <TextBlock VerticalAlignment="Center" Text="{Binding}" />
+                        <TextBlock VerticalAlignment="Center" Text="{Binding Name}" />
                         <Button
                             Margin="5,0"
                             Click="DeleteButton_Click"

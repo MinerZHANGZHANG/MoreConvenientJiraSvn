@@ -1,19 +1,7 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using MoreConvenientJiraSvn.Core.Models;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace MoreConvenientJiraSvn.App.Views.Controls
 {
@@ -23,27 +11,45 @@ namespace MoreConvenientJiraSvn.App.Views.Controls
     public partial class ListBoxInput : UserControl
     {
         public static readonly DependencyProperty ItemsSourceProperty =
-            DependencyProperty.Register("ItemsSource", typeof(IEnumerable), typeof(ListBoxInput));
+            DependencyProperty.Register(nameof(ItemsSource), typeof(IEnumerable<SelectItem>), typeof(ListBoxInput));
 
-        public static readonly DependencyProperty SelectedItemsProperty =
-            DependencyProperty.Register("SelectedItems", typeof(ObservableCollection<string>), typeof(ListBoxInput),
-                new PropertyMetadata(new ObservableCollection<string>()));
+        public static readonly DependencyProperty InputTextProperty =
+            DependencyProperty.Register(nameof(InputText), typeof(string), typeof(ListBoxInput),
+                new PropertyMetadata(string.Empty));
 
-        public IEnumerable ItemsSource
+        public IEnumerable<SelectItem> ItemsSource
         {
-            get => (IEnumerable)GetValue(ItemsSourceProperty);
+            get => (IEnumerable<SelectItem>)GetValue(ItemsSourceProperty);
             set => SetValue(ItemsSourceProperty, value);
         }
 
-        public ObservableCollection<string> SelectedItems
+        public string InputText
         {
-            get => (ObservableCollection<string>)GetValue(SelectedItemsProperty);
-            set => SetValue(SelectedItemsProperty, value);
+            get => (string)GetValue(InputTextProperty);
+            set => SetValue(InputTextProperty, value);
+        }
+
+        public IEnumerable<SelectItem> SelectedItems
+        {
+            get { return ItemsSource.Where(i => i.IsSelected); }
+        }
+
+        public IEnumerable<string> SuggestionItems
+        {
+            get { return ItemsSource.Select(i => i.Name); }
         }
 
         public ListBoxInput()
         {
             InitializeComponent();
+
+            Loaded += ListBoxInput_Loaded;
+        }
+
+        private void ListBoxInput_Loaded(object sender, RoutedEventArgs e)
+        {
+            SelectedItemsList.ItemsSource = SelectedItems;
+            InputTextBox.Suggestions = SuggestionItems;
         }
 
         private void AddButton_Click(object sender, RoutedEventArgs e)
@@ -52,14 +58,21 @@ namespace MoreConvenientJiraSvn.App.Views.Controls
             {
                 return;
             }
-            SelectedItems.Add(InputTextBox.Text);
+
+            var item = ItemsSource.FirstOrDefault(i => i.Name == InputTextBox.Text);
+            if (item != null)
+            {
+                item.IsSelected = true;
+                SelectedItemsList.ItemsSource = SelectedItems;
+            }
         }
 
         private void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is Button button && button.DataContext is string item)
+            if (sender is Button button && button.DataContext is SelectItem item)
             {
-                SelectedItems.Remove(item);
+                item.IsSelected = false;
+                SelectedItemsList.ItemsSource = SelectedItems;
             }
         }
     }

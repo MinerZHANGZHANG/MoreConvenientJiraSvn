@@ -27,12 +27,23 @@ namespace MoreConvenientJiraSvn.Service
 
             _jiraConfig = _settingService.FindSetting<JiraConfig>() ?? new();
             _settingService.OnConfigChanged += RefreshJiraCilent_OnConfigChanged;
+
+            _jiraClient.InitHttpClient(_jiraConfig);
         }
 
 
         public async Task<List<JiraIssueFilter>> GetCurrentUserFavouriteFilterAsync()
         {
-            List<JiraIssueFilter> result = await _jiraClient.GetUserFavouriteFilterAsync();
+            _logService.Debug($"{nameof(GetCurrentUserFavouriteFilterAsync)}");
+            List<JiraIssueFilter> result = [];
+            try
+            {
+                result = await _jiraClient.GetUserFavouriteFilterAsync();
+            }
+            catch (Exception ex)
+            {
+                _logService.Debug($"Get favourite filter failed! \n\r {ex.Message}");
+            }
 
             return result;
         }

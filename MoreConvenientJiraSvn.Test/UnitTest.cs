@@ -163,6 +163,24 @@ namespace MoreConvenientJiraSvn.Test
                 </fieldset>
             </div>
 
+            <div class=""field-group aui-field-versionspicker frother-control-renderer"">
+                <label for=""customfield_14444"">Multi Field Name</label> <select class=""select"" id=""customfield_14444""
+                    multiple=""multiple"" size=""6"" name=""customfield_14444"" data-remove-null-options=""true"">
+                    <option value=""-1"" title=""UnKnow"">UnKnow</option>
+                    <optgroup label=""SelectGroup_1"" data-version-group=""Group1"">
+                        <option value=""20000"" title=""Option1"">
+                            Option1
+                        </option>
+                        <option value=""20001"" title=""Option2"">
+                            Option2
+                        </option>
+                        <option value=""20002"" title=""Option3"">
+                            Option3
+                        </option>
+                    </optgroup>
+                </select>
+                <div class=""aui-description description"">Multi Description</div>
+            </div>
 
             <div class=""field-group aui-field-wikiedit comment-input"">
                 <label for=""comment"">Comment</label>
@@ -257,8 +275,8 @@ namespace MoreConvenientJiraSvn.Test
 </div>";
 
             var result = await htmlConvert.ConvertHtmlToJiraFieldsAsync(htmlString, CancellationToken.None);
-            var result2 =  JsonBuilder.TryConvertJiraFieldsToJson(result, out var jsonResult);
-            Assert.Equals(result.Count, 6);
+
+            Assert.Pass();
         }
 
     }

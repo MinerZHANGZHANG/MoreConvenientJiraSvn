@@ -2,7 +2,9 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="clr-namespace:MoreConvenientJiraSvn.App.Styles"
-    xmlns:model="clr-namespace:MoreConvenientJiraSvn.Core.Models;assembly=MoreConvenientJiraSvn.Core">
+    xmlns:model="clr-namespace:MoreConvenientJiraSvn.Core.Models;assembly=MoreConvenientJiraSvn.Core"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:control="clr-namespace:MoreConvenientJiraSvn.App.Views.Controls">
 
     <DataTemplate x:Key="LevelTemplate">
         <Border
@@ -51,7 +53,7 @@
             <TextBlock MinWidth="120" Text="{Binding Name}" />
             <ComboBox
                 MinWidth="120"
-                DisplayMemberPath="OptionName"
+                DisplayMemberPath="OptionValue"
                 ItemsSource="{Binding Options}"
                 SelectedItem="{Binding Value}" />
         </StackPanel>
@@ -65,27 +67,17 @@
                 SelectedDateFormat="Short" />
         </StackPanel>
     </DataTemplate>
-    <DataTemplate x:Key="ListBoxTemplate" DataType="{x:Type model:JiraField}">
-        <StackPanel DataContext="{Binding ElementName=ContentControl, Path=DataContext}" Orientation="Vertical">
-            <TextBlock MinWidth="120" Text="{Binding FieldName}" />
-            <!--<ListBox
-                        MinWidth="120"
-                        ItemsSource="{Binding Options}"
-                        SelectionChanged="ListBox_SelectionChanged"
-                        SelectionMode="Multiple">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate DataType="{x:Type model:FieldOption}">
-                                <TextBlock Text="{Binding OptionName}" />
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>-->
+    <DataTemplate x:Key="JiraMultiSelectTemplate" DataType="{x:Type model:JiraMultiSelectField}">
+        <StackPanel Orientation="Vertical">
+            <control:ListBoxInput ItemsSource="{Binding Options}"/>
         </StackPanel>
     </DataTemplate>
     <local:JiraFieldTemplateSelector
         x:Key="JiraFieldTemplateSelector"
         JiraDateTemplate="{StaticResource JiraDateTemplate}"
         JiraSelectTemplate="{StaticResource JiraSelectTemplate}"
-        JiraTextTemplate="{StaticResource JiraTextTemplate}" />
+        JiraTextTemplate="{StaticResource JiraTextTemplate}" 
+        JiraMultiSelectTemplate="{StaticResource JiraMultiSelectTemplate}"/>
 
 
 </ResourceDictionary>

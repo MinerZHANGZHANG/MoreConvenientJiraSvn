@@ -40,6 +40,7 @@ public partial class JiraIssueBrowseViewModel
         _transitionCancellationTokenSource?.Cancel();
 
         Transitions = [.. await _jiraService.GetTransitionsByIssueId(SelectedJiraIssue.IssueId)];
+        JiraFields.Clear();
     }
 
 
