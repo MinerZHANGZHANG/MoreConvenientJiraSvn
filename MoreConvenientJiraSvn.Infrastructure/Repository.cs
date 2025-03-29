@@ -57,6 +57,12 @@ public class Repository(LiteDatabase db) : IRepository
         return result;
     }
 
+    public T? FindOne<T>(Expression<Func<T, bool>> predicate) where T : new()
+    {
+        var result = _db.GetCollection<T>().FindOne(predicate);
+        return result;
+    }
+
     public bool Delete<T>(BsonValue id) where T : new()
     {
         var result = _db.GetCollection<T>().Delete(id);

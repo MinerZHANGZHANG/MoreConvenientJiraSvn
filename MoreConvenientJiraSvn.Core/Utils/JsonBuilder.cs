@@ -27,35 +27,36 @@ public static class JsonBuilder
 
             if (field is JiraTextField textField)
             {
-                fieldsNode[textField.Name] = textField.Value;
+                fieldsNode[textField.Id] = textField.Value;
             }
             else if (field is JiraSelectField selectField)
             {
-                fieldsNode[selectField.Name] = new JsonObject()
+                fieldsNode[selectField.Id] = new JsonObject()
                 {
-                    ["name"] = selectField.Options.FirstOrDefault(o => o.IsSelected)?.OptionValue ?? string.Empty
+                    ["name"] = selectField.Options.FirstOrDefault(o => o.IsSelected)?.Name ?? string.Empty
                 };
             }
-            else if (field is JiraSelectField multipleSelectField)
+            else if (field is JiraMultiSelectField multipleSelectField)
             {
-                fieldsNode[multipleSelectField.Name] = new JsonObject();
+                fieldsNode[multipleSelectField.Id] = new JsonArray();
                 foreach (var item in multipleSelectField.Options.Where(o => o.IsSelected))
                 {
-                    var parentNode = fieldsNode[multipleSelectField.Name];
-                    if (parentNode == null)
+                    var parentNode = fieldsNode[multipleSelectField.Id];
+                    if (parentNode is not JsonArray jsonArray)
                     {
                         continue;
                     }
-                    parentNode["name"] = item.OptionValue;
+                    jsonArray.Add(new JsonObject() { ["name"] = item.Name });
                 }
             }
             else if (field is JiraDateField dateField)
             {
-                fieldsNode[dateField.Name] = dateField.Value.ToString("yyyy-MM-dd");
+                fieldsNode[dateField.Id] = dateField.Value.ToString("yyyy-MM-dd");
             }
 
         }
         jsonResult = jsonObject.ToJsonString();
-        return false;
+        return true;
+
     }
 }

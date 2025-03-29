@@ -204,6 +204,12 @@ namespace MoreConvenientJiraSvn.Service
             return await _jiraClient.TryPostTransitionsAsync(issueKey, transitionId, jiraFields, cancellationToken); ;
         }
 
+        public async Task<int> DownloadIssueAttachmentAsync(string issueKey, string directoryPath, CancellationToken cancellationToken = default)
+        {
+            return await _jiraClient.DownloadIssueAttachmentAsync(issueKey, directoryPath, cancellationToken);
+        }
+
+
 
         //private List<JiraOperation> InitializeOperations()
         //{

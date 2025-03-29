@@ -212,9 +212,9 @@ public partial class JiraIssueBrowseViewModel
 
         directoryInfo.CreateSubdirectory("SQL");
         directoryInfo.CreateSubdirectory("图片示例");
-        directoryInfo.CreateSubdirectory("附件文档");
 
-        // TODO: support download attachments
+        var attachmentDir = directoryInfo.CreateSubdirectory("附件文档");
+        await _jiraService.DownloadIssueAttachmentAsync(SelectedJiraIssue.IssueKey, attachmentDir.FullName);
 
         SelectedJiraIssueLocalInfo = new() { IssueKey = SelectedJiraIssue.IssueKey, LocalDir = fullDirName };
         _repository.Upsert(SelectedJiraIssueLocalInfo);

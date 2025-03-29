@@ -1,7 +1,9 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MoreConvenientJiraSvn.App.Properties;
 using MoreConvenientJiraSvn.Core.Models;
 using System.Collections.ObjectModel;
+using System.Windows;
 
 namespace MoreConvenientJiraSvn.App.ViewModels;
 
@@ -11,6 +13,7 @@ public partial class JiraIssueBrowseViewModel
     private ObservableCollection<JiraTransition> _transitions = [];
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(SubmitTransitionFormCommand))]
     private JiraTransition? _selectedTransition;
 
     [ObservableProperty]
@@ -58,14 +61,17 @@ public partial class JiraIssueBrowseViewModel
         _originJiraFields = jiraFields.Item2;
     }
 
-    // Todo: learn the changed event...
     [RelayCommand(CanExecute = nameof(HasTransitionBeSelected))]
     public async Task SubmitTransitionForm()
     {
-        // Only changed field...
         if (SelectedJiraIssue == null || SelectedTransition == null)
         {
             return;
+        }
+
+        if (!Settings.Default.IsEnableWriteOperation)
+        {
+            MessageBox.Show($"未启用Jira提交功能，若需要启用写操作请在【首页】-【应用设置】中打开开关.");
         }
 
         foreach (var oldField in _originJiraFields)
@@ -78,5 +84,8 @@ public partial class JiraIssueBrowseViewModel
         }
 
         await _jiraService.TryPostTransitionsAsync(SelectedJiraIssue.IssueKey, SelectedTransition.TransitionId, JiraFields);
+
+        JiraFields.Clear();
+        SelectedTransition = null;
     }
 }

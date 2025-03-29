@@ -1,5 +1,6 @@
 ﻿
 using MoreConvenientJiraSvn.Core.Models;
+using System.IO;
 
 namespace MoreConvenientJiraSvn.Core.Interfaces;
 
@@ -22,4 +23,6 @@ public interface IJiraClient
     Task<string> GetTransitionFormAsync(string issueId, string transitionId, CancellationToken cancellationToken = default);
 
     Task<string> TryPostTransitionsAsync(string issueKey, string transitionId, IEnumerable<JiraField> jiraFields, CancellationToken cancellationToken = default);
+
+    Task<int> DownloadIssueAttachmentAsync(string issueKey, string absolutePath, CancellationToken cancellationToken = default);
 }

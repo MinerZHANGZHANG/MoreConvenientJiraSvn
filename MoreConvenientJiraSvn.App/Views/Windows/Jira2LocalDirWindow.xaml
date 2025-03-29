@@ -49,40 +49,40 @@
             </Style>
         </materialDesign:DrawerHost.Style>
         <materialDesign:DrawerHost.LeftDrawerContent>
-            <ScrollViewer  Margin="16,16,16,16">
+            <ScrollViewer Margin="16,16,16,16">
                 <StackPanel Width="512">
                     <ListBox
-        ItemsSource="{Binding Transitions}"
-        SelectedValue="{Binding SelectedTransition}"
-        Style="{StaticResource MaterialDesignChoiceChipSecondaryListBox}" />
+                        ItemsSource="{Binding Transitions}"
+                        SelectedValue="{Binding SelectedTransition}"
+                        Style="{StaticResource MaterialDesignChoiceChipSecondaryListBox}" />
                     <ItemsControl ItemsSource="{Binding JiraFields}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate DataType="{x:Type model:JiraField}">
                                 <ContentControl
-                    x:Name="ContentControl"
-                    Margin="4,8,4,8"
-                    Content="{Binding}"
-                    ContentTemplateSelector="{StaticResource JiraFieldTemplateSelector}" />
+                                    x:Name="ContentControl"
+                                    Margin="4,8,4,8"
+                                    Content="{Binding}"
+                                    ContentTemplateSelector="{StaticResource JiraFieldTemplateSelector}" />
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
 
-                <Button
-                    Margin="4"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Bottom"
-                    Command="{x:Static materialDesign:DrawerHost.CloseDrawerCommand}"
-                    CommandParameter="{x:Static Dock.Left}"
-                    Content="取消"
-                    Style="{StaticResource MaterialDesignFlatButton}" />
-                <Button
-                    Margin="4"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Bottom"
-                    Command="{Binding SubmitTransitionFormCommand}"
-                    Content="提交"
-                    Style="{StaticResource MaterialDesignFlatButton}" />
-            </StackPanel>
+                    <Button
+                        Margin="4"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Bottom"
+                        Command="{x:Static materialDesign:DrawerHost.CloseDrawerCommand}"
+                        CommandParameter="{x:Static Dock.Left}"
+                        Content="取消"
+                        Style="{StaticResource MaterialDesignFlatButton}" />
+                    <Button
+                        Margin="4"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Bottom"
+                        Command="{Binding SubmitTransitionFormCommand}"
+                        Content="提交"
+                        Style="{StaticResource MaterialDesignFlatButton}" />
+                </StackPanel>
             </ScrollViewer>
         </materialDesign:DrawerHost.LeftDrawerContent>
 
@@ -266,10 +266,16 @@
                             <Button
                                 Command="{x:Static materialDesign:DrawerHost.OpenDrawerCommand}"
                                 CommandParameter="{x:Static Dock.Left}"
-                                Content="修改Jira状态" />
+                                Content="修改Jira状态"
+                                IsEnabled="{Binding HasIssueBeSelected}" />
                             <materialDesign:Badged Badge="{Binding ChildJiraIssues.Count}">
                                 <Button Command="{Binding OnlyDisplayCurrentJiraIssuesCommand}" Content="仅查看相关Jira" />
                             </materialDesign:Badged>
+                            <Button
+                                Command="{Binding OpenWebPageCommand}"
+                                CommandParameter="{Binding SelectedJiraIssue.TestPlatformUrl}"
+                                Content="打开测试用例"
+                                IsEnabled="{Binding HasTestCases}" />
                         </WrapPanel>
                     </Expander>
 

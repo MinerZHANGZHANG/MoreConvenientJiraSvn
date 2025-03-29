@@ -40,6 +40,24 @@ public class JiraMultiSelectField : JiraField
 {
     public List<JiraFieldOption> Options { get; set; } = [];
     public List<JiraFieldOption>? Value { get; set; }
+
+    public override bool ValueIsEquals(JiraField jiraField)
+    {
+        if (jiraField is JiraMultiSelectField selectField)
+        {
+            foreach (var option in Options)
+            {
+                var anotherOption = selectField.Options.First(o => o.OptionId == option.OptionId);
+                if (anotherOption.IsSelected != option.IsSelected)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        return false;
+    }
 }
 
 public class JiraTextField : JiraField

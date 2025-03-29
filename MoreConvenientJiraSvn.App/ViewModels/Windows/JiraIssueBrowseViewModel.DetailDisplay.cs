@@ -12,6 +12,8 @@ public partial class JiraIssueBrowseViewModel
     [ObservableProperty]
     private List<JiraIssue> _childJiraIssues = [];
 
+    public bool HasTestCases => !string.IsNullOrEmpty(SelectedJiraIssue?.TestPlatformUrl);
+
     private void InitJiraIssueDetailDisplay()
     {
         _selectedIssueChanged += JiraIssueBrowseViewModel_selectedIssueChanged;

@@ -15,7 +15,7 @@ public class CheckSqlHostedService : TimedHostedService
     private readonly LogService _logService;
 
     public CheckSqlHostedService(IRepository repository, IPlSqlCheckPipeline plSqlCheckPipeline, LogService logService, SettingService settingService)
-    : base(new TimeSpan(9, 30, 0), TimeSpan.FromMinutes(5), 3)
+    : base(repository, new TimeSpan(9, 30, 0), TimeSpan.FromMinutes(5), 3)
     {
         _repository = repository;
         _plSqlCheckPipeline = plSqlCheckPipeline;
@@ -26,7 +26,7 @@ public class CheckSqlHostedService : TimedHostedService
         var config = _settingService.FindSetting<BackgroundTaskConfig>();
         if (config != null)
         {
-            base.RefreshExecuteConfig(config.ExecutionTime - DateTime.Today,
+            base.RefreshExecuteConfig(config.ExecutionTime - config.ExecutionTime.Date,
                 TimeSpan.FromMinutes(config.RetryIntervalMinutes),
                 config.MaxRetryCount);
         }

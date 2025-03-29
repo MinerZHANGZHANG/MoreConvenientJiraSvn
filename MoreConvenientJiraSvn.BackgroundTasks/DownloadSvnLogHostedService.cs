@@ -15,7 +15,7 @@ public class DownloadSvnLogHostedService : TimedHostedService
     private readonly SettingService _settingService;
 
     public DownloadSvnLogHostedService(IRepository repository, SvnService svnService, LogService logService, SettingService settingService)
-        : base(new TimeSpan(9, 30, 0), TimeSpan.FromMinutes(5), 3)
+        : base(repository, new TimeSpan(9, 30, 0), TimeSpan.FromMinutes(5), 3)
     {
         _repository = repository;
 
@@ -26,7 +26,7 @@ public class DownloadSvnLogHostedService : TimedHostedService
         var config = _settingService.FindSetting<BackgroundTaskConfig>();
         if (config != null)
         {
-            base.RefreshExecuteConfig(config.ExecutionTime - DateTime.Today,
+            base.RefreshExecuteConfig(config.ExecutionTime - config.ExecutionTime.Date,
                 TimeSpan.FromMinutes(config.RetryIntervalMinutes),
                 config.MaxRetryCount);
         }

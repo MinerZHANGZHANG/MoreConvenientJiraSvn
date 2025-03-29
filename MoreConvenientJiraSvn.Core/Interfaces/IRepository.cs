@@ -21,6 +21,8 @@ public interface IRepository
 
     T? FindOne<T>(BsonExpression expression) where T : new();
 
+    T? FindOne<T>(Expression<Func<T, bool>> predicate) where T : new();
+
     bool Delete<T>(BsonValue id) where T : new();
 
     Task<BsonValue> InsertAsync<T>(T obj) where T : new();

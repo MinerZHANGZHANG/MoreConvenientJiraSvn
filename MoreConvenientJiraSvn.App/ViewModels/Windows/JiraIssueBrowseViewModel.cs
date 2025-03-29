@@ -42,6 +42,7 @@ public partial class JiraIssueBrowseViewModel(JiraService jiraService, SvnServic
     private ObservableCollection<JiraIssue>? _jiraIssueList;
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasIssueBeSelected))]
+    [NotifyPropertyChangedFor(nameof(HasTestCases))]
     [NotifyCanExecuteChangedFor(nameof(OpenOrCreateJiraIssueDirectoryCommand))]
     [NotifyCanExecuteChangedFor(nameof(CopyCommitTextCommand))]
     [NotifyCanExecuteChangedFor(nameof(CopyAnnotationTextCommand))]
