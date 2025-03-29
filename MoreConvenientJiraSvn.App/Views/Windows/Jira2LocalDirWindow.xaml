@@ -74,6 +74,13 @@
                     CommandParameter="{x:Static Dock.Left}"
                     Content="取消"
                     Style="{StaticResource MaterialDesignFlatButton}" />
+                <Button
+                    Margin="4"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Bottom"
+                    Command="{Binding SubmitTransitionFormCommand}"
+                    Content="提交"
+                    Style="{StaticResource MaterialDesignFlatButton}" />
             </StackPanel>
         </materialDesign:DrawerHost.LeftDrawerContent>
 

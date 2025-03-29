@@ -1,4 +1,5 @@
-﻿using MoreConvenientJiraSvn.Core.Interfaces;
+﻿using Antlr4.Runtime.Atn;
+using MoreConvenientJiraSvn.Core.Interfaces;
 using MoreConvenientJiraSvn.Core.Models;
 using MoreConvenientJiraSvn.Core.Utils;
 using System.Net.Http.Headers;
@@ -340,5 +341,27 @@ public class JiraClient : IJiraClient
         response.EnsureSuccessStatusCode();
 
         return await response.Content.ReadAsStringAsync(cancellationToken);
+    }
+
+    public async Task<string> TryPostTransitionsAsync(string issueKey, string transitionId, IEnumerable<JiraField> jiraFields, CancellationToken cancellationToken = default)
+    {
+        if (_httpClient == null)
+        {
+            return "no httpClient";
+        }
+
+        if (!JsonBuilder.TryConvertJiraFieldsToJson(transitionId, jiraFields, out string json))
+        {
+            return "can`t builder json";
+        }
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+        var response = await _httpClient.PostAsync($"{IssueUri}/{issueKey}/transitions", content, cancellationToken);
+
+        if (response.IsSuccessStatusCode)
+        {
+            return string.Empty;
+        }
+
+        return await response.Content.ReadAsStringAsync();
     }
 }

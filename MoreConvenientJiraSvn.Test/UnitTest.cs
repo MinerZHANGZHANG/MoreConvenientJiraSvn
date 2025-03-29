@@ -1,4 +1,5 @@
-﻿using MoreConvenientJiraSvn.Infrastructure;
+﻿using MoreConvenientJiraSvn.Core.Utils;
+using MoreConvenientJiraSvn.Infrastructure;
 using System.Threading.Tasks;
 
 namespace MoreConvenientJiraSvn.Test
@@ -256,7 +257,7 @@ namespace MoreConvenientJiraSvn.Test
 </div>";
 
             var result = await htmlConvert.ConvertHtmlToJiraFieldsAsync(htmlString, CancellationToken.None);
-
+            var result2 =  JsonBuilder.TryConvertJiraFieldsToJson(result, out var jsonResult);
             Assert.Equals(result.Count, 6);
         }
 

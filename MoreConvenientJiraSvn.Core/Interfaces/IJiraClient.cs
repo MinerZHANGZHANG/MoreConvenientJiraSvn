@@ -21,4 +21,5 @@ public interface IJiraClient
 
     Task<string> GetTransitionFormAsync(string issueId, string transitionId, CancellationToken cancellationToken = default);
 
+    Task<string> TryPostTransitionsAsync(string issueKey, string transitionId, IEnumerable<JiraField> jiraFields, CancellationToken cancellationToken = default);
 }

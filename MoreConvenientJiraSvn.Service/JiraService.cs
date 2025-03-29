@@ -178,13 +178,21 @@ namespace MoreConvenientJiraSvn.Service
             return results;
         }
 
-        public async Task<List<JiraField>> GetFieldInfoFromTransitionAndIssueId(string issueId, JiraTransition jiraTransition, CancellationToken cancellationToken)
+        public async Task<(List<JiraField>, List<JiraField>)> GetFieldInfoFromTransitionAndIssueId(string issueId, JiraTransition jiraTransition, CancellationToken cancellationToken)
         {
             var formString = await _jiraClient.GetTransitionFormAsync(issueId, jiraTransition.TransitionId, cancellationToken);
-            var jiraFields = await _htmlConvert.ConvertHtmlToJiraFieldsAsync(formString, cancellationToken);
 
-            return jiraFields;
+            var jiraFields = await _htmlConvert.ConvertHtmlToJiraFieldsAsync(formString, cancellationToken);
+            var backupFields = await _htmlConvert.ConvertHtmlToJiraFieldsAsync(formString, cancellationToken);
+
+            return (jiraFields, backupFields);
         }
+
+        public async Task<string> TryPostTransitionsAsync(string issueKey, string transitionId, IEnumerable<JiraField> jiraFields, CancellationToken cancellationToken = default)
+        {
+            return await _jiraClient.TryPostTransitionsAsync(issueKey, transitionId, jiraFields, cancellationToken); ;
+        }
+
 
         //private List<JiraOperation> InitializeOperations()
         //{
