@@ -1,17 +1,7 @@
 ﻿using MoreConvenientJiraSvn.Core.Attributes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
 using System.Text.Json;
-using System.Threading.Tasks;
 using MoreConvenientJiraSvn.Core.Models;
 using MoreConvenientJiraSvn.Core.Enums;
-using Microsoft.Extensions.Options;
-using System.Reflection.PortableExecutable;
-using System.Reflection;
-using System.Xml.Linq;
 
 namespace MoreConvenientJiraSvn.Core.Utils;
 
@@ -112,13 +102,13 @@ public static class IssueInfoConverter
                 try
                 {
                     if (targetElement.Value.TryGetProperty(propertyMap.Value.Key, out var childElement))
-                {
-                    targetElement = childElement;
-                }
-                else
-                {
-                    targetElement = null;
-                }
+                    {
+                        targetElement = childElement;
+                    }
+                    else
+                    {
+                        targetElement = null;
+                    }
                 }
                 catch (Exception)
                 {

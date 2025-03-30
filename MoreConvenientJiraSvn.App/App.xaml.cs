@@ -1,14 +1,15 @@
 ﻿using LiteDB;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using MoreConvenientJiraSvn.Service;
 using MoreConvenientJiraSvn.App.Properties;
 using MoreConvenientJiraSvn.App.ViewModels;
+using MoreConvenientJiraSvn.BackgroundTask;
+using MoreConvenientJiraSvn.Core.Interfaces;
+using MoreConvenientJiraSvn.Core.Models;
+using MoreConvenientJiraSvn.Infrastructure;
+using MoreConvenientJiraSvn.Service;
 using System.Windows;
 using Application = System.Windows.Application;
-using MoreConvenientJiraSvn.Core.Interfaces;
-using MoreConvenientJiraSvn.Infrastructure;
-using MoreConvenientJiraSvn.BackgroundTask;
 
 namespace MoreConvenientJiraSvn.App
 {
@@ -30,6 +31,7 @@ namespace MoreConvenientJiraSvn.App
             services.AddSingleton<IJiraClient, JiraClient>();
             services.AddSingleton<IPlSqlCheckPipeline, PlSqlCheckPipeline>();
             services.AddSingleton<ISubversionClient, SubversionClient>();
+            services.AddSingleton<IHtmlConvert, HtmlConvert>();
 
             services.AddSingleton<LogService>();
             services.AddSingleton<SettingService>();
@@ -68,6 +70,12 @@ namespace MoreConvenientJiraSvn.App
 
         private void App_Startup(object sender, StartupEventArgs e)
         {
+            var settingService = _services.GetRequiredService<SettingService>();
+            if (settingService.FindSetting<BackgroundTaskConfig>()?.IsEnableBackgroundTask != true)
+            {
+                return;
+            }
+
             var hostServices = _services.GetServices<IHostedService>();
             foreach (var service in hostServices)
             {

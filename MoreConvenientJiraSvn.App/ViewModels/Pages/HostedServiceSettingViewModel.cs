@@ -7,7 +7,6 @@ using MoreConvenientJiraSvn.Core.Interfaces;
 using MoreConvenientJiraSvn.Core.Models;
 using MoreConvenientJiraSvn.Service;
 using System.Collections.ObjectModel;
-using System.Windows.Automation;
 
 namespace MoreConvenientJiraSvn.App.ViewModels;
 

@@ -4,13 +4,8 @@ using MoreConvenientJiraSvn.App.Properties;
 using MoreConvenientJiraSvn.Core.Enums;
 using MoreConvenientJiraSvn.Core.Models;
 using MoreConvenientJiraSvn.Core.Utils;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace MoreConvenientJiraSvn.App.ViewModels
@@ -73,7 +68,7 @@ namespace MoreConvenientJiraSvn.App.ViewModels
         [RelayCommand]
         public void ShowEnableWriteTip()
         {
-            MessageBox.Show("启用这个按钮将允许进行以下操作:\r\n - 修改和提交Jira状态");
+            MessageBox.Show("启用这个按钮将允许进行以下危险操作!\r\n - 修改Jira状态\n\r - 修改Jira问题要素\n\r\n\r话说回来，这只是启用了一些不包含删除的增改操作\n\r能有什么问题呢?");
         }
     }
 }

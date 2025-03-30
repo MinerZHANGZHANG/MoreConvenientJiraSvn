@@ -1,17 +1,11 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using LiteDB;
 using MaterialDesignThemes.Wpf;
-using Microsoft.Win32;
 using MoreConvenientJiraSvn.Core.Enums;
 using MoreConvenientJiraSvn.Core.Interfaces;
 using MoreConvenientJiraSvn.Core.Models;
 using MoreConvenientJiraSvn.Service;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.IO;
-using System.Text;
 using System.Windows;
 
 
@@ -47,20 +41,22 @@ public partial class JiraIssueBrowseViewModel(JiraService jiraService, SvnServic
     [ObservableProperty]
     private ObservableCollection<JiraIssue>? _jiraIssueList;
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(HasJiraBeSelected))]
+    [NotifyPropertyChangedFor(nameof(HasIssueBeSelected))]
+    [NotifyPropertyChangedFor(nameof(HasTestCases))]
     [NotifyCanExecuteChangedFor(nameof(OpenOrCreateJiraIssueDirectoryCommand))]
     [NotifyCanExecuteChangedFor(nameof(CopyCommitTextCommand))]
     [NotifyCanExecuteChangedFor(nameof(CopyAnnotationTextCommand))]
     [NotifyCanExecuteChangedFor(nameof(OpenWebPageCommand))]
+    [NotifyCanExecuteChangedFor(nameof(OnlyDisplayCurrentJiraIssuesCommand))]
     private JiraIssue? _selectedJiraIssue;
 
     public IReadOnlyList<JiraIssueQueryType> JiraIssueQueryTypes { get; } = Enum.GetValues<JiraIssueQueryType>();
     public bool IsUseTextToSearch => SelectedJiraIssueQueryType != JiraIssueQueryType.Filter;
     public bool HaveQueryText => !string.IsNullOrEmpty(JiraIssueQueryText);
-    public bool HasJiraBeSelected => SelectedJiraIssue != null;
+    public bool HasIssueBeSelected => SelectedJiraIssue != null;
 
     private event EventHandler<JiraIssue>? _selectedIssueChanged;
-    public SnackbarMessageQueue MessageQueue { get; }  = new(TimeSpan.FromSeconds(2d));
+    public SnackbarMessageQueue MessageQueue { get; } = new(TimeSpan.FromSeconds(2d));
 
     #endregion
 
@@ -92,21 +88,30 @@ public partial class JiraIssueBrowseViewModel(JiraService jiraService, SvnServic
                 {
                     break;
                 }
-                JiraIssueList = [jiraIssue];
+                RefreshCurrentJiraIssues([jiraIssue]);
                 break;
-            case JiraIssueQueryType.Sql:
-                MessageBox.Show("暂不支持");
+            case JiraIssueQueryType.Jql:
+                if (string.IsNullOrEmpty(JiraIssueQueryText))
+                {
+                    break;
+                }
+                RefreshCurrentJiraIssues(await _jiraService.GetIssuesByJqlAsync(JiraIssueQueryText));
                 break;
             case JiraIssueQueryType.Filter:
                 if (SelectedJiraIssueFilter == null)
                 {
                     break;
                 }
-                JiraIssueList = [.. await _jiraService.GetIssuesByFilterAsync(SelectedJiraIssueFilter)];
+                RefreshCurrentJiraIssues(await _jiraService.GetIssuesByFilterAsync(SelectedJiraIssueFilter));
                 break;
             default:
                 break;
         }
+    }
+
+    public void RefreshCurrentJiraIssues(IEnumerable<JiraIssue> issues)
+    {
+        JiraIssueList = [.. issues];
     }
 
     public void InvokeSelectedJiraIssueEvent(object? sender)

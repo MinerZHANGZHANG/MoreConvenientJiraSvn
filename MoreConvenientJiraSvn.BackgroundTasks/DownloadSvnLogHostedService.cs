@@ -15,7 +15,7 @@ public class DownloadSvnLogHostedService : TimedHostedService
     private readonly SettingService _settingService;
 
     public DownloadSvnLogHostedService(IRepository repository, SvnService svnService, LogService logService, SettingService settingService)
-        : base(new TimeSpan(9, 30, 0), TimeSpan.FromMinutes(5), 3)
+        : base(repository, new TimeSpan(9, 30, 0), TimeSpan.FromMinutes(5), 3)
     {
         _repository = repository;
 
@@ -26,7 +26,7 @@ public class DownloadSvnLogHostedService : TimedHostedService
         var config = _settingService.FindSetting<BackgroundTaskConfig>();
         if (config != null)
         {
-            base.RefreshExecuteConfig(config.ExecutionTime - DateTime.Today,
+            base.RefreshExecuteConfig(config.ExecutionTime - config.ExecutionTime.Date,
                 TimeSpan.FromMinutes(config.RetryIntervalMinutes),
                 config.MaxRetryCount);
         }
@@ -41,9 +41,10 @@ public class DownloadSvnLogHostedService : TimedHostedService
             IsSucccess = false,
         };
         List<BackgroundTaskMessage> taskMessages = [];
-
+        var config = _settingService.FindSetting<BackgroundTaskConfig>();
+        var prevDays = config?.SvnLogDownloadPrevDays ?? 1;
         var needAutoRefreshSvnPaths = _settingService.FindSetting<BackgroundTaskConfig>()?.CheckSvnPaths ?? [];
-        var svnPaths = _svnService.SvnPaths.Where(p => needAutoRefreshSvnPaths.Contains(p.Path));
+        var svnPaths = _svnService.SvnPaths.Where(p => needAutoRefreshSvnPaths.Contains(p.PathName));
         if (svnPaths.Any())
         {
             // todo:add default date to svn config / use version instead
@@ -55,7 +56,7 @@ public class DownloadSvnLogHostedService : TimedHostedService
                 var latestLog = _repository.Find<SvnLog>(Query.EQ(nameof(SvnLog.SvnPath), path.Path))
                     .OrderByDescending(log => log.DateTime)
                     .FirstOrDefault();
-                var pathBeginTime = latestLog != null ? latestLog.DateTime : DateTime.Today;
+                var pathBeginTime = latestLog != null ? latestLog.DateTime : DateTime.Today.AddDays(-prevDays);
                 var pathEndTime = DateTime.Today.AddDays(1);
 
                 try
@@ -69,6 +70,7 @@ public class DownloadSvnLogHostedService : TimedHostedService
                     {
                         Info = $"成功获取SVN日志并保存,路径:{path.Path}({pathBeginTime}->{pathEndTime}) 数量:{updateLogTotal}",
                         Level = InfoLevel.Normal,
+                        LogId = taskLog.Id,
                     });
                 }
                 catch (Exception ex)
@@ -77,13 +79,13 @@ public class DownloadSvnLogHostedService : TimedHostedService
                     {
                         Info = $"获取SVN日志并保存的过程中出错：路径:{path.Path}({pathBeginTime}->{pathEndTime}) 错误:{ex.Message}",
                         Level = InfoLevel.Error,
+                        LogId = taskLog.Id,
                     });
                 }
             }
 
             taskLog.IsSucccess = updatePathCount == svnPaths.Count();
             taskLog.Summary = $"SVN日志更新完成，成功更新了{updatePathCount}个路径";
-            taskLog.MessageIds = taskMessages.Select(x => x.Id);
         }
         else
         {

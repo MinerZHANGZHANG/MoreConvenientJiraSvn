@@ -1,13 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MoreConvenientJiraSvn.Core.Models;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace MoreConvenientJiraSvn.App.ViewModels;
 
@@ -46,7 +40,7 @@ public partial class JiraIssueBrowseViewModel
     public bool HasSvnLog => SelectedIssueSvnLogs.Count > 0;
 
     public string SvnLogVersionRangeText => $"版本:{OldestSvnLog?.Revision.ToString() ?? "无"} -> {NewestSvnLog?.Revision.ToString() ?? "无"}";
-    public string SvnLogTimeRangeText => $"日期:{OldestSvnLog?.DateTime.ToString("yy-MM-dd HH:mm") ?? "无"} -> {NewestSvnLog?.DateTime.ToString("yy-MM-dd HH:mm") ?? "无"}";
+    public string SvnLogTimeRangeText => $"现有数据日期:{OldestSvnLog?.DateTime.ToString("yy-MM-dd HH:mm") ?? "无"} -> {NewestSvnLog?.DateTime.ToString("yy-MM-dd HH:mm") ?? "无"}";
 
     private CancellationTokenSource? _cancellationTokenSource;
 
@@ -76,10 +70,22 @@ public partial class JiraIssueBrowseViewModel
     {
         if (SelectedJiraIssue == null || SelectedSvnPath == null)
         {
+            SelectedIssueSvnLogs = []; 
             return;
         }
 
         SelectedIssueSvnLogs = [.. _jiraService.GetSvnLogByJiraIdLocal(SelectedJiraIssue.IssueKey, SelectedSvnPath.Path).OrderByDescending(log => log.DateTime)];
+
+        if (SelectedIssueSvnLogs.Any())
+        {
+            BeginDate = SelectedIssueSvnLogs.Min(l => l.DateTime);
+            EndDate = SelectedIssueSvnLogs.Max(l => l.DateTime);
+        }
+        else
+        {
+            BeginDate = DateTime.Today;
+            EndDate = DateTime.Today;
+        }
     }
 
     [RelayCommand(CanExecute = nameof(CanQuerySvnLog))]
@@ -91,12 +97,26 @@ public partial class JiraIssueBrowseViewModel
         }
 
         _cancellationTokenSource = new();
-        SelectedIssueSvnLogs = [.. await _svnService.GetSvnLogsAsync(SelectedSvnPath.Path,
+
+        try
+        {
+            var svnLogs = await _svnService.GetSvnLogsAsync(SelectedSvnPath.Path,
                                                             BeginDate,
                                                             EndDate,
                                                             1000,
                                                             SelectedSvnPath.IsNeedExtractJiraId,
-                                                            _cancellationTokenSource.Token)];
+                                                            _cancellationTokenSource.Token);
+            _repository.Upsert(svnLogs.AsEnumerable());
+            SelectedIssueSvnLogs = [.. SelectedIssueSvnLogs.UnionBy(
+                svnLogs.Where(log => log.IssueJiraId == SelectedJiraIssue.IssueId || log.SubIssueJiraId == SelectedJiraIssue.IssueId),
+                l => l.Revision)];
+
+            MessageQueue.Enqueue($"刷新Log成功，查找到{svnLogs.Count}条数据");
+        }
+        catch (Exception ex)
+        {
+            MessageQueue.Enqueue($"刷新Log失败: {ex.Message}");
+        }
     }
 
 }

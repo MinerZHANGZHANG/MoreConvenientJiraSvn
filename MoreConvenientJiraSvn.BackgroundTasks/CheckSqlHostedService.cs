@@ -1,13 +1,12 @@
-﻿using MoreConvenientJiraSvn.Core.Interfaces;
+﻿using MoreConvenientJiraSvn.Core.Enums;
+using MoreConvenientJiraSvn.Core.Interfaces;
 using MoreConvenientJiraSvn.Core.Models;
-using MoreConvenientJiraSvn.Core.Utils;
-using MoreConvenientJiraSvn.Core.Enums;
 using MoreConvenientJiraSvn.Service;
 using System.IO;
 
 namespace MoreConvenientJiraSvn.BackgroundTask;
 
-public class CheckSqlHostedService: TimedHostedService
+public class CheckSqlHostedService : TimedHostedService
 {
     private readonly IRepository _repository;
     private readonly IPlSqlCheckPipeline _plSqlCheckPipeline;
@@ -16,7 +15,7 @@ public class CheckSqlHostedService: TimedHostedService
     private readonly LogService _logService;
 
     public CheckSqlHostedService(IRepository repository, IPlSqlCheckPipeline plSqlCheckPipeline, LogService logService, SettingService settingService)
-    : base(new TimeSpan(9, 30, 0), TimeSpan.FromMinutes(5), 3)
+    : base(repository, new TimeSpan(9, 30, 0), TimeSpan.FromMinutes(5), 3)
     {
         _repository = repository;
         _plSqlCheckPipeline = plSqlCheckPipeline;
@@ -27,7 +26,7 @@ public class CheckSqlHostedService: TimedHostedService
         var config = _settingService.FindSetting<BackgroundTaskConfig>();
         if (config != null)
         {
-            base.RefreshExecuteConfig(config.ExecutionTime - DateTime.Today,
+            base.RefreshExecuteConfig(config.ExecutionTime - config.ExecutionTime.Date,
                 TimeSpan.FromMinutes(config.RetryIntervalMinutes),
                 config.MaxRetryCount);
         }
@@ -84,9 +83,9 @@ public class CheckSqlHostedService: TimedHostedService
                     {
                         Info = $"[{i.FilePath}]存在问题:{i.Message}",
                         Level = i.Level,
+                        LogId = taskLog.Id
                     }));
 
-                    taskLog.MessageIds = taskMessages.Select(m => m.Id);
                     taskLog.Summary = $"找到{fileInfos.Count}个Sql文件，检测完成，发现{sqlIssues.Count}个问题";
                     taskLog.Level = sqlIssues.Any(i => i.Level == InfoLevel.Error)
                                       ? InfoLevel.Error

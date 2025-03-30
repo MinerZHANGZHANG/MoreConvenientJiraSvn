@@ -15,7 +15,7 @@ public partial class Jira2LocalDirWindow : Window
     {
         InitializeComponent();
         this._viewModel = ViewModelsManager.GetViewModel<JiraIssueBrowseViewModel>();
-        
+
         this.DataContext = _viewModel;
         this.Loaded += Jira2LocalDirWindow_Loaded;
         this.Closed += Jira2LocalDirWindow_Closed;
@@ -31,7 +31,7 @@ public partial class Jira2LocalDirWindow : Window
         await this._viewModel.InitViewModelAsync();
     }
 
-    private void DataGrid_SelectionChanged(object sender,SelectionChangedEventArgs e)
+    private void DataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         this._viewModel.InvokeSelectedJiraIssueEvent(sender);
     }
@@ -43,14 +43,6 @@ public partial class Jira2LocalDirWindow : Window
 
     private void ListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (sender is ListBox listBox && listBox.DataContext is JiraField field)
-        {
-            // 清空已选值并添加新的选中项  
-            field.SelectedValues?.Clear();
-            foreach (var item in listBox.SelectedItems)
-            {
-                field.SelectedValues?.Add(item.ToString() ?? string.Empty);
-            }
-        }
+
     }
 }

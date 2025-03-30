@@ -12,20 +12,23 @@
     WindowStartupLocation="CenterScreen"
     WindowStyle="ThreeDBorderWindow"
     mc:Ignorable="d">
-    <StackPanel>
-        <TabControl materialDesign:ColorZoneAssist.Mode="PrimaryLight" Style="{StaticResource MaterialDesignFilledTabControl}">
-            <TabItem Header="首页">
-                <Frame NavigationUIVisibility="Hidden" Source="/Views/Pages/MainPage.xaml" />
-            </TabItem>
-            <TabItem Header="Jira设置">
-                <Frame NavigationUIVisibility="Hidden" Source="/Views/Pages/JiraSettingPage.xaml" />
-            </TabItem>
-            <TabItem Header="Svn设置">
-                <Frame NavigationUIVisibility="Hidden" Source="/Views/Pages/SvnSettingPage.xaml" />
-            </TabItem>
-            <TabItem Header="定时任务设置">
-                <Frame NavigationUIVisibility="Hidden" Source="/Views/Pages/HostedServiceSettingPage.xaml" />
-            </TabItem>
-        </TabControl>
-    </StackPanel>
+    <materialDesign:DialogHost>
+        <StackPanel>
+            <TabControl materialDesign:ColorZoneAssist.Mode="PrimaryLight" Style="{StaticResource MaterialDesignFilledTabControl}">
+                <TabItem Header="首页">
+                    <Frame NavigationUIVisibility="Hidden" Source="/Views/Pages/MainPage.xaml" />
+                </TabItem>
+                <TabItem Header="Jira设置">
+                    <Frame NavigationUIVisibility="Hidden" Source="/Views/Pages/JiraSettingPage.xaml" />
+                </TabItem>
+                <TabItem Header="Svn设置">
+                    <Frame NavigationUIVisibility="Hidden" Source="/Views/Pages/SvnSettingPage.xaml" />
+                </TabItem>
+                <TabItem Header="定时任务设置">
+                    <Frame NavigationUIVisibility="Hidden" Source="/Views/Pages/HostedServiceSettingPage.xaml" />
+                </TabItem>
+            </TabControl>
+        </StackPanel>
+    </materialDesign:DialogHost>
+
 </Window>

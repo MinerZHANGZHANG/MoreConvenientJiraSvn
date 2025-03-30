@@ -1,6 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using System.Collections.ObjectModel;
 
 namespace MoreConvenientJiraSvn.App.ViewModels;
 
@@ -20,7 +19,7 @@ public partial class GetPluginControlViewModel : ObservableObject
     //[ObservableProperty]
     //public ObservableCollection<>? _currentPagePlugins;
 
-    public int TotalPages => (int)Math.Ceiling((double)( 0) / PageSize);
+    public int TotalPages => (int)Math.Ceiling((double)(0) / PageSize);
 
     public GetPluginControlViewModel()
     {

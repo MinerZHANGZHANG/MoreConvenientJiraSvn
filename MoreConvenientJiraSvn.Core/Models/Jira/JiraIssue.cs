@@ -125,10 +125,20 @@ public record JiraIssue
     [IssueJsonMapping("customfield_13602", "name")]
     public List<string> MergedVersions { get; set; } = [];
 
-    #endregion
+    [IssueJsonMapping("customfield_14216")]
+    public string TestPlatformUrl { get; set; } = string.Empty;
 
     #endregion
 
+    #endregion
+
+    #region jira JSQL
+
+    // use the "subtasks" node instead
+    public string ChildrenIssuesJql => $"parent={IssueKey}";
+    public string ChildrenIssuesLimitFieldsJql => $"parent={IssueKey}&fields=key,summary,status";
+
+    #endregion
 
 
 }

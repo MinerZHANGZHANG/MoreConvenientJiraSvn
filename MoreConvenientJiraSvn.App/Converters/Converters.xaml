@@ -1,0 +1,9 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:convert="clr-namespace:MoreConvenientJiraSvn.App.Converters">
+    <convert:EnumDescriptionConverter x:Key="EnumDescriptionConverter" />
+    <convert:EnumToVisibilityConverter x:Key="EnumToVisibilityConverter" />
+    <convert:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
+    <convert:JiraQueryTypeToStringConverter x:Key="JiraQueryTypeToStringConverter" />
+</ResourceDictionary>

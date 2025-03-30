@@ -15,7 +15,7 @@ public class PlSqlCheckPipeline : IPlSqlCheckPipeline
     private static readonly string[] stopwords = ["set feedback off", "set define off"];
     private static readonly string separator = Environment.NewLine;
 
-    private readonly string? fileFullName;
+    private readonly string fileFullName;
     private string? fileContent;
     private PlSqlParser.Sql_scriptContext? statement;
     private AntlrInputStream? inputStream;
@@ -25,7 +25,7 @@ public class PlSqlCheckPipeline : IPlSqlCheckPipeline
     
     public PlSqlCheckPipeline()
     {
-
+        fileFullName = string.Empty;
     }
 
     public PlSqlCheckPipeline(string fileFullName)

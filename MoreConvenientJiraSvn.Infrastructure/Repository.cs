@@ -1,5 +1,6 @@
 ﻿using LiteDB;
 using MoreConvenientJiraSvn.Core.Interfaces;
+using System.Linq.Expressions;
 
 namespace MoreConvenientJiraSvn.Infrastructure;
 
@@ -28,8 +29,7 @@ public class Repository(LiteDatabase db) : IRepository
     public int Upsert<T>(IEnumerable<T> objs) where T : new()
     {
         var collection = _db.GetCollection<T>();
-        collection.DeleteAll();
-        return collection.Insert(objs);
+        return collection.Upsert(objs);
     }
 
     public IEnumerable<T> FindAll<T>() where T : new()
@@ -44,9 +44,21 @@ public class Repository(LiteDatabase db) : IRepository
         return result ?? [];
     }
 
+    public IEnumerable<T> Find<T>(Expression<Func<T, bool>> predicate) where T : new()
+    {
+        var result = _db.GetCollection<T>().Find(predicate);
+        return result ?? [];
+    }
+
     public T? FindOne<T>(BsonExpression expression) where T : new()
     {
         var result = _db.GetCollection<T>().FindOne(expression);
+        return result;
+    }
+
+    public T? FindOne<T>(Expression<Func<T, bool>> predicate) where T : new()
+    {
+        var result = _db.GetCollection<T>().FindOne(predicate);
         return result;
     }
 

@@ -1,9 +1,6 @@
 ﻿using LiteDB;
 using MoreConvenientJiraSvn.Core.Interfaces;
 using MoreConvenientJiraSvn.Core.Models;
-using MoreConvenientJiraSvn.Service;
-using System.Net.Http.Headers;
-using System.Text.Json;
 
 namespace MoreConvenientJiraSvn.Service
 {
@@ -11,6 +8,7 @@ namespace MoreConvenientJiraSvn.Service
     {
         private readonly IRepository _repository;
         private readonly IJiraClient _jiraClient;
+        private readonly IHtmlConvert _htmlConvert;
 
         private readonly LogService _logService;
         private readonly SettingService _settingService;
@@ -18,10 +16,11 @@ namespace MoreConvenientJiraSvn.Service
         private JiraConfig _jiraConfig;
         public JiraConfig JiraConfig => _jiraConfig;
 
-        public JiraService(IRepository repository, IJiraClient jiraClient, SettingService settingService, LogService logService)
+        public JiraService(IRepository repository, IJiraClient jiraClient, IHtmlConvert htmlConvert, SettingService settingService, LogService logService)
         {
             _repository = repository;
             _jiraClient = jiraClient;
+            _htmlConvert = htmlConvert;
 
             _settingService = settingService;
             _logService = logService;
@@ -43,6 +42,7 @@ namespace MoreConvenientJiraSvn.Service
             }
             catch (Exception ex)
             {
+                _logService.Debug($"Get favourite filter failed! \n\r {ex.Message}");
             }
 
             return result;
@@ -61,7 +61,7 @@ namespace MoreConvenientJiraSvn.Service
 
         public async Task<List<JiraIssue>> GetIssuesByFilterAsync(JiraIssueFilter jiraFilter, int maxRequestCount = 200)
         {
-            List<JiraIssue> issues = [];
+            List<JiraIssue> issueInfos = [];
             int start = 0;
             int total = 1;
             int requestCount = 0;
@@ -79,10 +79,10 @@ namespace MoreConvenientJiraSvn.Service
                 start = issuePageInfo.StartAt + issuePageInfo.MaxResults;
                 total = issuePageInfo.Total;
 
-                issues.AddRange(issuePageInfo.IssueInfos);
+                issueInfos.AddRange(issuePageInfo.IssueInfos);
             }
 
-            return issues;
+            return issueInfos;
         }
 
         public async Task<List<IssueDiff>> GetIssuesDiffByFilterAsync(JiraIssueFilter jiraFilter, int maxRequestCount = 200)
@@ -109,6 +109,43 @@ namespace MoreConvenientJiraSvn.Service
                 return filters.Where(f => backgroundTaskConfig.CheckJiraFliterNames.Contains(f.Name));
             }
             return [];
+        }
+
+        public async Task<List<JiraIssue>> GetIssuesByJqlAsync(string jql, int maxRequestCount = 200, CancellationToken cancellationToken = default)
+        {
+            List<JiraIssue> issues = [];
+            int start = 0;
+            int total = 1;
+            int requestCount = 0;
+
+            while (start < total)
+            {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    break;
+                }
+
+                if (requestCount++ > maxRequestCount)
+                {
+                    break;
+                }
+
+                _logService.Debug($"{nameof(GetIssuesByJqlAsync)} [{jql}&startAt={start}]");
+                try
+                {
+                    var issuePageInfo = await _jiraClient.GetIssuesAsyncByJql(jql, start, cancellationToken);
+                    start = issuePageInfo.StartAt + issuePageInfo.MaxResults;
+                    total = issuePageInfo.Total;
+
+                    issues.AddRange(issuePageInfo.IssueInfos);
+                }
+                catch (TaskCanceledException)
+                {
+                    break;
+                }
+            }
+
+            return issues;
         }
 
         private async void RefreshJiraCilent_OnConfigChanged(object? sender, ConfigChangedArgs e)
@@ -146,7 +183,7 @@ namespace MoreConvenientJiraSvn.Service
             {
                 return [];
             }
-            var relations = _repository.Find<JiraSvnPathRelation>(Query.In(nameof(JiraSvnPathRelation.Version), IssueInfo.FixVersions.Select(v => new BsonValue(v))));
+            var relations = _repository.Find<JiraSvnPathRelation>(r => IssueInfo.FixVersions.Contains(r.Version));
             var svnPaths = _repository.Find<SvnPath>(Query.In(nameof(SvnPath.Path), relations.Select(v => new BsonValue(v.SvnPath))));
 
             return svnPaths;
@@ -156,144 +193,33 @@ namespace MoreConvenientJiraSvn.Service
 
         #region upload
 
-        //private List<JiraOperation> InitializeOperations()
-        //{
-        //    #region options
+        public async Task<List<JiraTransition>> GetTransitionsByIssueId(string issueId)
+        {
+            List<JiraTransition> results = await _jiraClient.GetTransitionsByIssueId(issueId);
 
-        //    FieldOption[] uploadStateOpions = [
-        //        new (){ OptionId = "-1", OptionName = "无" },
-        //        new (){ OptionId = "17113", OptionName = "文档" },
-        //        new (){ OptionId = "17114", OptionName = "脚本" },
-        //        new (){ OptionId = "17117", OptionName = "脚本（包含视图、报表）" },
-        //        new (){ OptionId = "17115", OptionName = "文档&脚本" },
-        //        new (){ OptionId = "17118", OptionName = "文档&脚本（包含视图、报表）" },
-        //        new (){ OptionId = "17116", OptionName = "不提交任何内容" },
-        //        ];
+            return results;
+        }
 
-        //    #endregion
+        public async Task<(List<JiraField>, List<JiraField>)> GetFieldInfoFromTransitionAndIssueId(string issueId, JiraTransition jiraTransition, CancellationToken cancellationToken)
+        {
+            var formString = await _jiraClient.GetTransitionFormAsync(issueId, jiraTransition.TransitionId, cancellationToken);
 
-        //    #region fields
+            var jiraFields = await _htmlConvert.ConvertHtmlToJiraFieldsAsync(formString, cancellationToken);
+            var backupFields = await _htmlConvert.ConvertHtmlToJiraFieldsAsync(formString, cancellationToken);
 
-        //    var summaryField = new JiraFieldModel
-        //    {
-        //        FieldName = "概要",
-        //        FieldId = "summary",
-        //        Type = FieldType.TextBox,
+            return (jiraFields, backupFields);
+        }
 
-        //        FieldValue = string.Empty,
-        //    };
+        public async Task<string> TryPostTransitionsAsync(string issueKey, string transitionId, IEnumerable<JiraField> jiraFields, CancellationToken cancellationToken = default)
+        {
+            _logService.Debug($"Change issue[{issueKey}] to [{transitionId}] (fields count:{jiraFields.Count()})");
+            return await _jiraClient.TryPostTransitionsAsync(issueKey, transitionId, jiraFields, cancellationToken);
+        }
 
-        //    var componentsField = new JiraFieldModel
-        //    {
-        //        FieldName = "模块",
-        //        FieldId = "components",
-        //        Type = FieldType.ListBox,
-
-        //        Options = [],
-        //        SelectedValues = []
-        //    };
-
-        //    var developDescriptionField = new JiraFieldModel
-        //    {
-        //        FieldName = "开发说明（原因分析/解决方案等）",
-        //        FieldId = "customfield_10910",
-        //        Type = FieldType.BigTextBox,
-
-        //        FieldValue = string.Empty,
-        //    };
-
-        //    var testSuggestionField = new JiraFieldModel
-        //    {
-        //        FieldName = "测试建议",
-        //        FieldId = "customfield_11700",
-        //        Type = FieldType.BigTextBox,
-
-        //        FieldValue = string.Empty,
-        //    };
-
-        //    var uploadStateField = new JiraFieldModel
-        //    {
-        //        FieldName = "文档/脚本是否提交★",
-        //        FieldId = "customfield_11003",
-        //        Type = FieldType.ComboBox,
-
-        //        Options = uploadStateOpions,
-        //        SelectedValues = []
-        //    };
-
-        //    var descriptionField = new JiraFieldModel
-        //    {
-        //        FieldName = "描述",
-        //        FieldId = "description",
-        //        Type = FieldType.BigTextBox,
-
-        //        FieldValue = string.Empty,
-        //    };
-
-        //    var expectedHangOverDateField = new JiraFieldModel
-        //    {
-        //        FieldName = "预计移交日期",
-        //        FieldId = "customfield_13202",
-        //        Type = FieldType.DatePicker,
-
-        //        FieldValue = string.Empty,
-        //    };
-
-        //    #endregion
-
-        //    #region operations
-        //    var operations = new List<JiraOperation>();
-
-        //    var updateInfoOperation = new JiraOperation
-        //    {
-        //        OperationName = "更新开发要素",
-        //        OperationId = "821"
-        //    };
-        //    updateInfoOperation.Fields.Add(summaryField);
-        //    updateInfoOperation.Fields.Add(componentsField);
-        //    updateInfoOperation.Fields.Add(developDescriptionField);
-        //    updateInfoOperation.Fields.Add(testSuggestionField);
-        //    updateInfoOperation.Fields.Add(uploadStateField);
-        //    updateInfoOperation.Fields.Add(descriptionField);
-        //    updateInfoOperation.Fields.Add(expectedHangOverDateField);
-
-        //    #endregion
-
-        //    operations.Add(updateInfoOperation);
-
-        //    return operations;
-        //}
-
-        //public async Task<List<Transition>> GetTransitionsByIssueId(string issueId)
-        //{
-        //    List<Transition> results = [];
-        //    if (_httpClient == null || string.IsNullOrEmpty(issueId))
-        //    {
-        //        return results;
-        //    }
-        //    _logService.DebugMessage($"{nameof(GetIssueAsync)} [rest/api/2/issue/{issueId}/transitions]");
-        //    var response = await _httpClient.GetAsync($"rest/api/2/issue/{issueId}/transitions");
-        //    if (!response.IsSuccessStatusCode)
-        //    {
-        //        return results;
-        //    }
-        //    var jsonResponse = await response.Content.ReadAsStringAsync();
-
-        //    using JsonDocument doc = JsonDocument.Parse(jsonResponse);
-
-        //    var transitionsElement = doc.RootElement.GetProperty("transitions");
-        //    foreach (var transition in transitionsElement.EnumerateArray())
-        //    {
-        //        Transition result = new()
-        //        {
-        //            TransitionId = transition.GetProperty("id").GetString() ?? string.Empty,
-        //            TransitionName = transition.GetProperty("name").GetString() ?? string.Empty,
-        //        };
-        //        results.Add(result);
-        //    }
-
-        //    return results;
-        //}
+        public async Task<int> DownloadIssueAttachmentAsync(string issueKey, string directoryPath, CancellationToken cancellationToken = default)
+        {
+            return await _jiraClient.DownloadIssueAttachmentAsync(issueKey, directoryPath, cancellationToken);
+        }
 
         #endregion
     }

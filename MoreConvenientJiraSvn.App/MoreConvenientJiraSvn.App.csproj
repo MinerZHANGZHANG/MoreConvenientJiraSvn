@@ -7,19 +7,23 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<UseWPF>true</UseWPF>
 		<ApplicationIcon>Resources\Images\Logo.ico</ApplicationIcon>
-		<Version>0.0.1</Version>
+		<Version>1.0.0</Version>
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="artifacts\**" />
 	  <Compile Remove="Views\Components\**" />
+	  <EmbeddedResource Remove="artifacts\**" />
 	  <EmbeddedResource Remove="Views\Components\**" />
+	  <None Remove="artifacts\**" />
 	  <None Remove="Views\Components\**" />
+	  <Page Remove="artifacts\**" />
 	  <Page Remove="Views\Components\**" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<None Remove="Resources\Images\Logo.png" />
-		<None Remove="Resources\Screens\SplashScreen.png" />
+		<None Remove="Resources\Screens\TempSplashScreen.png" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -46,6 +50,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <SplashScreen Include="Resources\Screens\TempSplashScreen.png" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<Compile Update="Properties\Settings.Designer.cs">
 			<DesignTimeSharedInput>True</DesignTimeSharedInput>
 			<AutoGen>True</AutoGen>
@@ -64,10 +72,6 @@
 			<Generator>SettingsSingleFileGenerator</Generator>
 			<LastGenOutput>Settings.Designer.cs</LastGenOutput>
 		</None>
-	</ItemGroup>
-
-	<ItemGroup>
-		<SplashScreen Include="Resources\Screens\SplashScreen.png" />
 	</ItemGroup>
 
 	<ItemGroup>

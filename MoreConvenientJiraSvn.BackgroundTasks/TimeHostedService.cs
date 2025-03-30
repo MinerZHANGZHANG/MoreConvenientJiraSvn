@@ -1,10 +1,14 @@
 ﻿using Microsoft.Extensions.Hosting;
+using MoreConvenientJiraSvn.Core.Interfaces;
+using MoreConvenientJiraSvn.Core.Models;
 using Timer = System.Threading.Timer;
 
 namespace MoreConvenientJiraSvn.BackgroundTask;
 
-public abstract class TimedHostedService(TimeSpan executionTime, TimeSpan retryInterval, int maxTryCount) : IHostedService, IDisposable
+public abstract class TimedHostedService(IRepository repository, TimeSpan executionTime, TimeSpan retryInterval, int maxTryCount) : IHostedService, IDisposable
 {
+    private readonly IRepository _repository = repository;
+
     private Timer? _executionTimer;
     private TimeSpan _executionTime = executionTime;
 
@@ -16,7 +20,6 @@ public abstract class TimedHostedService(TimeSpan executionTime, TimeSpan retryI
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         var now = DateTime.Now;
-
         var nextExecution = GetNextExecutionTimeWhenStart(now);
         if (now >= nextExecution)
         {
@@ -45,23 +48,18 @@ public abstract class TimedHostedService(TimeSpan executionTime, TimeSpan retryI
 
     private DateTime GetNextExecutionTimeWhenStart(DateTime now)
     {
-        if (now >= DateTime.Today.Add(_executionTime))
+        var todayExecutionTime = DateTime.Today.Add(_executionTime);
+        if (now >= todayExecutionTime)
         {
-            // query log to decide execute?
-            //var successLogs = _repository.SelectByExpression<HostTaskLog>(Query.And(
-            //     Query.EQ(nameof(HostTaskLog.TaskServiceName), nameof(this.GetType().Name)),
-            //     Query.EQ(nameof(HostTaskLog.IsSucccess), true)
-            //     ));
-            //var lastestLog = successLogs.OrderByDescending(log => log.DateTime)
-            //    .FirstOrDefault();
-
-            //if (lastestLog != null && lastestLog.DateTime > DateTime.Today.Add(_executionTime))
-            //{
-            //    hostTaskLog.IsSucccess = false;
-            //    hostTaskLog.Message = $"今天已经执行过一次了，时间：{lastestLog.DateTime}";
-            //}
-
-            return now;
+            var lastLog = _repository.Find<BackgroundTaskLog>(l => l.StartTime >= todayExecutionTime);
+            if (lastLog.Any())
+            {
+                return GetNextExecutionTime(now);
+            }
+            else
+            {
+                return now;
+            }
         }
         else
         {

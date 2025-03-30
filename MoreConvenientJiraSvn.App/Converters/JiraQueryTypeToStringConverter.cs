@@ -1,5 +1,4 @@
-﻿using MoreConvenientJiraSvn.App.ViewModels;
-using MoreConvenientJiraSvn.Core.Enums;
+﻿using MoreConvenientJiraSvn.Core.Enums;
 using MoreConvenientJiraSvn.Core.Utils;
 using System.Globalization;
 using System.Windows.Data;
