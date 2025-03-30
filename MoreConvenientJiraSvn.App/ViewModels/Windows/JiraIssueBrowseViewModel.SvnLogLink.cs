@@ -70,10 +70,22 @@ public partial class JiraIssueBrowseViewModel
     {
         if (SelectedJiraIssue == null || SelectedSvnPath == null)
         {
+            SelectedIssueSvnLogs = []; 
             return;
         }
 
         SelectedIssueSvnLogs = [.. _jiraService.GetSvnLogByJiraIdLocal(SelectedJiraIssue.IssueKey, SelectedSvnPath.Path).OrderByDescending(log => log.DateTime)];
+
+        if (SelectedIssueSvnLogs.Any())
+        {
+            BeginDate = SelectedIssueSvnLogs.Min(l => l.DateTime);
+            EndDate = SelectedIssueSvnLogs.Max(l => l.DateTime);
+        }
+        else
+        {
+            BeginDate = DateTime.Today;
+            EndDate = DateTime.Today;
+        }
     }
 
     [RelayCommand(CanExecute = nameof(CanQuerySvnLog))]
@@ -94,7 +106,10 @@ public partial class JiraIssueBrowseViewModel
                                                             1000,
                                                             SelectedSvnPath.IsNeedExtractJiraId,
                                                             _cancellationTokenSource.Token);
-            SelectedIssueSvnLogs = [.. SelectedIssueSvnLogs.UnionBy(svnLogs, l => l.Revision)];
+            _repository.Upsert(svnLogs.AsEnumerable());
+            SelectedIssueSvnLogs = [.. SelectedIssueSvnLogs.UnionBy(
+                svnLogs.Where(log => log.IssueJiraId == SelectedJiraIssue.IssueId || log.SubIssueJiraId == SelectedJiraIssue.IssueId),
+                l => l.Revision)];
 
             MessageQueue.Enqueue($"刷新Log成功，查找到{svnLogs.Count}条数据");
         }

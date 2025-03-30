@@ -53,9 +53,9 @@
             <TextBlock MinWidth="120" Text="{Binding Name}" />
             <ComboBox
                 MinWidth="120"
-                DisplayMemberPath="OptionValue"
+                DisplayMemberPath="Name"
                 ItemsSource="{Binding Options}"
-                SelectedItem="{Binding Value}" />
+                SelectedItem="{Binding SelectedOption,UpdateSourceTrigger=PropertyChanged}" />
         </StackPanel>
     </DataTemplate>
     <DataTemplate x:Key="JiraDateTemplate" DataType="{x:Type model:JiraDateField}">

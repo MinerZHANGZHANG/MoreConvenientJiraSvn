@@ -31,10 +31,10 @@ public partial class SvnJiraLinkViewModel(SvnService svnService, IRepository rep
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(PageTipText))]
     [NotifyPropertyChangedFor(nameof(SelectPathTipText))]
-    [NotifyPropertyChangedFor(nameof(SelectPathStateText))]
     private SvnPath? _selectedPath;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(SelectPathStateText))]
     private ObservableCollection<SvnLog> _selectedPathSvnLogs = [];
 
     [ObservableProperty]
@@ -106,8 +106,14 @@ public partial class SvnJiraLinkViewModel(SvnService svnService, IRepository rep
     public void RefreshSvnLog(SvnPath svnPath)
     {
         SelectedPathSvnLogs = [.. _repository.Find<SvnLog>(Query.EQ(nameof(SvnLog.SvnPath), svnPath.Path)).OrderByDescending(s => s.DateTime)];
-        SelectPathRelation = _repository.FindOne<JiraSvnPathRelation>(Query.EQ(nameof(JiraSvnPathRelation.SvnPath), svnPath.Path)) ?? new();
+        SelectPathRelation = _repository.FindOne<JiraSvnPathRelation>(Query.EQ(nameof(JiraSvnPathRelation.SvnPath), svnPath.Path))
+            ?? new() { SvnPath = svnPath.Path };
 
+        RefreshGrid();
+    }
+
+    private void RefreshGrid()
+    {
         _svnLogPaginator = new PaginationHelper<SvnLog>(SelectedPathSvnLogs, _pageSize);
         CurrentPageSvnLogs = _svnLogPaginator.GetCurrentItems();
 
@@ -131,9 +137,9 @@ public partial class SvnJiraLinkViewModel(SvnService svnService, IRepository rep
         {
             MessageBox.Show("请选择大于1天的时间范围");
         }
-        if (queryRangeSpan > TimeSpan.FromDays(180))
+        if (queryRangeSpan > TimeSpan.FromDays(365))
         {
-            MessageBox.Show("请选择小于180天的时间范围进行查询");
+            MessageBox.Show("请选择小于365天的时间范围进行查询");
             return;
         }
 
@@ -143,8 +149,7 @@ public partial class SvnJiraLinkViewModel(SvnService svnService, IRepository rep
             _cancellationTokenSource = new();
             await Task.Run(async () =>
             {
-                bool isHaveJiraId = SelectedPath.SvnPathType == SvnPathType.Code || SelectedPath.SvnPathType == SvnPathType.Document;
-                querySvnLog = await _svnService.GetSvnLogsAsync(SelectedPath.Path, BeginQueryDateTime, EndQueryDateTime, _singleQueryMaxLogCount, isHaveJiraId, _cancellationTokenSource.Token);
+                querySvnLog = await _svnService.GetSvnLogsAsync(SelectedPath.Path, BeginQueryDateTime, EndQueryDateTime, _singleQueryMaxLogCount, SelectedPath.IsNeedExtractJiraId, _cancellationTokenSource.Token);
             });
             if (querySvnLog != null && querySvnLog.Any())
             {
@@ -152,6 +157,8 @@ public partial class SvnJiraLinkViewModel(SvnService svnService, IRepository rep
                 SelectedPathSvnLogs = [.. SelectedPathSvnLogs.Union(querySvnLog)];
 
                 ShowMessageSnack($"查询成功，获取数据量{querySvnLog.Count()}");
+
+                RefreshGrid();
             }
             else
             {

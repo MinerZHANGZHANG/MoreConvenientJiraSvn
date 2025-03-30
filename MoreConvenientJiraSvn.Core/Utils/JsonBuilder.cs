@@ -33,7 +33,7 @@ public static class JsonBuilder
             {
                 fieldsNode[selectField.Id] = new JsonObject()
                 {
-                    ["name"] = selectField.Options.FirstOrDefault(o => o.IsSelected)?.Name ?? string.Empty
+                    ["name"] = selectField.SelectedOption?.Name ?? string.Empty
                 };
             }
             else if (field is JiraMultiSelectField multipleSelectField)

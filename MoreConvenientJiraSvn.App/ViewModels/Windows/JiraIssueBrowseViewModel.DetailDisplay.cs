@@ -14,6 +14,8 @@ public partial class JiraIssueBrowseViewModel
 
     public bool HasTestCases => !string.IsNullOrEmpty(SelectedJiraIssue?.TestPlatformUrl);
 
+    private CancellationTokenSource? _loadChildIssueCancellationTokenSource;
+
     private void InitJiraIssueDetailDisplay()
     {
         _selectedIssueChanged += JiraIssueBrowseViewModel_selectedIssueChanged;
@@ -21,12 +23,19 @@ public partial class JiraIssueBrowseViewModel
 
     private async void JiraIssueBrowseViewModel_selectedIssueChanged(object? sender, JiraIssue e)
     {
+        _loadChildIssueCancellationTokenSource?.Cancel();
+
         if (string.IsNullOrEmpty(SelectedJiraIssue?.ChildrenIssuesJql))
         {
             return;
         }
 
-        ChildJiraIssues = await _jiraService.GetIssuesByJqlAsync(SelectedJiraIssue.ChildrenIssuesJql);
+        _loadChildIssueCancellationTokenSource = new();
+        var childIssues = await _jiraService.GetIssuesByJqlAsync(SelectedJiraIssue.ChildrenIssuesJql, 50, _loadChildIssueCancellationTokenSource.Token);
+        if (!_loadChildIssueCancellationTokenSource.IsCancellationRequested)
+        {
+            ChildJiraIssues = childIssues;
+        }
     }
 
     [RelayCommand(CanExecute = nameof(HasIssueBeSelected))]

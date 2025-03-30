@@ -275,6 +275,7 @@ namespace MoreConvenientJiraSvn.Test
 </div>";
 
             var result = await htmlConvert.ConvertHtmlToJiraFieldsAsync(htmlString, CancellationToken.None);
+            var textResult = JsonBuilder.TryConvertJiraFieldsToJson("001", result, out var jsonResult);
 
             Assert.Pass();
         }

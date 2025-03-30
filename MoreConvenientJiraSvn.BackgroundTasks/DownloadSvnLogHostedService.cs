@@ -41,9 +41,10 @@ public class DownloadSvnLogHostedService : TimedHostedService
             IsSucccess = false,
         };
         List<BackgroundTaskMessage> taskMessages = [];
-
+        var config = _settingService.FindSetting<BackgroundTaskConfig>();
+        var prevDays = config?.SvnLogDownloadPrevDays ?? 1;
         var needAutoRefreshSvnPaths = _settingService.FindSetting<BackgroundTaskConfig>()?.CheckSvnPaths ?? [];
-        var svnPaths = _svnService.SvnPaths.Where(p => needAutoRefreshSvnPaths.Contains(p.Path));
+        var svnPaths = _svnService.SvnPaths.Where(p => needAutoRefreshSvnPaths.Contains(p.PathName));
         if (svnPaths.Any())
         {
             // todo:add default date to svn config / use version instead
@@ -55,7 +56,7 @@ public class DownloadSvnLogHostedService : TimedHostedService
                 var latestLog = _repository.Find<SvnLog>(Query.EQ(nameof(SvnLog.SvnPath), path.Path))
                     .OrderByDescending(log => log.DateTime)
                     .FirstOrDefault();
-                var pathBeginTime = latestLog != null ? latestLog.DateTime : DateTime.Today;
+                var pathBeginTime = latestLog != null ? latestLog.DateTime : DateTime.Today.AddDays(-prevDays);
                 var pathEndTime = DateTime.Today.AddDays(1);
 
                 try

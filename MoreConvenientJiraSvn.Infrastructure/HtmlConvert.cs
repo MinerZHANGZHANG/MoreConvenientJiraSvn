@@ -104,7 +104,8 @@ public class HtmlConvert : IHtmlConvert
                             IsRequired = div.QuerySelector("span.icon-required") != null,
                             Description = div.QuerySelector("div.description")?.TextContent,
 
-                            Options = jiraFieldOptions
+                            Options = jiraFieldOptions,
+                            SelectedOption = jiraFieldOptions?.FirstOrDefault(o => o.IsSelected)
                         };
                     }
                     else

@@ -1,5 +1,7 @@
 ﻿
 
+using System.ComponentModel;
+
 namespace MoreConvenientJiraSvn.Core.Models;
 
 public abstract class JiraField
@@ -13,26 +15,42 @@ public abstract class JiraField
     public abstract bool ValueIsEquals(JiraField jiraField);
 }
 
-public class JiraSelectField : JiraField
+public class JiraSelectField : JiraField, INotifyPropertyChanged
 {
     public List<JiraFieldOption> Options { get; set; } = [];
 
+    public JiraFieldOption? SelectedOption 
+    { 
+        get
+        {
+            return _selectedOption;
+        }
+        set
+        {
+            if (_selectedOption != value)
+            {
+                _selectedOption = value;
+                OnPropertyChanged(nameof(SelectedOption));
+            }
+        }
+    }
+    private JiraFieldOption? _selectedOption;
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
     public override bool ValueIsEquals(JiraField jiraField)
     {
-        if(jiraField is JiraSelectField selectField)
+        if (jiraField is JiraSelectField selectField)
         {
-            foreach (var option in Options)
-            {
-                var anotherOption = selectField.Options.First(o => o.OptionId == option.OptionId);
-                if (anotherOption.IsSelected != option.IsSelected)
-                {
-                    return false;
-                }
-            }
-            return true;
+            return selectField.SelectedOption?.OptionId == this.SelectedOption?.OptionId;
         }
 
         return false;
+    }
+
+    protected void OnPropertyChanged(string propertyName)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }
 

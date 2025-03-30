@@ -58,6 +58,15 @@ public partial class JiraIssueBrowseViewModel
 
         var jiraFields = await _jiraService.GetFieldInfoFromTransitionAndIssueId(SelectedJiraIssue.IssueId, SelectedTransition, _transitionCancellationTokenSource.Token);
         JiraFields = [.. jiraFields.Item1];
+
+        // TODO: Fix the selected bug
+        foreach (var item in JiraFields)
+        {
+            if(item is JiraSelectField field)
+            {
+                field.SelectedOption = null ;
+            }
+        }
         _originJiraFields = jiraFields.Item2;
     }
 
@@ -72,6 +81,7 @@ public partial class JiraIssueBrowseViewModel
         if (!Settings.Default.IsEnableWriteOperation)
         {
             MessageBox.Show($"未启用Jira提交功能，若需要启用写操作请在【首页】-【应用设置】中打开开关.");
+            return;
         }
 
         foreach (var oldField in _originJiraFields)

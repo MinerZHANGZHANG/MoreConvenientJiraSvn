@@ -112,8 +112,7 @@ public class SubversionClient : ISubversionClient
 
             if (item.ChangedPaths != null && item.ChangedPaths.Count > 0)
             {
-                svnLog.ChangedUrls = item.ChangedPaths.Select(s => s.Path)
-                                                .ToList();
+                svnLog.ChangedUrls = [.. item.ChangedPaths.Select(s => s.Path)];
                 svnLog.Operation = string.Join(',', item.ChangedPaths.Select(s => s.Action.ToString())
                                                               .Distinct());
             }
@@ -143,18 +142,18 @@ public class SubversionClient : ISubversionClient
         string issueId = string.Empty;
         string subIssueId = string.Empty;
 
-        string pattern = @".*?需求编号:(\w+)";
-        Match match = Regex.Match(input, pattern);
-        if (match.Success)
+        var pattern = @"(?:需求编号[:：]\s*([^\n\r]+)|缺陷编号[:：]\s*([^\n\r]+)(?=\s*[\n\r]))";
+        var matches = Regex.Matches(input, pattern);
+        foreach (Match match in matches)
         {
-            issueId = match.Groups[1].Value;
-        }
-
-        pattern = @".*?缺陷编号:(\w+)";
-        match = Regex.Match(input, pattern);
-        if (match.Success)
-        {
-            subIssueId = match.Groups[1].Value;
+            if (match.Groups[1].Success)
+            {
+                issueId = match.Groups[1].Value.Trim();
+            }
+            if (match.Groups[2].Success)
+            {
+                subIssueId = match.Groups[2].Value.Trim();
+            }
         }
         return (issueId, subIssueId);
     }

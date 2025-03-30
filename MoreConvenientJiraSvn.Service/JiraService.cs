@@ -111,7 +111,7 @@ namespace MoreConvenientJiraSvn.Service
             return [];
         }
 
-        public async Task<List<JiraIssue>> GetIssuesByJqlAsync(string jql, int maxRequestCount = 200)
+        public async Task<List<JiraIssue>> GetIssuesByJqlAsync(string jql, int maxRequestCount = 200, CancellationToken cancellationToken = default)
         {
             List<JiraIssue> issues = [];
             int start = 0;
@@ -120,18 +120,29 @@ namespace MoreConvenientJiraSvn.Service
 
             while (start < total)
             {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    break;
+                }
+
                 if (requestCount++ > maxRequestCount)
                 {
                     break;
                 }
 
                 _logService.Debug($"{nameof(GetIssuesByJqlAsync)} [{jql}&startAt={start}]");
-                var issuePageInfo = await _jiraClient.GetIssuesAsyncByJql(jql, start);
+                try
+                {
+                    var issuePageInfo = await _jiraClient.GetIssuesAsyncByJql(jql, start, cancellationToken);
+                    start = issuePageInfo.StartAt + issuePageInfo.MaxResults;
+                    total = issuePageInfo.Total;
 
-                start = issuePageInfo.StartAt + issuePageInfo.MaxResults;
-                total = issuePageInfo.Total;
-
-                issues.AddRange(issuePageInfo.IssueInfos);
+                    issues.AddRange(issuePageInfo.IssueInfos);
+                }
+                catch (TaskCanceledException)
+                {
+                    break;
+                }
             }
 
             return issues;
@@ -172,7 +183,7 @@ namespace MoreConvenientJiraSvn.Service
             {
                 return [];
             }
-            var relations = _repository.Find<JiraSvnPathRelation>(Query.In(nameof(JiraSvnPathRelation.Version), IssueInfo.FixVersions.Select(v => new BsonValue(v))));
+            var relations = _repository.Find<JiraSvnPathRelation>(r => IssueInfo.FixVersions.Contains(r.Version));
             var svnPaths = _repository.Find<SvnPath>(Query.In(nameof(SvnPath.Path), relations.Select(v => new BsonValue(v.SvnPath))));
 
             return svnPaths;
@@ -201,154 +212,14 @@ namespace MoreConvenientJiraSvn.Service
 
         public async Task<string> TryPostTransitionsAsync(string issueKey, string transitionId, IEnumerable<JiraField> jiraFields, CancellationToken cancellationToken = default)
         {
-            return await _jiraClient.TryPostTransitionsAsync(issueKey, transitionId, jiraFields, cancellationToken); ;
+            _logService.Debug($"Change issue[{issueKey}] to [{transitionId}] (fields count:{jiraFields.Count()})");
+            return await _jiraClient.TryPostTransitionsAsync(issueKey, transitionId, jiraFields, cancellationToken);
         }
 
         public async Task<int> DownloadIssueAttachmentAsync(string issueKey, string directoryPath, CancellationToken cancellationToken = default)
         {
             return await _jiraClient.DownloadIssueAttachmentAsync(issueKey, directoryPath, cancellationToken);
         }
-
-
-
-        //private List<JiraOperation> InitializeOperations()
-        //{
-        //    #region options
-
-        //    FieldOption[] uploadStateOpions = [
-        //        new (){ OptionId = "-1", OptionValue = "无" },
-        //        new (){ OptionId = "17113", OptionValue = "文档" },
-        //        new (){ OptionId = "17114", OptionValue = "脚本" },
-        //        new (){ OptionId = "17117", OptionValue = "脚本（包含视图、报表）" },
-        //        new (){ OptionId = "17115", OptionValue = "文档&脚本" },
-        //        new (){ OptionId = "17118", OptionValue = "文档&脚本（包含视图、报表）" },
-        //        new (){ OptionId = "17116", OptionValue = "不提交任何内容" },
-        //        ];
-
-        //    #endregion
-
-        //    #region fields
-
-        //    var summaryField = new JiraFieldModel
-        //    {
-        //        Name = "概要",
-        //        Id = "summary",
-        //        Type = FieldType.TextBox,
-
-        //        Value = string.Empty,
-        //    };
-
-        //    var componentsField = new JiraFieldModel
-        //    {
-        //        Name = "模块",
-        //        Id = "components",
-        //        Type = FieldType.ListBox,
-
-        //        Options = [],
-        //        FieldValues = []
-        //    };
-
-        //    var developDescriptionField = new JiraFieldModel
-        //    {
-        //        Name = "开发说明（原因分析/解决方案等）",
-        //        Id = "customfield_10910",
-        //        Type = FieldType.BigTextBox,
-
-        //        Value = string.Empty,
-        //    };
-
-        //    var testSuggestionField = new JiraFieldModel
-        //    {
-        //        Name = "测试建议",
-        //        Id = "customfield_11700",
-        //        Type = FieldType.BigTextBox,
-
-        //        Value = string.Empty,
-        //    };
-
-        //    var uploadStateField = new JiraFieldModel
-        //    {
-        //        Name = "文档/脚本是否提交★",
-        //        Id = "customfield_11003",
-        //        Type = FieldType.ComboBox,
-
-        //        Options = uploadStateOpions,
-        //        FieldValues = []
-        //    };
-
-        //    var descriptionField = new JiraFieldModel
-        //    {
-        //        Name = "描述",
-        //        Id = "description",
-        //        Type = FieldType.BigTextBox,
-
-        //        Value = string.Empty,
-        //    };
-
-        //    var expectedHangOverDateField = new JiraFieldModel
-        //    {
-        //        Name = "预计移交日期",
-        //        Id = "customfield_13202",
-        //        Type = FieldType.DatePicker,
-
-        //        Value = string.Empty,
-        //    };
-
-        //    #endregion
-
-        //    #region operations
-        //    var operations = new List<JiraOperation>();
-
-        //    var updateInfoOperation = new JiraOperation
-        //    {
-        //        OperationName = "更新开发要素",
-        //        OperationId = "821"
-        //    };
-        //    updateInfoOperation.Fields.Add(summaryField);
-        //    updateInfoOperation.Fields.Add(componentsField);
-        //    updateInfoOperation.Fields.Add(developDescriptionField);
-        //    updateInfoOperation.Fields.Add(testSuggestionField);
-        //    updateInfoOperation.Fields.Add(uploadStateField);
-        //    updateInfoOperation.Fields.Add(descriptionField);
-        //    updateInfoOperation.Fields.Add(expectedHangOverDateField);
-
-        //    #endregion
-
-        //    operations.Add(updateInfoOperation);
-
-        //    return operations;
-        //}
-
-        //public async Task<List<Transition>> GetTransitionsByIssueId(string issueId)
-        //{
-        //    List<Transition> results = [];
-        //    if (_httpClient == null || string.IsNullOrEmpty(issueId))
-        //    {
-        //        return results;
-        //    }
-        //    _logService.DebugMessage($"{nameof(GetIssueAsync)} [rest/api/2/issue/{issueId}/transitions]");
-        //    var response = await _httpClient.GetAsync($"rest/api/2/issue/{issueId}/transitions");
-        //    if (!response.IsSuccessStatusCode)
-        //    {
-        //        return results;
-        //    }
-        //    var jsonResponse = await response.Content.ReadAsStringAsync();
-
-        //    using JsonDocument doc = JsonDocument.Parse(jsonResponse);
-
-        //    var transitionsElement = doc.RootElement.GetProperty("transitions");
-        //    foreach (var transition in transitionsElement.EnumerateArray())
-        //    {
-        //        Transition result = new()
-        //        {
-        //            TransitionId = transition.GetProperty("id").GetString() ?? string.Empty,
-        //            TransitionName = transition.GetProperty("name").GetString() ?? string.Empty,
-        //        };
-        //        results.Add(result);
-        //    }
-
-        //    return results;
-        //}
 
         #endregion
     }
