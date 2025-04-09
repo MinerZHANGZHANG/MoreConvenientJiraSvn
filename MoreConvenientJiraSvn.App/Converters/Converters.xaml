@@ -6,4 +6,5 @@
     <convert:EnumToVisibilityConverter x:Key="EnumToVisibilityConverter" />
     <convert:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
     <convert:JiraQueryTypeToStringConverter x:Key="JiraQueryTypeToStringConverter" />
+    <convert:LevelToColorConverter x:Key="LevelToColorConverter" />
 </ResourceDictionary>

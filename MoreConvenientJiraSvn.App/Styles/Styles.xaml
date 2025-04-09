@@ -55,7 +55,7 @@
                 MinWidth="120"
                 DisplayMemberPath="Name"
                 ItemsSource="{Binding Options}"
-                SelectedItem="{Binding SelectedOption,UpdateSourceTrigger=PropertyChanged}" />
+                SelectedItem="{Binding SelectedOption, UpdateSourceTrigger=PropertyChanged}" />
         </StackPanel>
     </DataTemplate>
     <DataTemplate x:Key="JiraDateTemplate" DataType="{x:Type model:JiraDateField}">
@@ -79,5 +79,56 @@
         JiraSelectTemplate="{StaticResource JiraSelectTemplate}"
         JiraTextTemplate="{StaticResource JiraTextTemplate}" />
 
+    <!--  Add Material Design styles for DataGrid  -->
+    <Style
+        x:Key="MaterialDesignDataGrid"
+        BasedOn="{StaticResource MaterialDesignDataGrid}"
+        TargetType="DataGrid">
+        <Setter Property="Margin" Value="8" />
+        <Setter Property="RowHeight" Value="40" />
+        <Setter Property="ColumnHeaderHeight" Value="48" />
+    </Style>
+
+    <!--  Add Material Design styles for DatePicker  -->
+    <Style
+        x:Key="MaterialDesignDatePicker"
+        BasedOn="{StaticResource MaterialDesignFloatingHintDatePicker}"
+        TargetType="DatePicker">
+        <Setter Property="Margin" Value="8" />
+    </Style>
+
+    <!--  Add Material Design styles for TextBox  -->
+    <Style
+        x:Key="MaterialDesignOutlinedTextBox"
+        BasedOn="{StaticResource MaterialDesignOutlinedTextBox}"
+        TargetType="TextBox">
+        <Setter Property="Margin" Value="8" />
+    </Style>
+
+    <!--  Add Material Design styles for Buttons  -->
+    <Style
+        x:Key="MaterialDesignRaisedButton"
+        BasedOn="{StaticResource MaterialDesignRaisedButton}"
+        TargetType="Button">
+        <Setter Property="Margin" Value="8" />
+    </Style>
+
+    <Style
+        x:Key="MaterialDesignOutlinedButton"
+        BasedOn="{StaticResource MaterialDesignOutlinedButton}"
+        TargetType="Button">
+        <Setter Property="Margin" Value="8" />
+        <Setter Property="Padding" Value="8,4" />
+        <Setter Property="FontSize" Value="14" />
+    </Style>
+
+    <!--  Material Design Button Styles  -->
+    <Style
+        x:Key="MaterialDesignFlatButton"
+        BasedOn="{StaticResource MaterialDesignFlatButton}"
+        TargetType="Button">
+        <Setter Property="Padding" Value="8,4" />
+        <Setter Property="FontSize" Value="14" />
+    </Style>
 
 </ResourceDictionary>

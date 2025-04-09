@@ -109,6 +109,8 @@
         <ContentControl
             Grid.Column="1"
             Margin="4"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
             Content="{Binding CurrentContent}" />
     </Grid>
 </Page>

@@ -115,6 +115,7 @@
                 <!--  Jira search bar  -->
                 <DockPanel
                     Grid.Row="0"
+                    Margin="4"
                     HorizontalAlignment="Stretch"
                     DockPanel.Dock="Top">
                     <ComboBox
@@ -122,7 +123,8 @@
                         Margin="0,0,16,0"
                         DockPanel.Dock="Left"
                         ItemsSource="{Binding JiraIssueQueryTypes}"
-                        SelectedItem="{Binding SelectedJiraIssueQueryType}">
+                        SelectedItem="{Binding SelectedJiraIssueQueryType}"
+                        Style="{StaticResource MaterialDesignComboBox}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Converter={x:Static convert:JiraQueryTypeToStringConverter.Instance}}" />
@@ -138,6 +140,7 @@
                             Width="256"
                             ItemsSource="{Binding JiraIssueFilters}"
                             SelectedItem="{Binding SelectedJiraIssueFilter}"
+                            Style="{StaticResource MaterialDesignComboBox}"
                             Visibility="{Binding IsUseTextToSearch, Converter={x:Static convert:InverseBooleanToVisibilityConverter.Instance}}">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
@@ -148,6 +151,8 @@
 
                         <TextBox
                             Width="256"
+                            Height="28"
+                            Style="{StaticResource MaterialDesignTextBox}"
                             Text="{Binding JiraIssueQueryText}"
                             Visibility="{Binding IsUseTextToSearch, Converter={StaticResource BooleanToVisibilityConverter}}" />
                     </Grid>
@@ -157,7 +162,7 @@
                         Command="{Binding QueryJiraInfoCommand}"
                         Content="搜索"
                         DockPanel.Dock="Right"
-                        Style="{StaticResource MaterialDesignRaisedSecondaryDarkButton}" />
+                        Style="{StaticResource MaterialDesignRaisedButton}" />
                 </DockPanel>
 
                 <!--  Jira list  -->
