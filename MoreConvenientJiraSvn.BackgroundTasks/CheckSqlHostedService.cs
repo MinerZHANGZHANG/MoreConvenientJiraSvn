@@ -105,7 +105,7 @@ public class CheckSqlHostedService : TimedHostedService
 
         _repository.Insert<BackgroundTaskMessage>(taskMessages);
         _repository.Insert(taskLog);
-        _logService.Debug($"检测Sql已完成:{taskLog.Summary}");
+        _logService.LogDebug($"检测Sql已完成:{taskLog.Summary}");
 
         return await Task.FromResult(taskLog.IsSucccess);
     }

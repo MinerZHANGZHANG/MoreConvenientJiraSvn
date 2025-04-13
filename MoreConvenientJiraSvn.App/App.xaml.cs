@@ -9,7 +9,10 @@ using MoreConvenientJiraSvn.Core.Models;
 using MoreConvenientJiraSvn.Infrastructure;
 using MoreConvenientJiraSvn.Service;
 using System.Windows;
-using Application = System.Windows.Application;
+using Serilog;
+using Serilog.Extensions.Logging;
+using Microsoft.Extensions.Logging;
+using MoreConvenientJiraSvn.Core.Enums;
 
 namespace MoreConvenientJiraSvn.App
 {
@@ -20,9 +23,15 @@ namespace MoreConvenientJiraSvn.App
     {
         private readonly ServiceProvider _services;
 
+        [System.Runtime.InteropServices.LibraryImport("kernel32.dll")]
+        [return: System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.Bool)]
+        private static partial bool AllocConsole();
+
         public App()
         {
             var services = new ServiceCollection();
+
+            AddLogService(services);
 
             services.AddSingleton(new LiteDatabase(Settings.Default.DatabaseName));
             services.AddSingleton(new NotificationService(Settings.Default.IconUrl));
@@ -33,7 +42,6 @@ namespace MoreConvenientJiraSvn.App
             services.AddSingleton<ISubversionClient, SubversionClient>();
             services.AddSingleton<IHtmlConvert, HtmlConvert>();
 
-            services.AddSingleton<LogService>();
             services.AddSingleton<SettingService>();
             services.AddSingleton<SvnService>();
             services.AddSingleton<JiraService>();
@@ -68,6 +76,25 @@ namespace MoreConvenientJiraSvn.App
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
         }
 
+        private static void AddLogService(ServiceCollection services)
+        {
+            var logConfig = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .WriteTo.File(Settings.Default.LogFileName, rollingInterval: RollingInterval.Day)
+                .WriteTo.Debug();
+
+            if (Settings.Default.LogRemindLevel == (int)LogRemindLevel.Debug)
+            {
+                AllocConsole();
+                logConfig.WriteTo.Console(); // Add console sink only in Debug mode
+            }
+
+            Log.Logger = logConfig.CreateLogger();
+
+            services.AddSingleton<ILoggerFactory>(new SerilogLoggerFactory(Log.Logger));
+            services.AddSingleton<LogService>();
+        }
+
         private void App_Startup(object sender, StartupEventArgs e)
         {
             var settingService = _services.GetRequiredService<SettingService>();
@@ -81,6 +108,9 @@ namespace MoreConvenientJiraSvn.App
             {
                 service.StartAsync(CancellationToken.None);
             }
+
+            var logService = _services.GetRequiredService<LogService>();
+            logService.LogInfo("Application started");
         }
 
         private async void App_Exit(object sender, ExitEventArgs e)
@@ -115,10 +145,9 @@ namespace MoreConvenientJiraSvn.App
             }
         }
 
-        private void LogException(Exception ex)
+        private static void LogException(Exception ex)
         {
-            // TODO: Replace it to a more useful log
-            System.IO.File.AppendAllText("exceptions.log", $"{DateTime.Now}: {ex}\n");
+            System.IO.File.AppendAllText("exceptions.log", $"{DateTime.Now}: {ex}\n{ex.StackTrace}");
         }
     }
 

@@ -4,8 +4,8 @@ namespace MoreConvenientJiraSvn.Core.Enums;
 
 public enum LogRemindLevel
 {
-    [Description("仅存储")]
+    [Description("存储")]
     Normal = 0,
-    [Description("弹窗提示")]
+    [Description("控制台")]
     Debug = 1,
 }

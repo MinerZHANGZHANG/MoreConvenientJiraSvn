@@ -97,7 +97,7 @@ public class DownloadSvnLogHostedService : TimedHostedService
         _repository.Insert(taskLog);
         _repository.Insert<BackgroundTaskMessage>(taskMessages);
 
-        _logService.Debug(taskLog.Summary);
+        _logService.LogDebug(taskLog.Summary);
 
         return taskLog.IsSucccess;
     }

@@ -82,7 +82,7 @@ public class CheckJiraStateHostedService : TimedHostedService
         _repository.Insert<BackgroundTaskMessage>(taskMessages);
         _repository.Insert(taskLog);
 
-        _logService.Debug("获取和检测jira状态已完成");
+        _logService.LogDebug("获取和检测jira状态已完成");
 
         return taskLog.IsSucccess;
     }
