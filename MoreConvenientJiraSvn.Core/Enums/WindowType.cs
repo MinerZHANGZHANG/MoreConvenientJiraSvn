@@ -5,6 +5,7 @@
         Main,
         Jira,
         Svn,
-        Sql
+        Sql,
+        Analysis
     }
 }

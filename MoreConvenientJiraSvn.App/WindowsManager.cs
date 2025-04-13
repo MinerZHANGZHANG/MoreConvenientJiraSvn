@@ -69,6 +69,20 @@ namespace MoreConvenientJiraSvn.App
                         _windows.Add(sqlWindow);
                     }
                     break;
+                case WindowType.Analysis:
+                    var analysisWindow = _windows.Find(w => w is IssueAIAnalysisWindow);
+                    if (analysisWindow != null)
+                    {
+                        analysisWindow.Focus();
+                    }
+                    else
+                    {
+                        analysisWindow = new IssueAIAnalysisWindow();
+                        analysisWindow.Show();
+
+                        _windows.Add(analysisWindow);
+                    }
+                    break;
                 default:
                     break;
             }

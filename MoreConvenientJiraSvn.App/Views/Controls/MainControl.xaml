@@ -144,7 +144,9 @@
                 <Button
                     Width="128"
                     Margin="8"
-                    Content="For排版"
+                    Command="{Binding OpenWindowCommand}"
+                    CommandParameter="{x:Static enum:WindowType.Analysis}"
+                    Content="内容分析"
                     Style="{StaticResource MaterialDesignFlatButton}" />
             </StackPanel>
         </materialDesign:Card>

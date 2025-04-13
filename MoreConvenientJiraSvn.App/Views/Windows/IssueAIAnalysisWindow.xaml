@@ -1,0 +1,483 @@
+﻿<Window
+    x:Class="MoreConvenientJiraSvn.App.Views.Windows.IssueAIAnalysisWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:control="clr-namespace:MoreConvenientJiraSvn.App.Views.Controls"
+    xmlns:convert="clr-namespace:MoreConvenientJiraSvn.App.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:MoreConvenientJiraSvn.App.Views.Windows"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:model="clr-namespace:MoreConvenientJiraSvn.Core.Models;assembly=MoreConvenientJiraSvn.Core"
+    xmlns:style="clr-namespace:MoreConvenientJiraSvn.App.Styles"
+    xmlns:viewModel="clr-namespace:MoreConvenientJiraSvn.App.ViewModels"
+    Title="AIIssueAnalysisWindow"
+    Width="800"
+    Height="600"
+    d:DataContext="{d:DesignInstance Type=viewModel:IssueAIAnalysisViewModel}"
+    Style="{StaticResource MaterialDesignWindow}"
+    mc:Ignorable="d">
+    <materialDesign:DialogHost x:Name="MainDialogHost">
+        <Grid Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <!--  Top Area: Prompt & Selection Controls  -->
+            <Border
+                Margin="0,0,0,10"
+                Padding="10"
+                BorderBrush="{StaticResource MaterialDesignDivider}"
+                BorderThickness="0,0,0,1">
+                <StackPanel Margin="0" Orientation="Vertical">
+                    <!--  Prompt Expander  -->
+                    <Expander
+                        Margin="0,0,0,10"
+                        Header="接口设置"
+                        IsExpanded="False">
+                        <StackPanel Orientation="Vertical">
+                            <control:ConfigLine Margin="4" ConfigName="Ai服务地址">
+                                <TextBox materialDesign:HintAssist.Hint="输入接口地址" />
+                            </control:ConfigLine>
+                            <control:ConfigLine Margin="4" ConfigName="Ai服务Token">
+                                <TextBox materialDesign:HintAssist.Hint="输入Token" />
+                            </control:ConfigLine>
+                        </StackPanel>
+
+                    </Expander>
+                    <!--  Model and Folder Selection  -->
+                    <Expander Header="模型设置">
+                        <StackPanel VerticalAlignment="Center" Orientation="Vertical">
+                            <StackPanel
+                                Margin="0,0,20,0"
+                                VerticalAlignment="Center"
+                                Orientation="Horizontal">
+
+                                <TextBlock
+                                    Margin="0,0,10,0"
+                                    VerticalAlignment="Center"
+                                    Text="文本模型:" />
+                                <ComboBox
+                                    x:Name="ModelComboBox"
+                                    Width="200"
+                                    ItemsSource="{Binding Models}"
+                                    SelectedItem="{Binding SelectedModel}"
+                                    Style="{StaticResource MaterialDesignComboBox}" />
+                                <TextBlock
+                                    Margin="20,0,10,0"
+                                    VerticalAlignment="Center"
+                                    Text="视觉模型:" />
+                                <ComboBox
+                                    Width="200"
+                                    ItemsSource="{Binding Models}"
+                                    SelectedItem="{Binding SelectedModel}"
+                                    Style="{StaticResource MaterialDesignComboBox}" />
+                            </StackPanel>
+                            <TextBlock
+                                Margin="4,4,4,0"
+                                VerticalAlignment="Center"
+                                Text="提示词:" />
+                            <TextBox
+                                x:Name="PromptTextBox"
+                                materialDesign:HintAssist.Hint="请输入提示文本..."
+                                AcceptsReturn="True"
+                                Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                TextWrapping="Wrap" />
+                        </StackPanel>
+                    </Expander>
+                    <DockPanel VerticalAlignment="Center">
+                        <Button
+                            Margin="0,0,10,0"
+                            HorizontalAlignment="Left"
+                            Click="SelectFolder_Click"
+                            DockPanel.Dock="Top"
+                            Style="{StaticResource MaterialDesignFlatButton}">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon
+                                    Width="16"
+                                    Height="16"
+                                    Margin="0,0,5,0"
+                                    Kind="FolderOpen" />
+                                <TextBlock Text="选择Jira本地文件夹" />
+                            </StackPanel>
+                        </Button>
+                        <control:ConfigLine
+                            Margin="4"
+                            ConfigName="当前Jira问题上下文"
+                            DockPanel.Dock="Top">
+                            <ComboBox
+                                Width="200"
+                                ItemsSource="{Binding FolderFiles}"
+                                SelectedItem="{Binding SelectedFolderFile}"
+                                Style="{StaticResource MaterialDesignComboBox}" />
+                        </control:ConfigLine>
+
+                    </DockPanel>
+                </StackPanel>
+            </Border>
+            <!--  Bottom Area: TabControl  -->
+            <TabControl Grid.Row="1">
+                <!--  Code Q&A Tab  -->
+                <TabItem Header="代码问答">
+                    <Grid Margin="10">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <!--  AI对话输出  -->
+                            <RowDefinition Height="Auto" />
+                            <!--  输入区域  -->
+                        </Grid.RowDefinitions>
+                        <!--  Output Conversation (read-only)  -->
+                        <TextBox
+                            x:Name="CodeOutputTextBox"
+                            Grid.Row="0"
+                            materialDesign:HintAssist.Hint="AI对话输出..."
+                            AcceptsReturn="True"
+                            IsReadOnly="True"
+                            Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                            TextWrapping="Wrap" />
+                        <!--  Input and File Selection  -->
+                        <StackPanel Grid.Row="1" Margin="0,10,0,0">
+                            <!--  文件选择与列表  -->
+                            <StackPanel
+                                Margin="0,5,0,0"
+                                VerticalAlignment="Center"
+                                Orientation="Vertical">
+                                <Button
+                                    HorizontalAlignment="Left"
+                                    Click="SelectCodeFiles_Click"
+                                    Style="{StaticResource MaterialDesignFlatButton}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <materialDesign:PackIcon
+                                            Width="16"
+                                            Height="16"
+                                            Margin="0,0,5,0"
+                                            Kind="FolderOpen" />
+                                        <TextBlock Text="选择关联文件" />
+                                    </StackPanel>
+                                </Button>
+                                <ListBox
+                                    x:Name="CodeFilesListBox"
+                                    Width="250"
+                                    Margin="10,0,0,0"
+                                    HorizontalAlignment="Left"
+                                    ItemsSource="{Binding CodeFiles}"
+                                    Style="{StaticResource MaterialDesignListBox}">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <DockPanel>
+                                                <TextBlock VerticalAlignment="Center" Text="{Binding}" />
+                                                <Button
+                                                    Click="RemoveCodeFile_Click"
+                                                    DockPanel.Dock="Right"
+                                                    Style="{StaticResource MaterialDesignFlatButton}"
+                                                    Tag="{Binding}"
+                                                    ToolTip="移除文件">
+                                                    <materialDesign:PackIcon
+                                                        Width="16"
+                                                        Height="16"
+                                                        Kind="Close" />
+                                                </Button>
+                                            </DockPanel>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                            </StackPanel>
+                            <!--  输入代码  -->
+                            <TextBox
+                                x:Name="CodeInputTextBox"
+                                Height="100"
+                                materialDesign:HintAssist.Hint="输入代码..."
+                                AcceptsReturn="True"
+                                Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                TextWrapping="Wrap" />
+
+                            <!--  发送按钮  -->
+                            <Button
+                                Margin="0,10,0,0"
+                                HorizontalAlignment="Right"
+                                Click="SendCodeQuery_Click"
+                                Style="{StaticResource MaterialDesignRaisedButton}">
+                                <StackPanel Orientation="Horizontal">
+                                    <materialDesign:PackIcon
+                                        Width="16"
+                                        Height="16"
+                                        Margin="0,0,5,0"
+                                        Kind="Send" />
+                                    <TextBlock Text="发送" />
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+                </TabItem>
+                <!--  SQL Q&A Tab  -->
+                <TabItem Header="Sql问答">
+                    <Grid Margin="10">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <!--  AI对话输出  -->
+                            <RowDefinition Height="Auto" />
+                            <!--  输入区域  -->
+                        </Grid.RowDefinitions>
+                        <!--  输出SQL结果  -->
+                        <TextBox
+                            x:Name="SqlOutputTextBox"
+                            Grid.Row="0"
+                            materialDesign:HintAssist.Hint="AI对话输出..."
+                            AcceptsReturn="True"
+                            IsReadOnly="True"
+                            Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                            TextWrapping="Wrap" />
+                        <!--  输入SQL及文件选择  -->
+                        <StackPanel Grid.Row="1" Margin="0,10,0,0">
+                            <!--  文件选择与列表  -->
+                            <StackPanel
+                                Margin="0,5,0,0"
+                                VerticalAlignment="Center"
+                                Orientation="Vertical">
+                                <Button
+                                    HorizontalAlignment="Left"
+                                    Click="SelectCodeFiles_Click"
+                                    Style="{StaticResource MaterialDesignFlatButton}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <materialDesign:PackIcon
+                                            Width="16"
+                                            Height="16"
+                                            Margin="0,0,5,0"
+                                            Kind="FolderOpen" />
+                                        <TextBlock Text="选择关联文件" />
+                                    </StackPanel>
+                                </Button>
+                                <ListBox
+                                    Width="250"
+                                    Margin="10,0,0,0"
+                                    HorizontalAlignment="Left"
+                                    ItemsSource="{Binding CodeFiles}"
+                                    Style="{StaticResource MaterialDesignListBox}">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <DockPanel>
+                                                <TextBlock VerticalAlignment="Center" Text="{Binding}" />
+                                                <Button
+                                                    Click="RemoveCodeFile_Click"
+                                                    DockPanel.Dock="Right"
+                                                    Style="{StaticResource MaterialDesignFlatButton}"
+                                                    Tag="{Binding}"
+                                                    ToolTip="移除文件">
+                                                    <materialDesign:PackIcon
+                                                        Width="16"
+                                                        Height="16"
+                                                        Kind="Close" />
+                                                </Button>
+                                            </DockPanel>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                            </StackPanel>
+                            <!--  输入SQL代码  -->
+                            <TextBox
+                                x:Name="SqlInputTextBox"
+                                Height="100"
+                                materialDesign:HintAssist.Hint="输入SQL代码..."
+                                AcceptsReturn="True"
+                                Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                TextWrapping="Wrap" />
+                            <!--  发送按钮  -->
+                            <Button
+                                Margin="0,10,0,0"
+                                HorizontalAlignment="Right"
+                                Click="SendSqlQuery_Click"
+                                Style="{StaticResource MaterialDesignRaisedButton}">
+                                <StackPanel Orientation="Horizontal">
+                                    <materialDesign:PackIcon
+                                        Width="16"
+                                        Height="16"
+                                        Margin="0,0,5,0"
+                                        Kind="Send" />
+                                    <TextBlock Text="发送" />
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+                </TabItem>
+                <!--  Change Summary Tab  -->
+                <TabItem Header="改动内容总结">
+                    <Grid Margin="10">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <!--  开发文档/对话输出  -->
+                            <RowDefinition Height="Auto" />
+                            <!--  输入区  -->
+                        </Grid.RowDefinitions>
+                        <!--  输出对话  -->
+                        <TextBox
+                            x:Name="SummaryOutputTextBox"
+                            Grid.Row="0"
+                            materialDesign:HintAssist.Hint="AI对话输出..."
+                            AcceptsReturn="True"
+                            IsReadOnly="True"
+                            Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                            TextWrapping="Wrap" />
+                        <!--  输入需求文档等  -->
+                        <StackPanel Grid.Row="1" Margin="0,10,0,0">
+                            <!--  文件选择与列表  -->
+                            <StackPanel
+                                Margin="0,5,0,0"
+                                VerticalAlignment="Center"
+                                Orientation="Vertical">
+                                <Button
+                                    HorizontalAlignment="Left"
+                                    Click="SelectCodeFiles_Click"
+                                    Style="{StaticResource MaterialDesignFlatButton}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <materialDesign:PackIcon
+                                            Width="16"
+                                            Height="16"
+                                            Margin="0,0,5,0"
+                                            Kind="FolderOpen" />
+                                        <TextBlock Text="选择关联文件" />
+                                    </StackPanel>
+                                </Button>
+                                <ListBox
+                                    Width="250"
+                                    Margin="10,0,0,0"
+                                    HorizontalAlignment="Left"
+                                    ItemsSource="{Binding CodeFiles}"
+                                    Style="{StaticResource MaterialDesignListBox}">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <DockPanel>
+                                                <TextBlock VerticalAlignment="Center" Text="{Binding}" />
+                                                <Button
+                                                    Click="RemoveCodeFile_Click"
+                                                    DockPanel.Dock="Right"
+                                                    Style="{StaticResource MaterialDesignFlatButton}"
+                                                    Tag="{Binding}"
+                                                    ToolTip="移除文件">
+                                                    <materialDesign:PackIcon
+                                                        Width="16"
+                                                        Height="16"
+                                                        Kind="Close" />
+                                                </Button>
+                                            </DockPanel>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                            </StackPanel>
+                            <TextBox
+                                x:Name="SummaryInputTextBox"
+                                Height="100"
+                                materialDesign:HintAssist.Hint="输入需求文档、截图说明等..."
+                                AcceptsReturn="True"
+                                Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                TextWrapping="Wrap" />
+                            <!--  发送按钮  -->
+                            <Button
+                                Margin="0,10,0,0"
+                                HorizontalAlignment="Right"
+                                Click="SendSummary_Click"
+                                Style="{StaticResource MaterialDesignRaisedButton}">
+                                <StackPanel Orientation="Horizontal">
+                                    <materialDesign:PackIcon
+                                        Width="16"
+                                        Height="16"
+                                        Margin="0,0,5,0"
+                                        Kind="Send" />
+                                    <TextBlock Text="发送" />
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+                </TabItem>
+                <!--  Submit Issue to Jira Tab  -->
+                <TabItem Header="提交Issue到Jira">
+                    <Grid Margin="10">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <!--  推荐填写内容输出  -->
+                            <RowDefinition Height="Auto" />
+                            <!--  输入开发文档  -->
+                        </Grid.RowDefinitions>
+                        <!--  输出推荐填写内容  -->
+                        <TextBox
+                            x:Name="JiraOutputTextBox"
+                            Grid.Row="0"
+                            materialDesign:HintAssist.Hint="输出推荐填写内容..."
+                            AcceptsReturn="True"
+                            IsReadOnly="True"
+                            Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                            TextWrapping="Wrap" />
+                        <!--  输入开发文档  -->
+                        <StackPanel Grid.Row="1" Margin="0,10,0,0">
+                            <!--  文件选择与列表  -->
+                            <StackPanel
+                                Margin="0,5,0,0"
+                                VerticalAlignment="Center"
+                                Orientation="Vertical">
+                                <Button
+                                    HorizontalAlignment="Left"
+                                    Click="SelectCodeFiles_Click"
+                                    Style="{StaticResource MaterialDesignFlatButton}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <materialDesign:PackIcon
+                                            Width="16"
+                                            Height="16"
+                                            Margin="0,0,5,0"
+                                            Kind="FolderOpen" />
+                                        <TextBlock Text="选择关联文件" />
+                                    </StackPanel>
+                                </Button>
+                                <ListBox
+                                    Width="250"
+                                    Margin="10,0,0,0"
+                                    HorizontalAlignment="Left"
+                                    ItemsSource="{Binding CodeFiles}"
+                                    Style="{StaticResource MaterialDesignListBox}">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <DockPanel>
+                                                <TextBlock VerticalAlignment="Center" Text="{Binding}" />
+                                                <Button
+                                                    Click="RemoveCodeFile_Click"
+                                                    DockPanel.Dock="Right"
+                                                    Style="{StaticResource MaterialDesignFlatButton}"
+                                                    Tag="{Binding}"
+                                                    ToolTip="移除文件">
+                                                    <materialDesign:PackIcon
+                                                        Width="16"
+                                                        Height="16"
+                                                        Kind="Close" />
+                                                </Button>
+                                            </DockPanel>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                            </StackPanel>
+                            <TextBox
+                                x:Name="JiraInputTextBox"
+                                Height="100"
+                                materialDesign:HintAssist.Hint="输入开发文档..."
+                                AcceptsReturn="True"
+                                Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                TextWrapping="Wrap" />
+                            <!--  发送按钮  -->
+                            <Button
+                                Margin="0,10,0,0"
+                                HorizontalAlignment="Right"
+                                Click="SendJiraIssue_Click"
+                                Style="{StaticResource MaterialDesignRaisedButton}">
+                                <StackPanel Orientation="Horizontal">
+                                    <materialDesign:PackIcon
+                                        Width="16"
+                                        Height="16"
+                                        Margin="0,0,5,0"
+                                        Kind="Send" />
+                                    <TextBlock Text="发送" />
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+                </TabItem>
+            </TabControl>
+        </Grid>
+    </materialDesign:DialogHost>
+</Window>

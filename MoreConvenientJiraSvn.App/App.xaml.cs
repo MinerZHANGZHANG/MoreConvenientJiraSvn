@@ -62,6 +62,7 @@ namespace MoreConvenientJiraSvn.App
             services.AddTransient<MainControlViewModel>();
             services.AddTransient<AppSettingControlViewModel>();
             services.AddTransient<HostedServiceSettingViewModel>();
+            services.AddTransient<IssueAIAnalysisViewModel>();
 
             _services = services.BuildServiceProvider(true);
 
