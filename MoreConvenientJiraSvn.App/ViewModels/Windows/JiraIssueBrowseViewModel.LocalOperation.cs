@@ -183,7 +183,7 @@ public partial class JiraIssueBrowseViewModel
                              "相同编号的目录",
                              MessageBoxButton.YesNo,
                              MessageBoxImage.Question);
-            if (boxResult == MessageBoxResult.OK)
+            if (boxResult == MessageBoxResult.Yes)
             {
                 SelectedJiraIssueLocalInfo = new() { IssueKey = SelectedJiraIssue.IssueKey, LocalDir = sameIssueKeyDir };
                 _repository.Upsert(SelectedJiraIssueLocalInfo);

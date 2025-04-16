@@ -51,6 +51,7 @@
                 IsReadOnly="True"
                 ItemsSource="{Binding SvnPaths}"
                 SelectedItem="{Binding SelectedPath}"
+                SelectionChanged="DataGrid_SelectionChanged"
                 Style="{StaticResource MaterialDesignDataGrid}">
                 <DataGrid.Columns>
                     <DataGridTextColumn
