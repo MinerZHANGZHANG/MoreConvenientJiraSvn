@@ -53,14 +53,16 @@ public partial class JiraIssueBrowseViewModel
     }
 
     [RelayCommand(CanExecute = nameof(HasIssueBeSelected))]
-    public void OpenWebPage(string issueKey)
+    public void OpenWebPage(string issueKeyOrUrl)
     {
-        if (string.IsNullOrEmpty(issueKey))
+        if (string.IsNullOrEmpty(issueKeyOrUrl))
         {
             return;
         }
 
-        string? url = $"{_jiraService.JiraConfig.BaseUrl}browse/{issueKey}";
+        string? url = issueKeyOrUrl.StartsWith("http")
+            ? issueKeyOrUrl
+            : $"{_jiraService.JiraConfig.BaseUrl}/browse/{issueKeyOrUrl}";
         if (string.IsNullOrEmpty(url))
         {
             return;

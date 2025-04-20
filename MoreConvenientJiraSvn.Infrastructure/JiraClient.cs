@@ -407,7 +407,12 @@ public class JiraClient : IJiraClient
         foreach (var kvp in attachmentUrlWithNameDict)
         {
             byte[] fileBytes = await _httpClient.GetByteArrayAsync(kvp.Key, cancellationToken);
-            await File.WriteAllBytesAsync(Path.Combine(directoryPath, kvp.Value), fileBytes, cancellationToken);
+            string filePath = Path.Combine(directoryPath, kvp.Value);
+            if (!File.Exists(filePath))
+            {
+                await File.WriteAllBytesAsync(filePath, fileBytes, cancellationToken);
+
+            }
             result++;
         }
 
