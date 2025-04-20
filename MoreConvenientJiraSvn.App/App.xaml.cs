@@ -45,11 +45,12 @@ namespace MoreConvenientJiraSvn.App
             services.AddSingleton<SettingService>();
             services.AddSingleton<SvnService>();
             services.AddSingleton<JiraService>();
+            services.AddSingleton<SemanticKernelService>();
 
             services.AddHostedService<DownloadSvnLogHostedService>();
             services.AddHostedService<CheckJiraStateHostedService>();
             services.AddHostedService<CheckSqlHostedService>();
-
+            
             services.AddSingleton<DownloadSvnLogHostedService>();
             services.AddSingleton<CheckJiraStateHostedService>();
             services.AddSingleton<CheckSqlHostedService>();
