@@ -71,7 +71,7 @@
                                         Margin="0,5"
                                         AutoGenerateColumns="False">
                                         <DataGrid.Columns>
-                                            <DataGridTextColumn Binding="{Binding FolderName}" Header="文件夹名称" />
+                                            <DataGridTextColumn Binding="{Binding FolderName}" Header="文件夹路径" />
                                             <DataGridTemplateColumn Header="操作">
                                                 <DataGridTemplateColumn.CellTemplate>
                                                     <DataTemplate>
