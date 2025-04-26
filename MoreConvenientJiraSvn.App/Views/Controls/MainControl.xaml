@@ -16,112 +16,139 @@
     d:DesignWidth="1080"
     mc:Ignorable="d">
 
-    <DockPanel>
-        <!--  Top title  -->
-        <StackPanel
-            MinHeight="40"
-            DockPanel.Dock="Top"
-            Orientation="Horizontal">
-            <TextBlock
-                Margin="16,0,16,0"
-                VerticalAlignment="Center"
-                FontSize="20"
-                Text="插件信息" />
-            <Button
-                Margin="0,4,0,4"
-                Command="{Binding RefreshMessageCommand}"
-                Content="刷新"
-                Style="{StaticResource MaterialDesignOutlinedButton}" />
-        </StackPanel>
+    <Grid Background="{DynamicResource MaterialDesignPaper}">
+        <!--  Define rows for layout  -->
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <!--  Top AppBar  -->
+            <RowDefinition Height="*" />
+            <!--  Center Content  -->
+            <RowDefinition Height="Auto" />
+            <!--  Separator  -->
+            <RowDefinition Height="Auto" />
+            <!--  Bottom Actions  -->
+        </Grid.RowDefinitions>
 
-        <!--  Center grid  -->
-        <ListView
-            Height="528"
-            DockPanel.Dock="Top"
-            ItemsSource="{Binding BackgroundTaskLogs}"
-            SelectedItem="{Binding SelectedBackgroundTaskLog}">
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn Width="90" Header="级别">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <ContentControl Content="{Binding Level}" ContentTemplate="{StaticResource LevelTemplate}" />
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                    <GridViewColumn
-                        Width="128"
-                        DisplayMemberBinding="{Binding DisplayStartTime}"
-                        Header="时间" />
-                    <GridViewColumn
-                        Width="670"
-                        DisplayMemberBinding="{Binding Summary}"
-                        Header="描述" />
-                    <GridViewColumn Width="128" Header="操作">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <Button
-                                    Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}"
-                                    Content="查看详情"
-                                    Style="{StaticResource MaterialDesignOutlinedButton}">
-                                    <Button.CommandParameter>
-                                        <StackPanel Margin="16">
-                                            <ListView ItemsSource="{Binding BackgroundTaskMessages}">
-                                                <ListView.View>
-                                                    <GridView>
-                                                        <GridViewColumn DisplayMemberBinding="{Binding Level}" Header="级别" />
-                                                        <GridViewColumn DisplayMemberBinding="{Binding Info}" Header="信息" />
-                                                    </GridView>
-                                                </ListView.View>
-                                            </ListView>
-                                            <Button
-                                                HorizontalAlignment="Center"
-                                                Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
-                                                Content="关闭"
-                                                IsCancel="True"
-                                                Style="{StaticResource MaterialDesignFlatButton}" />
-                                        </StackPanel>
-                                    </Button.CommandParameter>
-                                </Button>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                </GridView>
-            </ListView.View>
-        </ListView>
+        <!--  Top AppBar  -->
+        <materialDesign:Card
+            Grid.Row="0"
+            Margin="16,16,32,16"
+            Padding="8"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Top">
+            <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                <TextBlock
+                    FontSize="24"
+                    FontWeight="Bold"
+                    Foreground="{DynamicResource MaterialDesignBody}"
+                    Text="后台任务记录" />
+                <Button
+                    Margin="16,0,0,0"
+                    Command="{Binding RefreshMessageCommand}"
+                    Content="刷新"
+                    Style="{StaticResource MaterialDesignOutlinedButton}" />
+            </StackPanel>
+        </materialDesign:Card>
 
-        <!--  bottom button  -->
-        <StackPanel
-            MinHeight="40"
-            HorizontalAlignment="Center"
-            DockPanel.Dock="Bottom"
-            Orientation="Horizontal">
-            <Button
-                Width="128"
-                Margin="8"
-                Command="{Binding OpenWindowCommand}"
-                CommandParameter="{x:Static enum:WindowType.Jira}"
-                Content="Jira浏览"
-                Style="{StaticResource MaterialDesignFlatButton}" />
-            <Button
-                Width="128"
-                Margin="8"
-                Command="{Binding OpenWindowCommand}"
-                CommandParameter="{x:Static enum:WindowType.Svn}"
-                Content="Svn浏览"
-                Style="{StaticResource MaterialDesignFlatButton}" />
-            <Button
-                Width="128"
-                Margin="8"
-                Command="{Binding OpenWindowCommand}"
-                CommandParameter="{x:Static enum:WindowType.Sql}"
-                Content="PLSql检测"
-                Style="{StaticResource MaterialDesignFlatButton}" />
-            <Button
-                Width="128"
-                Margin="8"
-                Content="For排版"
-                Style="{StaticResource MaterialDesignFlatButton}" />
-        </StackPanel>
-    </DockPanel>
+        <!--  Center Content  -->
+        <ScrollViewer Grid.Row="1" Margin="16,0,16,16">
+            <materialDesign:Card Padding="16">
+                <ListView ItemsSource="{Binding BackgroundTaskLogs}" SelectedItem="{Binding SelectedBackgroundTaskLog}">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Width="100" Header="级别">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock
+                                            FontWeight="Bold"
+                                            Foreground="{Binding Level, Converter={StaticResource LevelToColorConverter}}"
+                                            Text="{Binding Level}" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn
+                                Width="150"
+                                DisplayMemberBinding="{Binding DisplayStartTime}"
+                                Header="时间" />
+                            <GridViewColumn
+                                Width="Auto"
+                                DisplayMemberBinding="{Binding Summary}"
+                                Header="描述" />
+                            <GridViewColumn Width="150" Header="操作">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button
+                                            Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}"
+                                            Content="查看详情"
+                                            Style="{StaticResource MaterialDesignFlatButton}">
+                                            <Button.CommandParameter>
+                                                <StackPanel Margin="16">
+                                                    <ListView ItemsSource="{Binding BackgroundTaskMessages}">
+                                                        <ListView.View>
+                                                            <GridView>
+                                                                <GridViewColumn DisplayMemberBinding="{Binding Level}" Header="级别" />
+                                                                <GridViewColumn DisplayMemberBinding="{Binding Info}" Header="信息" />
+                                                            </GridView>
+                                                        </ListView.View>
+                                                    </ListView>
+                                                    <Button
+                                                        HorizontalAlignment="Center"
+                                                        Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
+                                                        Content="关闭"
+                                                        IsCancel="True"
+                                                        Style="{StaticResource MaterialDesignFlatButton}" />
+                                                </StackPanel>
+                                            </Button.CommandParameter>
+                                        </Button>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </materialDesign:Card>
+        </ScrollViewer>
+
+        <!--  Separator  -->
+        <Separator Grid.Row="2" Margin="16,0,32,0" />
+
+        <!--  Bottom Actions  -->
+        <materialDesign:Card
+            Grid.Row="3"
+            Margin="16,16,32,16"
+            Padding="8"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Bottom">
+            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                <Button
+                    Width="128"
+                    Margin="8"
+                    Command="{Binding OpenWindowCommand}"
+                    CommandParameter="{x:Static enum:WindowType.Jira}"
+                    Content="Jira浏览"
+                    Style="{StaticResource MaterialDesignFlatButton}" />
+                <Button
+                    Width="128"
+                    Margin="8"
+                    Command="{Binding OpenWindowCommand}"
+                    CommandParameter="{x:Static enum:WindowType.Svn}"
+                    Content="Svn浏览"
+                    Style="{StaticResource MaterialDesignFlatButton}" />
+                <Button
+                    Width="128"
+                    Margin="8"
+                    Command="{Binding OpenWindowCommand}"
+                    CommandParameter="{x:Static enum:WindowType.Sql}"
+                    Content="PLSql检测"
+                    Style="{StaticResource MaterialDesignFlatButton}" />
+                <Button
+                    Width="128"
+                    Margin="8"
+                    Command="{Binding OpenWindowCommand}"
+                    CommandParameter="{x:Static enum:WindowType.Analysis}"
+                    Content="内容分析"
+                    Style="{StaticResource MaterialDesignFlatButton}" />
+            </StackPanel>
+        </materialDesign:Card>
+    </Grid>
 </UserControl>

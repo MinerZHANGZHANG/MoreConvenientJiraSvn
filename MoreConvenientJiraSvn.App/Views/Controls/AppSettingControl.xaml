@@ -33,7 +33,7 @@
         </local:ConfigLine>
         <local:ConfigLine
             Margin="8"
-            ConfigName="日志提醒级别"
+            ConfigName="日志显示方式(重启生效)"
             DockPanel.Dock="Top"
             Foreground="Black"
             IsButtonVisible="False">

@@ -35,169 +35,147 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="2*" />
+            <ColumnDefinition Width="3*" />
         </Grid.ColumnDefinitions>
 
-        <!--  Left svn paths  -->
-        <DockPanel
+        <!--  Left Panel: Svn Paths  -->
+        <materialDesign:Card
             Grid.Row="0"
             Grid.Column="0"
-            Margin="8">
+            Margin="16"
+            Padding="16">
             <DataGrid
                 AutoGenerateColumns="False"
                 CanUserAddRows="False"
-                Foreground="Black"
-                GridLinesVisibility="Horizontal"
-                HorizontalGridLinesBrush="Gray"
-                HorizontalScrollBarVisibility="Auto"
                 IsReadOnly="True"
                 ItemsSource="{Binding SvnPaths}"
-                ScrollViewer.HorizontalScrollBarVisibility="Visible"
-                ScrollViewer.VerticalScrollBarVisibility="Visible"
                 SelectedItem="{Binding SelectedPath}"
                 SelectionChanged="DataGrid_SelectionChanged"
-                SelectionMode="Extended"
-                SelectionUnit="FullRow"
-                VerticalScrollBarVisibility="Auto">
+                Style="{StaticResource MaterialDesignDataGrid}">
                 <DataGrid.Columns>
                     <DataGridTextColumn
-                        Width="1*"
+                        Width="*"
                         Binding="{Binding PathName}"
                         Header="名称" />
                     <DataGridTextColumn
-                        Width="3*"
+                        Width="2*"
                         Binding="{Binding Path}"
                         Header="路径" />
                     <DataGridTextColumn
-                        Width="1*"
+                        Width="*"
                         Binding="{Binding SvnPathType}"
                         Header="类型" />
                 </DataGrid.Columns>
             </DataGrid>
-        </DockPanel>
+        </materialDesign:Card>
 
-        <!--  Right path detail  -->
-        <Grid
+        <!--  Right Panel: Path Details  -->
+        <materialDesign:Card
             Grid.Row="0"
             Grid.Column="1"
-            Margin="8">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            <Expander
-                Grid.Row="0"
-                Header="路径信息"
-                IsExpanded="True">
-                <StackPanel VerticalAlignment="Top">
-                    <materialDesign:Snackbar
-                        Height="50"
-                        Margin="0,0,0,-50"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Top"
-                        MessageQueue="{Binding SnackbarMessageQueue}" />
-                    <TextBlock Margin="4" Text="{Binding SelectPathTipText}" />
-                    <TextBlock Margin="4" Text="{Binding SelectPathStateText}" />
-                    <control:ConfigLine Margin="8" ConfigName="关联Jira版本">
-                        <DockPanel>
-                            <TextBox
-                                MinWidth="160"
-                                HorizontalAlignment="Left"
-                                DockPanel.Dock="Left"
-                                Style="{StaticResource MaterialDesignTextBox}"
-                                Text="{Binding SelectPathRelation.Version}" />
-                            <Button
-                                Width="60"
-                                HorizontalAlignment="Right"
-                                Command="{Binding SetRelationVersionCommand}"
-                                Content="设置"
-                                DockPanel.Dock="Right" />
-                        </DockPanel>
-                    </control:ConfigLine>
-                    <DockPanel>
-                        <TextBlock Text="开始日期" />
-                        <DatePicker
-                            Width="160"
-                            Margin="8,0,8,0"
-                            SelectedDate="{Binding BeginQueryDateTime}"
-                            Style="{StaticResource MaterialDesignFloatingHintDatePicker}" />
-                        <TextBlock Text="结束日期" />
-                        <DatePicker
-                            Width="160"
-                            Margin="8,0,8,0"
-                            SelectedDate="{Binding EndQueryDateTime}"
-                            Style="{StaticResource MaterialDesignFloatingHintDatePicker}" />
-                        <Button
-                            Width="120"
-                            HorizontalAlignment="Right"
-                            HorizontalContentAlignment="Center"
-                            Command="{Binding QuerySvnLogCommand}"
-                            Content="刷新Log"
-                            DockPanel.Dock="Right" />
-                    </DockPanel>
+            Margin="16"
+            Padding="16">
+            <StackPanel>
+                <materialDesign:Snackbar
+                    Height="50"
+                    Margin="0,0,0,-50"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Top"
+                    MessageQueue="{Binding SnackbarMessageQueue}" />
+                <TextBlock
+                    Margin="0,0,0,16"
+                    Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                    Text="路径信息" />
+                <TextBlock
+                    Margin="0,0,0,8"
+                    Style="{StaticResource MaterialDesignBody1TextBlock}"
+                    Text="{Binding SelectPathTipText}" />
+                <TextBlock
+                    Margin="0,0,0,8"
+                    Style="{StaticResource MaterialDesignBody1TextBlock}"
+                    Text="{Binding SelectPathStateText}" />
+
+                <StackPanel Margin="0,0,0,8" Orientation="Horizontal">
+                    <TextBox
+                        Width="200"
+                        Height="40"
+                        Padding="12"
+                        materialDesign:HintAssist.Hint="设置关联的Jira版本"
+                        Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                        Text="{Binding SelectPathRelation.Version}" />
+                    <Button
+                        Margin="16,0,0,0"
+                        Command="{Binding SetRelationVersionCommand}"
+                        Content="设置"
+                        Style="{StaticResource MaterialDesignRaisedButton}" />
                 </StackPanel>
-            </Expander>
-            <Expander
-                Grid.Row="1"
-                Header="Log情况"
-                IsExpanded="True">
-                <DockPanel LastChildFill="True">
-                    <DataGrid
-                        AutoGenerateColumns="False"
-                        CanUserAddRows="False"
-                        DockPanel.Dock="Top"
-                        Foreground="Black"
-                        GridLinesVisibility="Horizontal"
-                        HorizontalGridLinesBrush="Gray"
-                        HorizontalScrollBarVisibility="Auto"
-                        IsReadOnly="True"
-                        ItemsSource="{Binding CurrentPageSvnLogs}"
-                        ScrollViewer.HorizontalScrollBarVisibility="Visible"
-                        ScrollViewer.VerticalScrollBarVisibility="Visible"
-                        SelectionMode="Extended"
-                        SelectionUnit="FullRow"
-                        VerticalScrollBarVisibility="Auto">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn
-                                Width="1*"
-                                Binding="{Binding Revision}"
-                                Header="版本" />
-                            <DataGridTextColumn
-                                Width="1*"
-                                Binding="{Binding Operation}"
-                                Header="操作类型" />
-                            <DataGridTextColumn
-                                Width="1*"
-                                Binding="{Binding Author}"
-                                Header="作者" />
-                            <DataGridTextColumn
-                                Width="1*"
-                                Binding="{Binding DateTime}"
-                                Header="更新日期" />
-                            <DataGridTextColumn
-                                Width="3*"
-                                Binding="{Binding Message}"
-                                Header="信息" />
-                        </DataGrid.Columns>
-                    </DataGrid>
-                    <StackPanel
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Bottom"
-                        DockPanel.Dock="Bottom"
-                        Orientation="Horizontal">
-                        <Button
-                            Margin="4"
-                            Command="{Binding PrevPageCommand}"
-                            Content="上一页" />
-                        <TextBlock Margin="4" Text="{Binding PageTipText}" />
-                        <Button
-                            Margin="4"
-                            Command="{Binding NextPageCommand}"
-                            Content="下一页" />
-                    </StackPanel>
-                </DockPanel>
-            </Expander>
-        </Grid>
+
+                <StackPanel Margin="0,0,0,8" Orientation="Horizontal">
+                    <TextBlock Height="20" Text="开始日期" />
+                    <DatePicker SelectedDate="{Binding BeginQueryDateTime}" Style="{StaticResource MaterialDesignDatePicker}" />
+                    <TextBlock Height="20" Text="结束日期" />
+                    <DatePicker SelectedDate="{Binding EndQueryDateTime}" Style="{StaticResource MaterialDesignDatePicker}" />
+                    <Button
+                        Margin="16,0,0,0"
+                        Command="{Binding QuerySvnLogCommand}"
+                        Content="刷新Log"
+                        Style="{StaticResource MaterialDesignRaisedButton}" />
+                </StackPanel>
+
+                <TextBlock
+                    Margin="0,16,0,8"
+                    Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                    Text="Log情况" />
+                <DataGrid
+                    AutoGenerateColumns="False"
+                    CanUserAddRows="False"
+                    IsReadOnly="True"
+                    ItemsSource="{Binding CurrentPageSvnLogs}"
+                    Style="{StaticResource MaterialDesignDataGrid}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn
+                            Width="*"
+                            Binding="{Binding Revision}"
+                            Header="版本" />
+                        <DataGridTextColumn
+                            Width="*"
+                            Binding="{Binding Operation}"
+                            Header="操作类型" />
+                        <DataGridTextColumn
+                            Width="*"
+                            Binding="{Binding Author}"
+                            Header="作者" />
+                        <DataGridTextColumn
+                            Width="*"
+                            Binding="{Binding DateTime}"
+                            Header="更新日期" />
+                        <DataGridTextColumn
+                            Width="2*"
+                            Binding="{Binding Message}"
+                            Header="信息" />
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <StackPanel
+                    Margin="0,16,0,0"
+                    HorizontalAlignment="Center"
+                    Orientation="Horizontal">
+                    <Button
+                        Command="{Binding PrevPageCommand}"
+                        Content="上一页"
+                        Style="{StaticResource MaterialDesignOutlinedButton}" />
+                    <TextBlock
+                        Height="24"
+                        Margin="16,0"
+                        Style="{StaticResource MaterialDesignBody1TextBlock}"
+                        Text="{Binding PageTipText}" />
+                    <Button
+                        Command="{Binding NextPageCommand}"
+                        Content="下一页"
+                        Style="{StaticResource MaterialDesignOutlinedButton}" />
+                </StackPanel>
+            </StackPanel>
+        </materialDesign:Card>
     </Grid>
 </Window>

@@ -1,19 +1,61 @@
-﻿using MoreConvenientJiraSvn.Core.Interfaces;
+﻿using Microsoft.Extensions.Logging;
 
 namespace MoreConvenientJiraSvn.Service
 {
-    public class LogService(IRepository repository, NotificationService notificationService, bool isDebugMode = true)
+    public class LogService(ILoggerFactory loggerFactory, bool isDebugMode = true) : IDisposable
     {
-        private readonly IRepository _repository = repository;
-        private readonly NotificationService _notificationService = notificationService;
         private readonly bool _isDebugMode = isDebugMode;
+        private readonly ILogger _logger = loggerFactory.CreateLogger<LogService>();
 
-        public void Debug(string message)
+        public void LogDebug(string message)
         {
             if (_isDebugMode)
             {
-                _notificationService.DebugMessage(message);
+                Console.WriteLine($"DEBUG: {message}");
             }
+            _logger.LogDebug(message);
+        }
+
+        public void LogInfo(string message)
+        {
+            if (_isDebugMode)
+            {
+                Console.WriteLine($"INFO: {message}");
+            }
+            _logger.LogInformation(message);
+        }
+
+        public void LogWarning(string message)
+        {
+            if (_isDebugMode)
+            {
+                Console.WriteLine($"WARNING: {message}");
+            }
+            _logger.LogWarning(message);
+        }
+
+        public void LogError(string message, Exception? exception = null)
+        {
+            if (_isDebugMode)
+            {
+                Console.WriteLine($"ERROR: {message}");
+            }
+            if (exception != null)
+            {
+                _logger.LogError(exception, message);
+            }
+            else
+            {
+                _logger.LogError(message);
+            }
+        }
+
+        public void Dispose()
+        {
+            LogInfo("Application close.");
+            loggerFactory.Dispose();
+
+            GC.SuppressFinalize(this);
         }
     }
 }

@@ -9,7 +9,11 @@ using MoreConvenientJiraSvn.Core.Models;
 using MoreConvenientJiraSvn.Infrastructure;
 using MoreConvenientJiraSvn.Service;
 using System.Windows;
-using Application = System.Windows.Application;
+using Serilog;
+using Serilog.Extensions.Logging;
+using Microsoft.Extensions.Logging;
+using MoreConvenientJiraSvn.Core.Enums;
+using System.Threading.Tasks;
 
 namespace MoreConvenientJiraSvn.App
 {
@@ -20,9 +24,15 @@ namespace MoreConvenientJiraSvn.App
     {
         private readonly ServiceProvider _services;
 
+        [System.Runtime.InteropServices.LibraryImport("kernel32.dll")]
+        [return: System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.Bool)]
+        private static partial bool AllocConsole();
+
         public App()
         {
             var services = new ServiceCollection();
+
+            AddLogService(services);
 
             services.AddSingleton(new LiteDatabase(Settings.Default.DatabaseName));
             services.AddSingleton(new NotificationService(Settings.Default.IconUrl));
@@ -33,10 +43,10 @@ namespace MoreConvenientJiraSvn.App
             services.AddSingleton<ISubversionClient, SubversionClient>();
             services.AddSingleton<IHtmlConvert, HtmlConvert>();
 
-            services.AddSingleton<LogService>();
             services.AddSingleton<SettingService>();
             services.AddSingleton<SvnService>();
             services.AddSingleton<JiraService>();
+            services.AddSingleton<SemanticKernelService>();
 
             services.AddHostedService<DownloadSvnLogHostedService>();
             services.AddHostedService<CheckJiraStateHostedService>();
@@ -54,6 +64,7 @@ namespace MoreConvenientJiraSvn.App
             services.AddTransient<MainControlViewModel>();
             services.AddTransient<AppSettingControlViewModel>();
             services.AddTransient<HostedServiceSettingViewModel>();
+            services.AddTransient<IssueAIAnalysisViewModel>();
 
             _services = services.BuildServiceProvider(true);
 
@@ -68,8 +79,30 @@ namespace MoreConvenientJiraSvn.App
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
         }
 
-        private void App_Startup(object sender, StartupEventArgs e)
+        private static void AddLogService(ServiceCollection services)
         {
+            var logConfig = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .WriteTo.File(Settings.Default.LogFileName, rollingInterval: RollingInterval.Day)
+                .WriteTo.Debug();
+
+            if (Settings.Default.LogRemindLevel == (int)LogRemindLevel.Debug)
+            {
+                AllocConsole();
+                logConfig.WriteTo.Console(); // Add console sink only in Debug mode
+            }
+
+            Log.Logger = logConfig.CreateLogger();
+
+            services.AddSingleton<ILoggerFactory>(new SerilogLoggerFactory(Log.Logger));
+            services.AddSingleton<LogService>();
+        }
+
+        private async void App_Startup(object sender, StartupEventArgs e)
+        {
+            var logService = _services.GetRequiredService<LogService>();
+            logService.LogInfo("Application started");
+
             var settingService = _services.GetRequiredService<SettingService>();
             if (settingService.FindSetting<BackgroundTaskConfig>()?.IsEnableBackgroundTask != true)
             {
@@ -79,7 +112,7 @@ namespace MoreConvenientJiraSvn.App
             var hostServices = _services.GetServices<IHostedService>();
             foreach (var service in hostServices)
             {
-                service.StartAsync(CancellationToken.None);
+                await service.StartAsync(CancellationToken.None);
             }
         }
 
@@ -115,10 +148,9 @@ namespace MoreConvenientJiraSvn.App
             }
         }
 
-        private void LogException(Exception ex)
+        private static void LogException(Exception ex)
         {
-            // TODO: Replace it to a more useful log
-            System.IO.File.AppendAllText("exceptions.log", $"{DateTime.Now}: {ex}\n");
+            System.IO.File.AppendAllText("exceptions.log", $"{DateTime.Now}: {ex}\n{ex.StackTrace}");
         }
     }
 

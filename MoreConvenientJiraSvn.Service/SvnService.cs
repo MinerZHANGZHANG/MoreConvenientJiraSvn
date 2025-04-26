@@ -60,7 +60,7 @@ public class SvnService : IDisposable
     // TODO: Group query param
     public async Task<List<SvnLog>> GetSvnLogsAsync(string path, DateTime? beginDate, DateTime? endDate, int maxNumber = 200, bool isNeedExtractJiraId = false, CancellationToken cancellationToken = default)
     {
-        _logService.Debug($"{nameof(GetSvnLogs)}({path}) [{beginDate}——{endDate}](maxCount:{maxNumber})");
+        _logService.LogDebug($"{nameof(GetSvnLogs)}({path}) [{beginDate}——{endDate}](maxCount:{maxNumber})");
 
         List<SvnLog> result = await _svnClient.GetSvnLogAsync(path, beginDate ?? DateTime.MinValue, endDate ?? DateTime.Today, maxNumber, isNeedExtractJiraId, cancellationToken);
 
@@ -69,7 +69,7 @@ public class SvnService : IDisposable
 
     public async Task<List<SvnLog>> GetSvnLogs(string path, long? beginRevision, long? endRevision, int maxNumber = 200, bool isNeedExtractJiraId = false, CancellationToken cancellationToken = default)
     {
-        _logService.Debug($"{nameof(GetSvnLogs)}({path}) [{beginRevision}——{endRevision}](maxCount:{maxNumber})");
+        _logService.LogDebug($"{nameof(GetSvnLogs)}({path}) [{beginRevision}——{endRevision}](maxCount:{maxNumber})");
 
         List<SvnLog> result = await _svnClient.GetSvnLogAsync(path, beginRevision ?? 0, endRevision ?? long.MaxValue, maxNumber, isNeedExtractJiraId, cancellationToken);
 

@@ -34,7 +34,7 @@ namespace MoreConvenientJiraSvn.Service
 
         public async Task<List<JiraIssueFilter>> GetCurrentUserFavouriteFilterAsync()
         {
-            _logService.Debug($"{nameof(GetCurrentUserFavouriteFilterAsync)}");
+            _logService.LogDebug($"{nameof(GetCurrentUserFavouriteFilterAsync)}");
             List<JiraIssueFilter> result = [];
             try
             {
@@ -42,7 +42,7 @@ namespace MoreConvenientJiraSvn.Service
             }
             catch (Exception ex)
             {
-                _logService.Debug($"Get favourite filter failed! \n\r {ex.Message}");
+                _logService.LogDebug($"Get favourite filter failed! \n\r {ex.Message}");
             }
 
             return result;
@@ -73,7 +73,7 @@ namespace MoreConvenientJiraSvn.Service
                     break;
                 }
 
-                _logService.Debug($"{nameof(GetIssueAsync)} [{jiraFilter.SearchUrl}&startAt={start}]");
+                _logService.LogDebug($"{nameof(GetIssueAsync)} [{jiraFilter.SearchUrl}&startAt={start}]");
                 var issuePageInfo = await _jiraClient.GetIssuesAsyncByUrl(jiraFilter.SearchUrl, start);
 
                 start = issuePageInfo.StartAt + issuePageInfo.MaxResults;
@@ -130,7 +130,7 @@ namespace MoreConvenientJiraSvn.Service
                     break;
                 }
 
-                _logService.Debug($"{nameof(GetIssuesByJqlAsync)} [{jql}&startAt={start}]");
+                _logService.LogDebug($"{nameof(GetIssuesByJqlAsync)} [{jql}&startAt={start}]");
                 try
                 {
                     var issuePageInfo = await _jiraClient.GetIssuesAsyncByJql(jql, start, cancellationToken);
@@ -212,7 +212,7 @@ namespace MoreConvenientJiraSvn.Service
 
         public async Task<string> TryPostTransitionsAsync(string issueKey, string transitionId, IEnumerable<JiraField> jiraFields, CancellationToken cancellationToken = default)
         {
-            _logService.Debug($"Change issue[{issueKey}] to [{transitionId}] (fields count:{jiraFields.Count()})");
+            _logService.LogDebug($"Change issue[{issueKey}] to [{transitionId}] (fields count:{jiraFields.Count()})");
             return await _jiraClient.TryPostTransitionsAsync(issueKey, transitionId, jiraFields, cancellationToken);
         }
 
