@@ -15,6 +15,7 @@ using MaterialDesignThemes.Wpf;
 using Microsoft.Win32;
 using System.Collections.ObjectModel;
 using MoreConvenientJiraSvn.App.ViewModels;
+using MoreConvenientJiraSvn.Core.Models;
 
 namespace MoreConvenientJiraSvn.App.Views.Windows
 {
@@ -34,14 +35,30 @@ namespace MoreConvenientJiraSvn.App.Views.Windows
             this.Closed += IssueAIAnalysisWindow_Closed;
         }
 
-        private void IssueAIAnalysisWindow_Loaded(object sender, RoutedEventArgs e)
+        private async void IssueAIAnalysisWindow_Loaded(object sender, RoutedEventArgs e)
         {
-           
+            await this._viewModel.Initialize();
         }
 
         private void IssueAIAnalysisWindow_Closed(object? sender, EventArgs e)
         {
             WindowsManager.RemoveWindow(this);
+        }
+
+        private void PromptComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.AddedItems.Count > 0)
+            {
+                if (e.AddedItems[0] is KeyValuePair<string,string> keyValuePair)
+                {
+                    _viewModel.AIServiceSetting.PromptText = keyValuePair.Value;
+                }
+            }
+        }
+
+        private void DialogHost_DialogClosed(object sender, DialogClosedEventArgs eventArgs)
+        {
+
         }
     }
 }

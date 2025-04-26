@@ -13,6 +13,7 @@ using Serilog;
 using Serilog.Extensions.Logging;
 using Microsoft.Extensions.Logging;
 using MoreConvenientJiraSvn.Core.Enums;
+using System.Threading.Tasks;
 
 namespace MoreConvenientJiraSvn.App
 {
@@ -50,7 +51,7 @@ namespace MoreConvenientJiraSvn.App
             services.AddHostedService<DownloadSvnLogHostedService>();
             services.AddHostedService<CheckJiraStateHostedService>();
             services.AddHostedService<CheckSqlHostedService>();
-            
+
             services.AddSingleton<DownloadSvnLogHostedService>();
             services.AddSingleton<CheckJiraStateHostedService>();
             services.AddSingleton<CheckSqlHostedService>();
@@ -97,8 +98,11 @@ namespace MoreConvenientJiraSvn.App
             services.AddSingleton<LogService>();
         }
 
-        private void App_Startup(object sender, StartupEventArgs e)
+        private async void App_Startup(object sender, StartupEventArgs e)
         {
+            var logService = _services.GetRequiredService<LogService>();
+            logService.LogInfo("Application started");
+
             var settingService = _services.GetRequiredService<SettingService>();
             if (settingService.FindSetting<BackgroundTaskConfig>()?.IsEnableBackgroundTask != true)
             {
@@ -108,11 +112,8 @@ namespace MoreConvenientJiraSvn.App
             var hostServices = _services.GetServices<IHostedService>();
             foreach (var service in hostServices)
             {
-                service.StartAsync(CancellationToken.None);
+                await service.StartAsync(CancellationToken.None);
             }
-
-            var logService = _services.GetRequiredService<LogService>();
-            logService.LogInfo("Application started");
         }
 
         private async void App_Exit(object sender, ExitEventArgs e)

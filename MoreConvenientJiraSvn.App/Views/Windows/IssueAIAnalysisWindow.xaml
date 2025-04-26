@@ -8,6 +8,7 @@
     xmlns:local="clr-namespace:MoreConvenientJiraSvn.App.Views.Windows"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:mdxam="clr-namespace:MdXaml;assembly=MdXaml"
     xmlns:model="clr-namespace:MoreConvenientJiraSvn.Core.Models;assembly=MoreConvenientJiraSvn.Core"
     xmlns:style="clr-namespace:MoreConvenientJiraSvn.App.Styles"
     xmlns:viewModel="clr-namespace:MoreConvenientJiraSvn.App.ViewModels"
@@ -18,12 +19,27 @@
     Style="{StaticResource MaterialDesignWindow}"
     mc:Ignorable="d">
 
-    <materialDesign:DialogHost>
+    <materialDesign:DialogHost
+        DialogClosed="DialogHost_DialogClosed"
+        DialogContentUniformCornerRadius="20"
+        DialogTheme="Inherit"
+        Identifier="ConfirmDialog">
+
         <materialDesign:DrawerHost>
             <!--  Left Drawer content  -->
             <materialDesign:DrawerHost.LeftDrawerContent>
-                <ScrollViewer Width="320" VerticalScrollBarVisibility="Auto">
+                <ScrollViewer Width="400" VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="10" Orientation="Vertical">
+                        <Border
+                            Margin="0,0,0,10"
+                            BorderBrush="LightGray"
+                            BorderThickness="1"
+                            CornerRadius="4">
+                            <Button
+                                Margin="32,0,32,0"
+                                Command="{Binding SaveAIServiceSettingCommand}"
+                                Content="保存配置" />
+                        </Border>
                         <Border
                             Margin="0,0,0,10"
                             BorderBrush="LightGray"
@@ -32,30 +48,42 @@
                             <Expander Header="模型配置" IsExpanded="True">
                                 <StackPanel Margin="8" Orientation="Vertical">
                                     <!--  Model API Address  -->
-                                    <TextBox materialDesign:HintAssist.Hint="模型接口地址" Style="{StaticResource MaterialDesignFloatingHintTextBox}" />
+                                    <TextBox
+                                        materialDesign:HintAssist.Hint="模型接口地址"
+                                        Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                        Text="{Binding AIServiceSetting.ServiceAddress}" />
                                     <!--  ApiKey  -->
                                     <TextBox
                                         Margin="0,5"
                                         materialDesign:HintAssist.Hint="ApiKey"
-                                        Style="{StaticResource MaterialDesignFloatingHintTextBox}" />
+                                        Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                        Text="{Binding AIServiceSetting.ApiKey}" />
                                     <!--  Model Selection: Editable ComboBox  -->
                                     <ComboBox
                                         Margin="0,5"
                                         materialDesign:HintAssist.Hint="选择或输入模型"
                                         IsEditable="True"
-                                        Style="{StaticResource MaterialDesignComboBox}" />
+                                        ItemsSource="{Binding AIServiceSetting.Models}"
+                                        Style="{StaticResource MaterialDesignComboBox}"
+                                        Text="{Binding AIServiceSetting.SelectedModel}" />
                                     <!--  Enable streaming conversation (if supported by model)  -->
                                     <ToggleButton
                                         Margin="0,5"
                                         Content="启用流式对话(需模型支持)"
+                                        IsChecked="{Binding AIServiceSetting.EnableStreamResponse}"
+                                        IsEnabled="False"
                                         Style="{StaticResource MaterialDesignChoiceChipOutlineRadioButton}" />
                                     <!--  Enable multimodal input (if supported by model)  -->
                                     <ToggleButton
                                         Margin="0,5"
                                         Content="启用多模态输入(需模型支持)"
+                                        IsChecked="{Binding AIServiceSetting.EnableMultiModalInput}"
                                         Style="{StaticResource MaterialDesignChoiceChipOutlineRadioButton}" />
                                     <!--  Local folder selection button with icon  -->
-                                    <Button Margin="0,5" Style="{StaticResource MaterialDesignFlatButton}">
+                                    <Button
+                                        Margin="0,5"
+                                        Command="{Binding AddAIDefaultAccessedDirectoryCommand}"
+                                        Style="{StaticResource MaterialDesignFlatButton}">
                                         <StackPanel Orientation="Horizontal">
                                             <materialDesign:PackIcon
                                                 Width="20"
@@ -69,14 +97,21 @@
                                     <DataGrid
                                         Height="150"
                                         Margin="0,5"
-                                        AutoGenerateColumns="False">
+                                        AutoGenerateColumns="False"
+                                        CanUserAddRows="False"
+                                        IsReadOnly="True"
+                                        ItemsSource="{Binding AIServiceSetting.DefaultAccessedDirectories}">
                                         <DataGrid.Columns>
-                                            <DataGridTextColumn Binding="{Binding FolderName}" Header="文件夹路径" />
+                                            <DataGridTextColumn Binding="{Binding}" Header="文件夹路径" />
                                             <DataGridTemplateColumn Header="操作">
                                                 <DataGridTemplateColumn.CellTemplate>
                                                     <DataTemplate>
                                                         <StackPanel Orientation="Horizontal">
-                                                            <Button Padding="4" Style="{StaticResource MaterialDesignFlatButton}">
+                                                            <Button
+                                                                Padding="4"
+                                                                Command="{Binding DataContext.OpenFileOrDirectoryCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                CommandParameter="{Binding}"
+                                                                Style="{StaticResource MaterialDesignFlatButton}">
                                                                 <StackPanel Orientation="Horizontal">
                                                                     <materialDesign:PackIcon
                                                                         Width="16"
@@ -86,7 +121,11 @@
                                                                     <TextBlock VerticalAlignment="Center" Text="打开" />
                                                                 </StackPanel>
                                                             </Button>
-                                                            <Button Padding="4" Style="{StaticResource MaterialDesignFlatButton}">
+                                                            <Button
+                                                                Padding="4"
+                                                                Command="{Binding DataContext.RemoveAIDefaultAccessedDirectoryCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                CommandParameter="{Binding}"
+                                                                Style="{StaticResource MaterialDesignFlatButton}">
                                                                 <StackPanel Orientation="Horizontal">
                                                                     <materialDesign:PackIcon
                                                                         Width="16"
@@ -118,10 +157,16 @@
                                         materialDesign:HintAssist.Hint="填写提示词"
                                         AcceptsReturn="True"
                                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                        Text="{Binding AIServiceSetting.PromptText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                        TextWrapping="Wrap"
                                         VerticalScrollBarVisibility="Auto" />
                                     <ComboBox
                                         Margin="0,5"
                                         materialDesign:HintAssist.Hint="预设提示词"
+                                        DisplayMemberPath="Key"
+                                        ItemsSource="{Binding DefaultPromptList}"
+                                        SelectedValuePath="Value"
+                                        SelectionChanged="PromptComboBox_SelectionChanged"
                                         Style="{StaticResource MaterialDesignComboBox}" />
                                 </StackPanel>
                             </Expander>
@@ -150,6 +195,7 @@
                             <Button
                                 Grid.Row="0"
                                 Margin="5"
+                                Command="{Binding AddAIAccessedFileCommand}"
                                 Style="{StaticResource MaterialDesignFlatButton}">
                                 <StackPanel Orientation="Horizontal">
                                     <materialDesign:PackIcon
@@ -164,16 +210,25 @@
                             <DataGrid
                                 Grid.Row="1"
                                 Margin="5"
-                                AutoGenerateColumns="False">
+                                AutoGenerateColumns="False"
+                                CanUserAddRows="False"
+                                IsReadOnly="True"
+                                ItemsSource="{Binding IssueFiles}"
+                                SelectionMode="Single"
+                                SelectionUnit="FullRow">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Binding="{Binding FileIndex}" Header="文件序号" />
-                                    <DataGridTextColumn Binding="{Binding FileName}" Header="文件名称" />
-                                    <DataGridTextColumn Binding="{Binding FileType}" Header="文件类型" />
+                                    <DataGridTextColumn Binding="{Binding Id}" Header="文件序号" />
+                                    <DataGridTextColumn Binding="{Binding Name}" Header="文件名称" />
+                                    <DataGridTextColumn Binding="{Binding Type}" Header="文件类型" />
                                     <DataGridTemplateColumn Header="操作">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel Orientation="Horizontal">
-                                                    <Button Padding="2" Style="{StaticResource MaterialDesignFlatButton}">
+                                                    <Button
+                                                        Padding="2"
+                                                        Command="{Binding DataContext.OpenFileOrDirectoryCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                        CommandParameter="{Binding Path}"
+                                                        Style="{StaticResource MaterialDesignFlatButton}">
                                                         <StackPanel Orientation="Horizontal">
                                                             <materialDesign:PackIcon
                                                                 Width="16"
@@ -183,7 +238,11 @@
                                                             <TextBlock VerticalAlignment="Center" Text="打开" />
                                                         </StackPanel>
                                                     </Button>
-                                                    <Button Padding="2" Style="{StaticResource MaterialDesignFlatButton}">
+                                                    <Button
+                                                        Padding="2"
+                                                        Command="{Binding DataContext.RemoveAIAccessedFileCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                        CommandParameter="{Binding Id}"
+                                                        Style="{StaticResource MaterialDesignFlatButton}">
                                                         <StackPanel Orientation="Horizontal">
                                                             <materialDesign:PackIcon
                                                                 Width="16"
@@ -217,8 +276,12 @@
                                     Grid.Column="1"
                                     Margin="0,0,5,0"
                                     materialDesign:HintAssist.Hint="输入Jira编号载入默认文件"
-                                    Style="{StaticResource MaterialDesignFloatingHintTextBox}" />
-                                <Button Grid.Column="2" Style="{StaticResource MaterialDesignFlatButton}">
+                                    Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                    Text="{Binding IssueKey}" />
+                                <Button
+                                    Grid.Column="2"
+                                    Command="{Binding LoadDefaultFilesByIssueKeyCommand}"
+                                    Style="{StaticResource MaterialDesignFlatButton}">
                                     <StackPanel Orientation="Horizontal">
                                         <materialDesign:PackIcon
                                             Width="20"
@@ -241,15 +304,24 @@
                             <DataGrid
                                 Grid.Row="0"
                                 Margin="5"
-                                AutoGenerateColumns="False">
+                                AutoGenerateColumns="False"
+                                CanUserAddRows="False"
+                                IsReadOnly="True"
+                                ItemsSource="{Binding ChatHistories}"
+                                SelectionMode="Single"
+                                SelectionUnit="FullRow">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Binding="{Binding ModelName}" Header="模型名称" />
-                                    <DataGridTextColumn Binding="{Binding Title}" Header="对话标题" />
-                                    <DataGridTextColumn Binding="{Binding LastTime}" Header="最后对话时间" />
+                                    <DataGridTextColumn Binding="{Binding StartText}" Header="对话标题" />
+                                    <DataGridTextColumn Binding="{Binding LatestChatTime}" Header="最后对话时间" />
                                     <DataGridTemplateColumn Header="操作">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
-                                                <Button Padding="2" Style="{StaticResource MaterialDesignFlatButton}">
+                                                <Button
+                                                    Padding="2"
+                                                    Command="{Binding DataContext.LoadHistoryChatCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    CommandParameter="{Binding}"
+                                                    Style="{StaticResource MaterialDesignFlatButton}">
                                                     <StackPanel Orientation="Horizontal">
                                                         <materialDesign:PackIcon
                                                             Width="16"
@@ -275,13 +347,18 @@
                                     Grid.Column="0"
                                     Width="120"
                                     Margin="0,0,5,0"
-                                    materialDesign:HintAssist.Hint="开始日期" />
+                                    materialDesign:HintAssist.Hint="开始日期"
+                                    SelectedDate="{Binding StartDate}" />
                                 <DatePicker
                                     Grid.Column="1"
                                     Width="120"
                                     Margin="0,0,5,0"
-                                    materialDesign:HintAssist.Hint="结束日期" />
-                                <Button Grid.Column="2" Style="{StaticResource MaterialDesignFlatButton}">
+                                    materialDesign:HintAssist.Hint="结束日期"
+                                    SelectedDate="{Binding EndDate}" />
+                                <Button
+                                    Grid.Column="2"
+                                    Command="{Binding QueryChatHistoriesCommand}"
+                                    Style="{StaticResource MaterialDesignFlatButton}">
                                     <StackPanel Orientation="Horizontal">
                                         <materialDesign:PackIcon
                                             Width="20"
@@ -305,17 +382,12 @@
                     <FlowDocumentScrollViewer
                         Grid.Row="0"
                         Margin="5"
-                        VerticalScrollBarVisibility="Auto">
-                        <FlowDocument>
-                            <!--  Content displayed after Markdown conversion  -->
-                            <Paragraph>
-                                对话显示区…
-                            </Paragraph>
-                        </FlowDocument>
-                    </FlowDocumentScrollViewer>
+                        Document="{Binding ChatFlowDocument}"
+                        VerticalScrollBarVisibility="Auto" />
                     <!--  Message input area  -->
                     <Grid Grid.Row="1" Margin="5">
                         <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
@@ -336,9 +408,25 @@
                                 <TextBlock VerticalAlignment="Center" Text="设置" />
                             </StackPanel>
                         </Button>
+
+                        <!--  Clear button with icon  -->
+                        <Button
+                            Grid.Column="1"
+                            Margin="0,0,5,0"
+                            Command="{Binding ClearCurrentChatCommand}"
+                            Style="{StaticResource MaterialDesignFlatButton}">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon
+                                    Width="20"
+                                    Height="20"
+                                    Margin="0,0,5,0"
+                                    Kind="Clear" />
+                                <TextBlock VerticalAlignment="Center" Text="清空当前对话" />
+                            </StackPanel>
+                        </Button>
                         <!--  Textbox fills remaining space  -->
                         <TextBox
-                            Grid.Column="1"
+                            Grid.Column="2"
                             Height="60"
                             Margin="0,0,5,0"
                             HorizontalAlignment="Stretch"
@@ -346,9 +434,16 @@
                             materialDesign:HintAssist.Hint="请输入消息"
                             AcceptsReturn="True"
                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                            Text="{Binding InputText}"
                             VerticalScrollBarVisibility="Auto" />
                         <!--  Send button with icon  -->
-                        <Button Grid.Column="2" Style="{StaticResource MaterialDesignRaisedButton}">
+                        <Button
+                            Grid.Column="3"
+                            materialDesign:ButtonProgressAssist.IsIndeterminate="{Binding IsWaitResponse}"
+                            materialDesign:ButtonProgressAssist.IsIndicatorVisible="True"
+                            materialDesign:ButtonProgressAssist.Value="-1"
+                            Command="{Binding SendQuestionCommand}"
+                            Style="{StaticResource MaterialDesignRaisedButton}">
                             <StackPanel Orientation="Horizontal">
                                 <materialDesign:PackIcon
                                     Width="20"
@@ -358,6 +453,7 @@
                                 <TextBlock VerticalAlignment="Center" Text="发送" />
                             </StackPanel>
                         </Button>
+
                     </Grid>
                 </Grid>
             </Grid>

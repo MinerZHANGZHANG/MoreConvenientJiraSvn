@@ -107,6 +107,7 @@ public enum FileOperation
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum FileType
 {
+    Other,
     Code,
     Sql,
     Doc

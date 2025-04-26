@@ -131,4 +131,37 @@
         <Setter Property="FontSize" Value="14" />
     </Style>
 
+    <!--  Confirm Dialog  -->
+    <UserControl x:Key="DialogContentTemplate">
+        <StackPanel Margin="16">
+            <TextBlock Text="Tip Message" />
+            <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                <Button
+                    Margin="0,8,8,0"
+                    Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
+                    Content="确认"
+                    IsDefault="True"
+                    Style="{StaticResource MaterialDesignFlatButton}">
+                    <Button.CommandParameter>
+                        <system:Boolean xmlns:system="clr-namespace:System;assembly=mscorlib">
+                            True
+                        </system:Boolean>
+                    </Button.CommandParameter>
+                </Button>
+                <Button
+                    Margin="0,8,8,0"
+                    Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
+                    Content="取消"
+                    IsCancel="True"
+                    Style="{StaticResource MaterialDesignFlatButton}">
+                    <Button.CommandParameter>
+                        <system:Boolean xmlns:system="clr-namespace:System;assembly=mscorlib">
+                            False
+                        </system:Boolean>
+                    </Button.CommandParameter>
+                </Button>
+            </StackPanel>
+        </StackPanel>
+    </UserControl>
+
 </ResourceDictionary>

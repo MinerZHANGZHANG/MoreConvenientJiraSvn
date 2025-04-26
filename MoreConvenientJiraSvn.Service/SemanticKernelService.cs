@@ -12,7 +12,7 @@ public class SemanticKernelService(IRepository repository, LogService logService
 {
     public Kernel BuildKernelWithChatCompletion(string baseAddress, string modelId, string apiKey, IEnumerable<string>? replaceToEmptyStrings = null)
     {
-        if (Uri.TryCreate(baseAddress, UriKind.Absolute, out var uri))
+        if (!Uri.TryCreate(baseAddress, UriKind.Absolute, out var uri))
         {
             throw new ArgumentException("Invalid base address", nameof(baseAddress));
         }
@@ -24,6 +24,7 @@ public class SemanticKernelService(IRepository repository, LogService logService
                 httpClient: new HttpClient(new LoggingHandler(logService, replaceToEmptyStrings ?? [], new HttpClientHandler()))
                 {
                     BaseAddress = uri,
+                    Timeout = TimeSpan.FromSeconds(120)
                 }
         );
         builder.Services.AddLogging(logBuilder => logBuilder.AddConsole().SetMinimumLevel(LogLevel.Trace));
