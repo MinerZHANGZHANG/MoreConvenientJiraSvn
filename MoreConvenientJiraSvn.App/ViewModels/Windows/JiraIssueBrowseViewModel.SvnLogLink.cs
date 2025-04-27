@@ -47,7 +47,6 @@ public partial class JiraIssueBrowseViewModel
     private void InitJiraIssueSvnLogLink()
     {
         _selectedIssueChanged += JiraIssueSvnLogLink_SelectedIssueChanged;
-        SelectedIssueSvnLogs.CollectionChanged += SelectedIssueSvnLogs_CollectionChanged;
     }
 
     private void JiraIssueSvnLogLink_SelectedIssueChanged(object? sender, JiraIssue issue)
@@ -60,7 +59,7 @@ public partial class JiraIssueBrowseViewModel
         LoadSvnLogByFromLocal();
     }
 
-    private void SelectedIssueSvnLogs_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+    partial void OnSelectedIssueSvnLogsChanged(ObservableCollection<SvnLog> value)
     {
         NewestSvnLog = SelectedIssueSvnLogs?.FirstOrDefault();
         OldestSvnLog = SelectedIssueSvnLogs?.LastOrDefault();
@@ -70,7 +69,7 @@ public partial class JiraIssueBrowseViewModel
     {
         if (SelectedJiraIssue == null || SelectedSvnPath == null)
         {
-            SelectedIssueSvnLogs = []; 
+            SelectedIssueSvnLogs = [];
             return;
         }
 
@@ -78,13 +77,13 @@ public partial class JiraIssueBrowseViewModel
 
         if (SelectedIssueSvnLogs.Any())
         {
-            BeginDate = SelectedIssueSvnLogs.Min(l => l.DateTime);
-            EndDate = SelectedIssueSvnLogs.Max(l => l.DateTime);
+            BeginDate = SelectedIssueSvnLogs.Max(l => l.DateTime);
+            EndDate = DateTime.Today.AddDays(1);
         }
         else
         {
-            BeginDate = DateTime.Today;
-            EndDate = DateTime.Today;
+            BeginDate = DateTime.Today.AddDays(-7);
+            EndDate = DateTime.Today.AddDays(1);
         }
     }
 

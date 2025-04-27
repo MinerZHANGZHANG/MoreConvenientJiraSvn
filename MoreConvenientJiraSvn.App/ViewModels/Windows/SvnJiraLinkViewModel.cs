@@ -120,12 +120,12 @@ public partial class SvnJiraLinkViewModel(SvnService svnService, IRepository rep
         if (SelectedPathSvnLogs.Count > 0)
         {
             BeginQueryDateTime = SelectedPathSvnLogs.Max(l => l.DateTime);
-            EndQueryDateTime = DateTime.Now;
+            EndQueryDateTime = DateTime.Today.AddDays(1);
         }
         else
         {
             BeginQueryDateTime = DateTime.Now.AddDays(-7);
-            EndQueryDateTime = DateTime.Now;
+            EndQueryDateTime = DateTime.Today.AddDays(1);
         }
     }
 
