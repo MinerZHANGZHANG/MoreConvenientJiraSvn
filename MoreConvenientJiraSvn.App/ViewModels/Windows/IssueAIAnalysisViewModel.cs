@@ -287,6 +287,8 @@ namespace MoreConvenientJiraSvn.App.ViewModels
             }
 
             _chatContext.ChatHistory.AddUserMessage(InputText);
+            RefreshChatFlowDocument();
+
             await AskQuestion();
         }
 
@@ -384,7 +386,7 @@ namespace MoreConvenientJiraSvn.App.ViewModels
                 Id = _chatContext.Id,
                 ChatHistoryJson = JsonSerializer.Serialize(_chatContext.ChatHistory),
                 LatestChatTime = DateTime.Now,
-                ModelName = _chatContext.ChatCompletionService.GetModelId() ?? "UnKnowModel",
+                ModelName = _chatContext.ModelId,
                 FilePaths = IssueFiles.Select(x => x.Path),
                 StartText = InputText?[..Math.Min(32, InputText.Length)] ?? string.Empty
             };
@@ -509,5 +511,6 @@ namespace MoreConvenientJiraSvn.App.ViewModels
         public required IChatCompletionService ChatCompletionService { get; set; }
         public required ChatHistory ChatHistory { get; set; }
         public required OpenAIPromptExecutionSettings PromptExecutionSettings { get; set; }
+        public string ModelId => ChatCompletionService.GetModelId() ?? "Unknow Model";
     }
 }
