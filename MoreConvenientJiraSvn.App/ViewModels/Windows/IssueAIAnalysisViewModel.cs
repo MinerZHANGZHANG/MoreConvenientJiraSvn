@@ -386,7 +386,7 @@ namespace MoreConvenientJiraSvn.App.ViewModels
                 LatestChatTime = DateTime.Now,
                 ModelName = _chatContext.ChatCompletionService.GetModelId() ?? "UnKnowModel",
                 FilePaths = IssueFiles.Select(x => x.Path),
-                StartText = InputText?[..Math.Min(32, InputText.Length - 1)] ?? string.Empty
+                StartText = InputText?[..Math.Min(32, InputText.Length)] ?? string.Empty
             };
             repository.Upsert(chatRecord);
         }
