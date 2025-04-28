@@ -98,14 +98,14 @@ public partial class JiraIssueBrowseViewModel
             commitTextBuilder.AppendLine($"需求编号：{issue.ParentIssueKey}");
             commitTextBuilder.AppendLine($"内容概要：{issue.ParentIssueSummary}");
             commitTextBuilder.AppendLine($"缺陷编号：{issue.IssueKey}");
-            commitTextBuilder.Append($"内容概要：{issue.Summary}");
+            commitTextBuilder.Append($"问题描述：{issue.Summary}");
         }
         else
         {
             commitTextBuilder.AppendLine($"需求编号：{issue.IssueKey}");
             commitTextBuilder.AppendLine($"内容概要：{issue.Summary}");
             commitTextBuilder.AppendLine($"缺陷编号：");
-            commitTextBuilder.Append($"内容概要：");
+            commitTextBuilder.Append($"问题描述：");
         }
 
         return commitTextBuilder.ToString();
