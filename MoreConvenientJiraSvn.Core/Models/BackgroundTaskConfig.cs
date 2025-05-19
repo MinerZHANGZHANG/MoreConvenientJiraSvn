@@ -4,7 +4,6 @@ namespace MoreConvenientJiraSvn.Core.Models;
 
 public record BackgroundTaskConfig
 {
-    [BsonId]
     public ObjectId Id { get; set; } = ObjectId.Empty;
 
     // Todo: Split each service

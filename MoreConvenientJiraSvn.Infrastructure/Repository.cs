@@ -1,5 +1,6 @@
 ﻿using LiteDB;
 using MoreConvenientJiraSvn.Core.Interfaces;
+using MoreConvenientJiraSvn.Core.Models;
 using System.Linq.Expressions;
 
 namespace MoreConvenientJiraSvn.Infrastructure;
@@ -7,6 +8,29 @@ namespace MoreConvenientJiraSvn.Infrastructure;
 public class Repository(LiteDatabase db) : IRepository
 {
     private readonly LiteDatabase _db = db;
+
+    public void InitMapping()
+    {
+        var mapper = BsonMapper.Global;
+
+        // Fluent mapping for Id property as document Id for each model
+        mapper.Entity<AIServiceSetting>().Id(x => x.Id);
+        mapper.Entity<BackgroundTaskConfig>().Id(x => x.Id);
+        mapper.Entity<BackgroundTaskLog>().Id(x => x.Id);
+        mapper.Entity<BackgroundTaskMessage>().Id(x => x.Id);
+        mapper.Entity<ChatRecord>().Id(x => x.Id);
+        mapper.Entity<JiraIssueLocalInfo>().Id(x => x.Id);
+        mapper.Entity<JiraIssueLocalInfoSetting>().Id(x => x.Id);
+        mapper.Entity<JiraSvnPathRelation>().Id(x => x.Id);
+        mapper.Entity<SqlCheckSetting>().Id(x => x.Id);
+        mapper.Entity<SqlCreateInfo>().Id(x => x.Id);
+        mapper.Entity<SvnJiraLinkSetting>().Id(x => x.Id);
+        mapper.Entity<SvnConfig>().Id(x => x.Id);
+        mapper.Entity<SvnLog>().Id(x => x.Id);
+        mapper.Entity<JiraConfig>().Id(x => x.BaseUrl);
+        mapper.Entity<JiraIssue>().Id(x => x.IssueId);
+        mapper.Entity<JiraIssueFilter>().Id(x => x.FilterId);
+    }
 
     public BsonValue Insert<T>(T obj) where T : new()
     {

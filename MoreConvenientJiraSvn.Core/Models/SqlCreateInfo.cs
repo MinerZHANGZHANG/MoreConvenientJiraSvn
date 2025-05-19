@@ -3,10 +3,9 @@ using System.Collections.ObjectModel;
 
 namespace MoreConvenientJiraSvn.Core.Models;
 
-public record class SqlCreateInfo
+public record SqlCreateInfo
 {
-    [BsonId]
-    public required ObjectId Id { get; set; } = ObjectId.NewObjectId();
+    public ObjectId Id { get; set; } = ObjectId.NewObjectId();
 
     public required string Name { get; set; }
     public required string Template { get; set; }

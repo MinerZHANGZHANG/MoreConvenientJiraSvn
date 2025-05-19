@@ -100,6 +100,9 @@ namespace MoreConvenientJiraSvn.App
 
         private async void App_Startup(object sender, StartupEventArgs e)
         {
+            var repository = _services.GetRequiredService<IRepository>();
+            repository.InitMapping();
+
             var logService = _services.GetRequiredService<LogService>();
             logService.LogInfo("Application started");
 

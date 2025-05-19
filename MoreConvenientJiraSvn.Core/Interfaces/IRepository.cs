@@ -5,6 +5,8 @@ namespace MoreConvenientJiraSvn.Core.Interfaces;
 
 public interface IRepository
 {
+    void InitMapping();
+
     BsonValue Insert<T>(T obj) where T : new();
 
     BsonValue Insert<T>(IEnumerable<T> objs) where T : class;

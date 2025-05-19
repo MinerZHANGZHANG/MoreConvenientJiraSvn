@@ -3,9 +3,8 @@ using MoreConvenientJiraSvn.Core.Enums;
 
 namespace MoreConvenientJiraSvn.Core.Models;
 
-public class BackgroundTaskLog
+public record BackgroundTaskLog
 {
-    [BsonId]
     public ObjectId Id { get; set; } = ObjectId.NewObjectId();
     public string TaskName { get; set; } = string.Empty;
     public string Summary { get; set; } = string.Empty;
