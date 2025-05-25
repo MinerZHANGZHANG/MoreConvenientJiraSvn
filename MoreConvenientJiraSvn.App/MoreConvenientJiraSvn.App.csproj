@@ -66,6 +66,9 @@
 			<AutoGen>True</AutoGen>
 			<DependentUpon>Settings.settings</DependentUpon>
 		</Compile>
+		<Compile Update="Views\Controls\VersionControl.xaml.cs">
+		  <SubType>Code</SubType>
+		</Compile>
 		<Compile Update="Views\Pages\HostedServiceSettingPage.xaml.cs">
 		  <SubType>Code</SubType>
 		</Compile>

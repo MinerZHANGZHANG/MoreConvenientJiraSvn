@@ -14,6 +14,7 @@ using Serilog.Extensions.Logging;
 using Microsoft.Extensions.Logging;
 using MoreConvenientJiraSvn.Core.Enums;
 using System.Threading.Tasks;
+using MdXaml;
 
 namespace MoreConvenientJiraSvn.App
 {
@@ -36,6 +37,7 @@ namespace MoreConvenientJiraSvn.App
 
             services.AddSingleton(new LiteDatabase(Settings.Default.DatabaseName));
             services.AddSingleton(new NotificationService(Settings.Default.IconUrl));
+            services.AddSingleton(new Markdown());
 
             services.AddSingleton<IRepository, Repository>();
             services.AddSingleton<IJiraClient, JiraClient>();
@@ -47,6 +49,7 @@ namespace MoreConvenientJiraSvn.App
             services.AddSingleton<SvnService>();
             services.AddSingleton<JiraService>();
             services.AddSingleton<SemanticKernelService>();
+            services.AddSingleton<IVersionService, GitHubVersionService>();
 
             services.AddHostedService<DownloadSvnLogHostedService>();
             services.AddHostedService<CheckJiraStateHostedService>();
@@ -63,6 +66,7 @@ namespace MoreConvenientJiraSvn.App
             services.AddTransient<SqlCheckViewModel>();
             services.AddTransient<MainControlViewModel>();
             services.AddTransient<AppSettingControlViewModel>();
+            services.AddTransient<VersionControlViewModel>();
             services.AddTransient<HostedServiceSettingViewModel>();
             services.AddTransient<IssueAIAnalysisViewModel>();
 
@@ -100,11 +104,20 @@ namespace MoreConvenientJiraSvn.App
 
         private async void App_Startup(object sender, StartupEventArgs e)
         {
-            var repository = _services.GetRequiredService<IRepository>();
-            repository.InitMapping();
-
             var logService = _services.GetRequiredService<LogService>();
             logService.LogInfo("Application started");
+
+            var repository = _services.GetRequiredService<IRepository>();
+            repository.InitMapping();
+            if (!repository.TryMigrate())
+            {
+                MessageBox.Show("数据库迁移失败，请检查日志文件。", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                Environment.Exit(1);
+            }
+            else
+            {
+                //logService.LogInfo($"Database migration completed successfully");
+            }
 
             var settingService = _services.GetRequiredService<SettingService>();
             if (settingService.FindSetting<BackgroundTaskConfig>()?.IsEnableBackgroundTask != true)

@@ -8,6 +8,7 @@ namespace MoreConvenientJiraSvn.Infrastructure;
 public class Repository(LiteDatabase db) : IRepository
 {
     private readonly LiteDatabase _db = db;
+    private const int CURRENT_DATABASE_VERSION = 1;
 
     public void InitMapping()
     {
@@ -30,6 +31,62 @@ public class Repository(LiteDatabase db) : IRepository
         mapper.Entity<JiraConfig>().Id(x => x.BaseUrl);
         mapper.Entity<JiraIssue>().Id(x => x.IssueId);
         mapper.Entity<JiraIssueFilter>().Id(x => x.FilterId);
+        mapper.Entity<DatabaseInfo>().Id(x => x.Version);
+        mapper.Entity<VersionInfo>().Id(x => x.Version);
+    }
+
+    public bool TryMigrate()
+    {
+        try
+        {
+            var latestVersionInfo = _db.GetCollection<DatabaseInfo>().FindAll().OrderByDescending(i => i.UpdateTime).FirstOrDefault();
+            if (latestVersionInfo == null)
+            {
+                latestVersionInfo = new DatabaseInfo
+                {
+                    Version = CURRENT_DATABASE_VERSION,
+                    UpdateTime = DateTime.UtcNow
+                };
+                _db.GetCollection<DatabaseInfo>().Insert(latestVersionInfo);
+
+                return true;
+            }
+
+            if (latestVersionInfo.Version == CURRENT_DATABASE_VERSION)
+            {
+                return true;
+            }
+
+            // Perform migration logic here
+            if (latestVersionInfo.Version < 1)
+            {
+                MigrateToVersion1();
+                latestVersionInfo.Version = 1;
+
+                _db.GetCollection<DatabaseInfo>().Insert(latestVersionInfo);
+            }
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            // Handle migration error
+            Console.WriteLine($"Migration failed: {ex.Message}");
+            return false;
+        }
+    }
+
+    private void MigrateToVersion1()
+    {
+        // 在版本1中新增字段
+        var collection = _db.GetCollection<JiraConfig>("MyEntity");
+        var entities = collection.FindAll().ToList();
+
+        foreach (var entity in entities)
+        {
+            entity.ApiToken = "default value";
+            collection.Update(entity);
+        }
     }
 
     public BsonValue Insert<T>(T obj) where T : new()
@@ -83,6 +140,20 @@ public class Repository(LiteDatabase db) : IRepository
     public T? FindOne<T>(Expression<Func<T, bool>> predicate) where T : new()
     {
         var result = _db.GetCollection<T>().FindOne(predicate);
+        return result;
+    }
+
+    public T? FindOneByOrder<T>(string field, bool isDescending) where T : new()
+    {
+        T? result;
+        if (isDescending)
+        {
+            result = _db.GetCollection<T>().FindOne(Query.All(field, Query.Descending));
+        }
+        else
+        {
+            result = _db.GetCollection<T>().FindOne(Query.All(field, Query.Ascending));
+        }
         return result;
     }
 

@@ -7,6 +7,8 @@ public interface IRepository
 {
     void InitMapping();
 
+    bool TryMigrate();
+
     BsonValue Insert<T>(T obj) where T : new();
 
     BsonValue Insert<T>(IEnumerable<T> objs) where T : class;
@@ -18,12 +20,14 @@ public interface IRepository
     IEnumerable<T> FindAll<T>() where T : new();
 
     IEnumerable<T> Find<T>(BsonExpression expression) where T : new();
-    
+
     IEnumerable<T> Find<T>(Expression<Func<T, bool>> predicate) where T : new();
 
     T? FindOne<T>(BsonExpression expression) where T : new();
 
     T? FindOne<T>(Expression<Func<T, bool>> predicate) where T : new();
+
+    T? FindOneByOrder<T>(string field, bool isDescending) where T : new();
 
     bool Delete<T>(BsonValue id) where T : new();
 

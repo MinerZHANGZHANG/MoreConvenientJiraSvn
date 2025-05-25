@@ -44,4 +44,31 @@ internal static class GenerateControl
 
         return mainStackPanel;
     }
+
+    public static StackPanel GetErrorDialog(string message)
+    {
+        var mainStackPanel = new StackPanel { Margin = new Thickness(16) };
+
+        var textBlock = new TextBlock { Text = message };
+        mainStackPanel.Children.Add(textBlock);
+
+        var buttonPanel = new StackPanel
+        {
+            HorizontalAlignment = HorizontalAlignment.Right,
+            Orientation = Orientation.Horizontal
+        };
+        var confirmButton = new Button
+        {
+            Margin = new Thickness(0, 8, 8, 0),
+            Content = "确认",
+            IsDefault = true,
+            Style = (Style)Application.Current.Resources["MaterialDesignFlatButton"],
+            Command = MaterialDesignThemes.Wpf.DialogHost.CloseDialogCommand,
+            CommandParameter = true
+        };
+        buttonPanel.Children.Add(confirmButton);
+        mainStackPanel.Children.Add(buttonPanel);
+
+        return mainStackPanel;
+    }
 }
