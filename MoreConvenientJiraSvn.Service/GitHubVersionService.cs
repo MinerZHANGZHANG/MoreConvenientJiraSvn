@@ -11,7 +11,7 @@ namespace MoreConvenientJiraSvn.Service;
 public interface IVersionService
 {
     Task<bool> DownloadReleaseAssetAsync(ReleaseAsset releaseAsset, string downloadPath);
-    VersionInfo GetCurrentVersionInfoAsync();
+    VersionInfo GetCurrentVersionInfoAsync(string currentVersion);
     Task<VersionInfo?> GetLatestVersionInfoAsync();
     ReleaseAsset? GetUpdateVersionAssetAsync(VersionInfo currentVersion, VersionInfo latestVersion);
 }
@@ -20,7 +20,7 @@ public class GitHubVersionService(IRepository repository, LogService logService)
 {
     public const string DownloadSourceUrl = $"https://api.github.com/repos/MinerZHANGZHANG/MoreConvenientJiraSvn/releases/latest";
 
-    public VersionInfo GetCurrentVersionInfoAsync()
+    public VersionInfo GetCurrentVersionInfoAsync(string currentVersion)
     {
         var versionInfo = repository.FindOneByOrder<VersionInfo>(nameof(VersionInfo.Version), true);
 
@@ -28,7 +28,7 @@ public class GitHubVersionService(IRepository repository, LogService logService)
         {
             versionInfo = new VersionInfo
             {
-                Version = "1.0.1",
+                Version = currentVersion,
                 Description = string.Empty,
                 PublishTime = new DateTime(2025, 4, 1),
                 BuildType = IsSelfContained()
