@@ -53,9 +53,9 @@
                         IconKind="Settings" />
                     <control:IconButton
                         Margin="6"
-                        ButtonText="添加插件"
+                        ButtonText="应用版本"
                         Command="{Binding SwitchContentCommand}"
-                        CommandParameter="{x:Static viewModel:IndexContent.Plugin}"
+                        CommandParameter="{x:Static viewModel:IndexContent.Version}"
                         IconKind="Extension" />
                 </StackPanel>
             </GroupBox>

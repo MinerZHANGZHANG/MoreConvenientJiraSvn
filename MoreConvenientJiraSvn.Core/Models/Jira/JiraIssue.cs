@@ -8,7 +8,6 @@ public record JiraIssue
 {
     #region Main Property
 
-    [BsonId]
     [IssueJsonMapping("id", null, JsonPositionType.Main)]
     public string IssueId { get; set; } = string.Empty;
 

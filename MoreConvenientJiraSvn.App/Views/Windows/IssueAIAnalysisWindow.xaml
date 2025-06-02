@@ -375,19 +375,14 @@
                 <!--  Right Side: Chat Interface  -->
                 <Grid Grid.Column="1" Margin="5">
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
-                    <!--  Conversation display area, supports Markdown (using MdXaml conversion)  -->
-                    <FlowDocumentScrollViewer
-                        Grid.Row="0"
-                        Margin="5"
-                        Document="{Binding ChatFlowDocument}"
-                        VerticalScrollBarVisibility="Auto" />
-                    <!--  Message input area  -->
-                    <Grid Grid.Row="1" Margin="5">
+
+                    <!--  Right top title  -->
+                    <Grid Grid.Row="0">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
@@ -408,10 +403,51 @@
                                 <TextBlock VerticalAlignment="Center" Text="设置" />
                             </StackPanel>
                         </Button>
+                        <Border
+                            Grid.Column="1"
+                            BorderBrush="LightGray"
+                            BorderThickness="0.5"
+                            CornerRadius="6">
+                            <TextBlock
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Style="{StaticResource MaterialDesignTitleMediumTextBlock}"
+                                Text="{Binding AIServiceSetting.SelectedModel}" />
+                        </Border>
+                        <Button
+                            Grid.Column="2"
+                            Margin="0,0,5,0"
+                            Click="ReturnScrollTopButton_Click"
+                            Style="{StaticResource MaterialDesignFlatButton}">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon
+                                    Width="20"
+                                    Height="20"
+                                    Margin="0,0,5,0"
+                                    Kind="ArrowTop" />
+                                <TextBlock VerticalAlignment="Center" Text="回到顶部" />
+                            </StackPanel>
+                        </Button>
+                    </Grid>
+                    <!--  Conversation display area, supports Markdown (using MdXaml conversion)  -->
+                    <FlowDocumentScrollViewer
+                        x:Name="ChatFlowDocumentScrollViewer"
+                        Grid.Row="1"
+                        Margin="5"
+                        Document="{Binding ChatFlowDocument}"
+                        VerticalScrollBarVisibility="Auto" />
+                    <!--  Message input area  -->
+                    <Grid Grid.Row="2" Margin="5">
+                        <Grid.ColumnDefinitions>
+
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
 
                         <!--  Clear button with icon  -->
                         <Button
-                            Grid.Column="1"
+                            Grid.Column="0"
                             Margin="0,0,5,0"
                             Command="{Binding ClearCurrentChatCommand}"
                             Style="{StaticResource MaterialDesignFlatButton}">
@@ -426,7 +462,7 @@
                         </Button>
                         <!--  Textbox fills remaining space  -->
                         <TextBox
-                            Grid.Column="2"
+                            Grid.Column="1"
                             Height="60"
                             Margin="0,0,5,0"
                             HorizontalAlignment="Stretch"
@@ -438,7 +474,7 @@
                             VerticalScrollBarVisibility="Auto" />
                         <!--  Send button with icon  -->
                         <Button
-                            Grid.Column="3"
+                            Grid.Column="2"
                             materialDesign:ButtonProgressAssist.IsIndeterminate="{Binding IsWaitResponse}"
                             materialDesign:ButtonProgressAssist.IsIndicatorVisible="True"
                             materialDesign:ButtonProgressAssist.Value="-1"

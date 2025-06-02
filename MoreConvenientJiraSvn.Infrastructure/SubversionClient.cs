@@ -86,8 +86,16 @@ public class SubversionClient : ISubversionClient
 
         await Task.Run(() =>
         {
-            _client.GetLog(svnUri, svnLogArgs, out var logEventArgs);
-            results = logEventArgs;
+            try
+            {
+                _client.GetLog(svnUri, svnLogArgs, out var logEventArgs);
+                results = logEventArgs;
+            }
+            // TODO: add log
+            catch (SvnRepositoryIOException)
+            {
+                results = [];
+            }            
         }, cancellationToken);
 
         return results;

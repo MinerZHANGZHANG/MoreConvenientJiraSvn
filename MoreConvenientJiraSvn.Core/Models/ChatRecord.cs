@@ -2,9 +2,8 @@
 
 namespace MoreConvenientJiraSvn.Core.Models;
 
-public record class ChatRecord
+public record ChatRecord
 {
-    [BsonId]
     public ObjectId Id { get; set; } = ObjectId.NewObjectId();
 
     public string ModelName { get; set; } = string.Empty;

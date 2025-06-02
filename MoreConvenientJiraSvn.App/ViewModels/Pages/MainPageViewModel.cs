@@ -13,6 +13,7 @@ public partial class MainPageViewModel : ObservableObject
     //public readonly GetPluginControl getPluginControl = new();
     public readonly IntroduceWhatControl IntroduceWhatControl = new();
     public readonly IntroduceHowControl IntroduceHowControl = new();
+    public readonly VersionControl VersionControl = new();
 
     [ObservableProperty]
     private UserControl? _currentContent = null;
@@ -28,9 +29,8 @@ public partial class MainPageViewModel : ObservableObject
             case IndexContent.Setting:
                 CurrentContent = AppSettingControl;
                 break;
-            case IndexContent.Plugin:
-                //CurrentContent = getPluginControl;
-                MessageBox.Show("尚未支持");
+            case IndexContent.Version:
+                CurrentContent = VersionControl;
                 break;
             case IndexContent.What:
                 CurrentContent = IntroduceWhatControl;
@@ -51,7 +51,7 @@ public enum IndexContent
 {
     Index,
     Setting,
-    Plugin,
+    Version,
     What,
     How,
     Expand

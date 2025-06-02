@@ -4,9 +4,7 @@ namespace MoreConvenientJiraSvn.Core.Models;
 
 public record SvnLog
 {
-    [BsonId]
     public string Id => $"{SvnPath}_{Revision}";
-
     public string SvnPath { get; set; } = string.Empty;
     public long Revision { get; set; }
 

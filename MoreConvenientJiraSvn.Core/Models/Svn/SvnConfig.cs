@@ -5,7 +5,6 @@ namespace MoreConvenientJiraSvn.Core.Models;
 
 public record SvnConfig
 {
-    [BsonId]
     public ObjectId Id { get; set; } = ObjectId.Empty;
     public string UserName { get; set; } = string.Empty;
     // Yes, use really value :), take care your data file

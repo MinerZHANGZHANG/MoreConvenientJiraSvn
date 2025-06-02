@@ -6,7 +6,6 @@ namespace MoreConvenientJiraSvn.Core.Models;
 
 public class AIServiceSetting : ObservableObject
 {
-    [BsonId]
     public ObjectId Id { get; set; } = ObjectId.Empty;
 
     private string _serviceAddress = string.Empty;

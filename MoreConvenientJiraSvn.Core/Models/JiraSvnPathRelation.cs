@@ -7,7 +7,6 @@ namespace MoreConvenientJiraSvn.Core.Models;
 /// </summary>
 public record JiraSvnPathRelation
 {
-    [BsonId]
     public ObjectId Id { get; set; } = ObjectId.NewObjectId();
 
     public string SvnPath { get; set; } = string.Empty;
