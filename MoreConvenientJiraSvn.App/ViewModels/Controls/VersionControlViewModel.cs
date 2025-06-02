@@ -5,6 +5,7 @@ using MdXaml;
 using MoreConvenientJiraSvn.App.Utils;
 using MoreConvenientJiraSvn.Core.Models;
 using MoreConvenientJiraSvn.Service;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Windows;
@@ -41,6 +42,8 @@ public partial class VersionControlViewModel(IVersionService versionService, Log
          : $"{LatestVersion.Name}({LatestVersion.Version})";
 
     public static string AppRepoUrl => @"https://github.com/MinerZHANGZHANG/MoreConvenientJiraSvn";
+
+    public static string UpdateApplictionUrl => Path.Combine(Environment.CurrentDirectory, "UpdateApp.exe");
 
     public bool IsNeedUpdate => LatestVersion != null && CurrentVersion != null
         && LatestVersion.Version != CurrentVersion.Version;
@@ -111,26 +114,28 @@ public partial class VersionControlViewModel(IVersionService versionService, Log
                 }
             }
         }
-
-        DownloadProgressValue = 0f;
-        bool isDownload;
-        string errorMessage = string.Empty;
-        try
+        else
         {
-            isDownload = await versionService.DownloadReleaseAssetAsync(releaseAsset, downloadPosition);
+            DownloadProgressValue = 0f;
+            bool isDownload;
+            string errorMessage = string.Empty;
+            try
+            {
+                isDownload = await versionService.DownloadReleaseAssetAsync(releaseAsset, downloadPosition);
+            }
+            catch (Exception ex)
+            {
+                isDownload = false;
+                errorMessage = ex.Message;
+            }
+            if (!isDownload)
+            {
+                await DialogHost.Show(GenerateControl.GetErrorDialog($"文件下载失败 {errorMessage}"));
+                return;
+            }
+            DownloadProgressValue = 1f;
         }
-        catch (Exception ex)
-        {
-            isDownload = false;
-            errorMessage = ex.Message;
-        }
-        if (!isDownload)
-        {
-            await DialogHost.Show(GenerateControl.GetErrorDialog(errorMessage), "下载失败");
-            return;
-        }
-        DownloadProgressValue = 1f;
-
+            
         var confirmResult = await DialogHost.Show(GenerateControl.GetConfrimDialog($"{releaseAsset.Name}下载完成，是否立即关闭应用并更新?"));
         if (confirmResult is bool result && result)
         {
@@ -140,9 +145,9 @@ public partial class VersionControlViewModel(IVersionService versionService, Log
                 return;
             }
 
+            string extractDirectoryPath = Path.Combine(Environment.CurrentDirectory, "Backup", $"{Path.GetFileNameWithoutExtension(releaseAsset.Name)}_{DateTime.Now:yyyyMMdd-HHmmss}");
             try
             {
-                string extractDirectoryPath = Path.Combine(Environment.CurrentDirectory, "Backup", Path.GetFileNameWithoutExtension(releaseAsset.Name));
                 if (!Directory.Exists(extractDirectoryPath))
                 {
                     Directory.CreateDirectory(extractDirectoryPath);
@@ -153,16 +158,22 @@ public partial class VersionControlViewModel(IVersionService versionService, Log
             {
                 logService.LogDebug($"Unzip {downloadPosition} failed:{ex.Message}");
             }
+           
+            string backupPath = Path.Combine(Environment.CurrentDirectory, "Backup", $"Backup_{System.AppDomain.CurrentDomain.FriendlyName}_{CurrentVersion.Version}_{DateTime.Now:yyyyMMddHHmmss}");
+            string arguments = $"{System.AppDomain.CurrentDomain.FriendlyName} {backupPath} {extractDirectoryPath}";
 
-            //// Start script to update
-            //System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
-            //{
-            //    FileName = downloadPosition,
-            //    UseShellExecute = true,
-            //    Verb = "runas"
-            //});
-            //logService.LogDebug("appliction shutdown to update...");
-            //Application.Current.Shutdown();
+            // Start script to update
+            ProcessStartInfo startInfo = new ProcessStartInfo
+            {
+                FileName = UpdateApplictionUrl,
+                Arguments = arguments,
+                UseShellExecute = false,
+                CreateNoWindow = false
+            };
+
+            Process.Start(startInfo);
+
+            Application.Current.Shutdown();
         }
 
     }

@@ -28,7 +28,7 @@ public class GitHubVersionService(IRepository repository, LogService logService)
         {
             versionInfo = new VersionInfo
             {
-                Version = "1.0.0",
+                Version = "1.0.1",
                 Description = string.Empty,
                 PublishTime = new DateTime(2025, 4, 1),
                 BuildType = IsSelfContained()
