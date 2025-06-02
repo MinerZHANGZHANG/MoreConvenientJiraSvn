@@ -60,7 +60,6 @@ public class Repository(LiteDatabase db) : IRepository
             // Perform migration logic here
             if (latestVersionInfo.Version < 1)
             {
-                MigrateToVersion1();
                 latestVersionInfo.Version = 1;
 
                 _db.GetCollection<DatabaseInfo>().Insert(latestVersionInfo);
@@ -70,22 +69,8 @@ public class Repository(LiteDatabase db) : IRepository
         }
         catch (Exception ex)
         {
-            // Handle migration error
             Console.WriteLine($"Migration failed: {ex.Message}");
             return false;
-        }
-    }
-
-    private void MigrateToVersion1()
-    {
-        // 在版本1中新增字段
-        var collection = _db.GetCollection<JiraConfig>("MyEntity");
-        var entities = collection.FindAll().ToList();
-
-        foreach (var entity in entities)
-        {
-            entity.ApiToken = "default value";
-            collection.Update(entity);
         }
     }
 

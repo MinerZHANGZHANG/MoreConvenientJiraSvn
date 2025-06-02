@@ -8,6 +8,7 @@ using MoreConvenientJiraSvn.Service;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Documents;
 
@@ -48,9 +49,11 @@ public partial class VersionControlViewModel(IVersionService versionService, Log
     public bool IsNeedUpdate => LatestVersion != null && CurrentVersion != null
         && LatestVersion.Version != CurrentVersion.Version;
 
+    private const string _baseVersion = "1.0.2";
+
     public async Task Init()
     {
-        CurrentVersion = versionService.GetCurrentVersionInfoAsync();
+        CurrentVersion = versionService.GetCurrentVersionInfoAsync(GetVersion()?.ToString() ?? _baseVersion);
         LatestVersion = await versionService.GetLatestVersionInfoAsync();
         if (LatestVersion == null)
         {
@@ -59,6 +62,13 @@ public partial class VersionControlViewModel(IVersionService versionService, Log
         }
 
         UpdateLogDocument = markdownEngine.Transform(LatestVersion.Description);
+    }
+
+    private static Version? GetVersion()
+    {
+        Assembly assembly = Assembly.GetExecutingAssembly();
+        Version? version = assembly?.GetName()?.Version;
+        return version;
     }
 
     [RelayCommand]
@@ -135,7 +145,7 @@ public partial class VersionControlViewModel(IVersionService versionService, Log
             }
             DownloadProgressValue = 1f;
         }
-            
+
         var confirmResult = await DialogHost.Show(GenerateControl.GetConfrimDialog($"{releaseAsset.Name}下载完成，是否立即关闭应用并更新?"));
         if (confirmResult is bool result && result)
         {
@@ -158,7 +168,7 @@ public partial class VersionControlViewModel(IVersionService versionService, Log
             {
                 logService.LogDebug($"Unzip {downloadPosition} failed:{ex.Message}");
             }
-           
+
             string backupPath = Path.Combine(Environment.CurrentDirectory, "Backup", $"Backup_{System.AppDomain.CurrentDomain.FriendlyName}_{CurrentVersion.Version}_{DateTime.Now:yyyyMMddHHmmss}");
             string arguments = $"{System.AppDomain.CurrentDomain.FriendlyName} {backupPath} {extractDirectoryPath}";
 
