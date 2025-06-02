@@ -53,7 +53,7 @@ public partial class VersionControlViewModel(IVersionService versionService, Log
 
     public async Task Init()
     {
-        CurrentVersion = versionService.GetCurrentVersionInfoAsync(GetVersion()?.ToString() ?? _baseVersion);
+        CurrentVersion = versionService.GetCurrentVersionInfoAsync(GetVersionString());
         LatestVersion = await versionService.GetLatestVersionInfoAsync();
         if (LatestVersion == null)
         {
@@ -64,11 +64,11 @@ public partial class VersionControlViewModel(IVersionService versionService, Log
         UpdateLogDocument = markdownEngine.Transform(LatestVersion.Description);
     }
 
-    private static Version? GetVersion()
+    private static string GetVersionString()
     {
         Assembly assembly = Assembly.GetExecutingAssembly();
         Version? version = assembly?.GetName()?.Version;
-        return version;
+        return version == null ? _baseVersion : $"{version.Major}.{version.Minor}.{version.Build}";
     }
 
     [RelayCommand]
