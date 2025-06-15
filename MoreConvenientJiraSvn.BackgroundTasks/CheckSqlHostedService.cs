@@ -2,19 +2,21 @@
 using MoreConvenientJiraSvn.Core.Interfaces;
 using MoreConvenientJiraSvn.Core.Models;
 using MoreConvenientJiraSvn.Service;
+using System;
 using System.IO;
+using System.Windows.Shapes;
 
 namespace MoreConvenientJiraSvn.BackgroundTask;
 
 public class CheckSqlHostedService : TimedHostedService
 {
     private readonly IRepository _repository;
-    private readonly IPlSqlCheckPipeline _plSqlCheckPipeline;
+    private readonly IPlSqlIssueChecker _plSqlCheckPipeline;
 
     private readonly SettingService _settingService;
     private readonly LogService _logService;
 
-    public CheckSqlHostedService(IRepository repository, IPlSqlCheckPipeline plSqlCheckPipeline, LogService logService, SettingService settingService)
+    public CheckSqlHostedService(IRepository repository, IPlSqlIssueChecker plSqlCheckPipeline, LogService logService, SettingService settingService)
     : base(repository, new TimeSpan(9, 30, 0), TimeSpan.FromMinutes(5), 3)
     {
         _repository = repository;
@@ -53,8 +55,8 @@ public class CheckSqlHostedService : TimedHostedService
         {
             try
             {
-                Dictionary<string, int> viewAlertCountDict = [];
                 List<string> fileInfos = [];
+                SqlCheckSetting sqlCheckSetting = _settingService.FindSetting<SqlCheckSetting>() ?? new SqlCheckSetting();
 
                 foreach (string dir in config.CheckSqlDirectoies)
                 {
@@ -62,6 +64,12 @@ public class CheckSqlHostedService : TimedHostedService
                     {
                         fileInfos.AddRange(Directory.GetFiles(dir, "*.sql"));
                     }
+                }
+
+                // 如果设置了跳过目录名，且当前路径包含该目录名，则跳过
+                if (!string.IsNullOrEmpty(sqlCheckSetting.SkipDirectoryName))
+                {
+                    fileInfos = [.. fileInfos.Where(p => !p.Contains(sqlCheckSetting.SkipDirectoryName))];
                 }
 
                 if (fileInfos.Count == 0)
@@ -72,12 +80,7 @@ public class CheckSqlHostedService : TimedHostedService
                 }
                 else
                 {
-                    List<SqlIssue> sqlIssues = [];
-                    foreach (var file in fileInfos)
-                    {
-                        var issues = _plSqlCheckPipeline.CheckSingleFile(file, viewAlertCountDict);
-                        sqlIssues.AddRange(issues);
-                    }
+                    List<SqlIssue> sqlIssues = await _plSqlCheckPipeline.CheckMultipleFilesAsync(fileInfos, sqlCheckSetting);
 
                     taskMessages.AddRange(sqlIssues.Select(i => new BackgroundTaskMessage()
                     {

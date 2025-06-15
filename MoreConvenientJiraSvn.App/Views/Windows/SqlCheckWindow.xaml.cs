@@ -47,4 +47,14 @@ public partial class SqlCheckWindow : Window
     {
         this._viewModel.SetCheckDir();
     }
+
+    private void TextBox_LostFocus(object sender, RoutedEventArgs e)
+    {
+        this._viewModel.SaveSetting();
+    }
+
+    private void ComboBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+    {
+        this._viewModel.SaveSetting();
+    }
 }

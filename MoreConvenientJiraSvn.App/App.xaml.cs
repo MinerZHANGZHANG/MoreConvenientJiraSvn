@@ -1,20 +1,21 @@
 ﻿using LiteDB;
+using MdXaml;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using MoreConvenientJiraSvn.App.Properties;
 using MoreConvenientJiraSvn.App.ViewModels;
 using MoreConvenientJiraSvn.BackgroundTask;
+using MoreConvenientJiraSvn.Core.Enums;
 using MoreConvenientJiraSvn.Core.Interfaces;
 using MoreConvenientJiraSvn.Core.Models;
 using MoreConvenientJiraSvn.Infrastructure;
 using MoreConvenientJiraSvn.Service;
-using System.Windows;
 using Serilog;
 using Serilog.Extensions.Logging;
-using Microsoft.Extensions.Logging;
-using MoreConvenientJiraSvn.Core.Enums;
+using System.Text;
 using System.Threading.Tasks;
-using MdXaml;
+using System.Windows;
 
 namespace MoreConvenientJiraSvn.App
 {
@@ -41,7 +42,7 @@ namespace MoreConvenientJiraSvn.App
 
             services.AddSingleton<IRepository, Repository>();
             services.AddSingleton<IJiraClient, JiraClient>();
-            services.AddSingleton<IPlSqlCheckPipeline, PlSqlCheckPipeline>();
+            services.AddTransient<IPlSqlIssueChecker, PlSqlChecker>();
             services.AddSingleton<ISubversionClient, SubversionClient>();
             services.AddSingleton<IHtmlConvert, HtmlConvert>();
 
@@ -76,6 +77,7 @@ namespace MoreConvenientJiraSvn.App
             Settings.Default.Save();
 
             ViewModelsManager.InitService(_services);
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
             this.Exit += App_Exit;
             this.Startup += App_Startup;

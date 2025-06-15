@@ -1,27 +1,37 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MaterialDesignThemes.Wpf;
 using Microsoft.Win32;
+using MoreConvenientJiraSvn.App.Utils;
 using MoreConvenientJiraSvn.Core.Interfaces;
 using MoreConvenientJiraSvn.Core.Models;
 using MoreConvenientJiraSvn.Service;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace MoreConvenientJiraSvn.App.ViewModels;
 
-public partial class SqlCheckViewModel(SvnService svnService, IRepository repository, IPlSqlCheckPipeline plSqlCheckPipeline, SettingService settingService) : ObservableObject
+public partial class SqlCheckViewModel(SvnService svnService, IRepository repository, IPlSqlIssueChecker plSqlCheckPipeline, SettingService settingService) : ObservableObject
 {
     #region Service
     private readonly SvnService _svnService = svnService;
     private readonly IRepository _repository = repository;
-    private readonly IPlSqlCheckPipeline _plSqlCheckPipeline = plSqlCheckPipeline;
+    private readonly IPlSqlIssueChecker _plSqlCheckPipeline = plSqlCheckPipeline;
     private readonly SettingService _settingService = settingService;
 
     #endregion
 
     #region Property & Field
+
+    public static string DialogHostIdent => "SqlCheckWindowDialogHost";
+
+    public static string[] Encodes => [
+        "utf-8",
+        "gb2312"
+   ];
 
     [ObservableProperty]
     private SqlCheckSetting _setting = new();
@@ -35,13 +45,17 @@ public partial class SqlCheckViewModel(SvnService svnService, IRepository reposi
     [ObservableProperty]
     private ObservableCollection<SqlIssue> _sqlIssues = [];
 
-    private Dictionary<string, int> _viewAlertCountDict = [];
-
     #endregion
 
     public void InitViewModel()
     {
         Setting = _settingService.FindSetting<SqlCheckSetting>() ?? new();
+    }
+
+    [RelayCommand]
+    public void SaveSetting()
+    {
+        _settingService.UpsertSetting(Setting);
     }
 
     [RelayCommand]
@@ -73,30 +87,30 @@ public partial class SqlCheckViewModel(SvnService svnService, IRepository reposi
         {
             return;
         }
-        _viewAlertCountDict = [];
+        SqlIssues.Clear();
         CheckStateProgress = 0;
-        string[] fileInfos = Directory.GetFiles(Setting.DefaultDir, "*.sql");
+        string[] fileInfos = Directory.GetFiles(Setting.DefaultDir, "*.sql", SearchOption.AllDirectories);
         if (fileInfos.Length == 0)
         {
             MessageBox.Show($"{Setting.DefaultDir}路径下没有.sql文件");
             return;
         }
+
+        // 如果设置了跳过目录名，且当前路径包含该目录名，则跳过
+        if (!string.IsNullOrEmpty(Setting.SkipDirectoryName))
+        {
+            fileInfos = [.. fileInfos.Where(p => !p.Contains(Setting.SkipDirectoryName))];
+        }
+
         CheckStateText = $"找到{fileInfos.Length}个Sql文件，正在检测...";
         float eachRatio = 100f / fileInfos.Length;
-        List<SqlIssue> tempIssues = [];
-        await Task.Run(() =>
-        {
-            Parallel.ForEach(fileInfos, file =>
-            {
-                var issues = _plSqlCheckPipeline.CheckSingleFile(file, _viewAlertCountDict);
-                lock (tempIssues)
-                {
-                    tempIssues.AddRange(issues);
-                }
 
-                CheckStateProgress += eachRatio;
-            });
-        });
+        void progressAction(int progress)
+        {
+            CheckStateProgress = progress * eachRatio;
+            CheckStateText = $"正在检测第{progress + 1}个文件，进度：{CheckStateProgress}%";
+        }
+        List<SqlIssue> tempIssues = await _plSqlCheckPipeline.CheckMultipleFilesAsync(fileInfos, Setting, progressAction);
 
         CheckStateProgress = 1;
         SqlIssues = [.. tempIssues];
@@ -105,8 +119,7 @@ public partial class SqlCheckViewModel(SvnService svnService, IRepository reposi
 
     public List<SqlIssue> CheckFile(string filePath)
     {
-        _viewAlertCountDict = [];
-        return _plSqlCheckPipeline.CheckSingleFile(filePath, _viewAlertCountDict);
+        return _plSqlCheckPipeline.CheckSingleFile(filePath, Setting);
     }
 
     [RelayCommand]
@@ -154,6 +167,13 @@ public partial class SqlCheckViewModel(SvnService svnService, IRepository reposi
             }
         }
 
+    }
+
+    [RelayCommand]
+    public async Task DisplayInfo(string message)
+    {
+        message = message.Replace(@"\n", Environment.NewLine);
+        await DialogHost.Show(GenerateControl.DisplayInfoDialog(message), DialogHostIdent);
     }
 
 }

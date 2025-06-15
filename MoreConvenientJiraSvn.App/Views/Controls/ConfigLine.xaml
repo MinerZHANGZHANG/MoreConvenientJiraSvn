@@ -28,6 +28,7 @@
             HorizontalAlignment="Left"
             VerticalAlignment="Center"
             Command="{Binding ShowConfigDescriptionCommand, ElementName=ConfigLineControl}"
+            CommandParameter="{Binding CommandParameter, ElementName=ConfigLineControl}"
             Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}"
             ToolTip="查看配置含义"
             Visibility="{Binding IsButtonVisible, ElementName=ConfigLineControl, Converter={StaticResource BooleanToVisibilityConverter}}">

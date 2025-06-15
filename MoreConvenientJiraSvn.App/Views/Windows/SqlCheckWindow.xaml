@@ -10,8 +10,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:viewModel="clr-namespace:MoreConvenientJiraSvn.App.ViewModels"
     Title="Sql正确性校验"
-    Width="595"
-    Height="765"
+    Width="1080"
+    Height="720"
     d:DataContext="{d:DesignInstance Type=viewModel:SqlCheckViewModel}"
     Style="{StaticResource MaterialDesignWindow}"
     mc:Ignorable="d">
@@ -37,16 +37,28 @@
         </ResourceDictionary>
     </Window.Resources>
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <StackPanel Orientation="Vertical">
+    <materialDesign:DialogHost Identifier="{Binding DialogHostIdent}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
 
             <!--  Directory check  -->
-            <Expander Header="设置检测路径" IsExpanded="True">
+            <Expander
+                Grid.Row="0"
+                Header="基本设置"
+                IsExpanded="True">
                 <StackPanel
                     Grid.Row="0"
                     Margin="10"
                     Orientation="Vertical">
-                    <control:ConfigLine Margin="4" ConfigName="检测路径">
+                    <control:ConfigLine
+                        Margin="4"
+                        ConfigName="检测路径"
+                        IsButtonVisible="False">
                         <DockPanel>
                             <Button
                                 Width="60"
@@ -66,55 +78,129 @@
                         </DockPanel>
                     </control:ConfigLine>
 
-                    <DockPanel Margin="4">
-                        <TextBlock Text="{Binding CheckStateText}" />
-                        <Button
-                            x:Name="CheckButton"
-                            Width="100"
-                            HorizontalAlignment="Right"
-                            Command="{Binding CheckDirCommand}"
-                            Content="检测SQL"
-                            DockPanel.Dock="Right"
-                            Style="{StaticResource MaterialDesignRaisedButton}" />
-                    </DockPanel>
-
-                    <ProgressBar
-                        Height="16"
+                    <control:ConfigLine
                         Margin="4"
-                        Style="{StaticResource MaterialDesignLinearProgressBar}"
-                        Value="{Binding CheckStateProgress}" />
+                        ConfigName="检测重复的视图"
+                        IsButtonVisible="False">
+                        <CheckBox
+                            MinWidth="160"
+                            Command="{Binding SaveSettingCommand}"
+                            IsChecked="{Binding Setting.IsCheckRepeatViews}" />
+                    </control:ConfigLine>
+
+                    <control:ConfigLine
+                        Margin="4"
+                        ConfigName="检测结尾的斜杠和Commit"
+                        IsButtonVisible="False">
+                        <CheckBox
+                            MinWidth="160"
+                            Command="{Binding SaveSettingCommand}"
+                            IsChecked="{Binding Setting.IsCheckCommitAndSlash}" />
+                    </control:ConfigLine>
+
+                    <control:ConfigLine
+                        Margin="4"
+                        ConfigName="读取编码方式"
+                        IsButtonVisible="False">
+                        <ComboBox
+                            MinWidth="160"
+                            ItemsSource="{Binding Encodes}"
+                            SelectedItem="{Binding Setting.Encoding}"
+                            SelectionChanged="ComboBox_SelectionChanged" />
+                    </control:ConfigLine>
+
+                    <control:ConfigLine
+                        Margin="4"
+                        ConfigName="要跳过的目录"
+                        IsButtonVisible="False">
+                        <TextBox
+                            MinWidth="160"
+                            LostFocus="TextBox_LostFocus"
+                            Text="{Binding Setting.SkipDirectoryName}" />
+                    </control:ConfigLine>
+
+                    <control:ConfigLine
+                        Margin="4"
+                        CommandParameter="启用后，每解析完Sql文件都会立即尝试释放相关对象，会导致解析速度的降低但占用更少的内存\n若内存够用建议关闭\n或者每次执行完任务都重启下应用也行(?"
+                        ConfigName="实时释放资源"
+                        ShowConfigDescriptionCommand="{Binding DisplayInfoCommand}">
+                        <CheckBox
+                            MinWidth="160"
+                            Command="{Binding SaveSettingCommand}"
+                            IsChecked="{Binding Setting.IsReleaseObjectNow}" />
+                    </control:ConfigLine>
+
+                    <control:ConfigLine
+                        Margin="4"
+                        CommandParameter="启用后，每次解析Sql时，解析完成后相关对象将会洗洗放回去继续用\n若不报错建议开启"
+                        ConfigName="启用对象池"
+                        ShowConfigDescriptionCommand="{Binding DisplayInfoCommand}">
+                        <CheckBox
+                            MinWidth="160"
+                            Command="{Binding SaveSettingCommand}"
+                            IsChecked="{Binding Setting.IsUseAntlrObjectPool}" />
+                    </control:ConfigLine>
                 </StackPanel>
             </Expander>
 
-            <!--  Issues list  -->
-            <Expander Header="问题列表" IsExpanded="True">
-                <DockPanel Height="400">
-                    <ListView Margin="4" ItemsSource="{Binding SqlIssues}">
-                        <ListView.View>
-                            <GridView>
-                                <GridViewColumn
-                                    Width="Auto"
-                                    DisplayMemberBinding="{Binding Message}"
-                                    Header="问题描述" />
-                                <GridViewColumn Width="Auto" Header="文件路径">
-                                    <GridViewColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <Button
-                                                Command="{Binding DataContext.OpenSqlFileCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                CommandParameter="{Binding FilePath}"
-                                                Content="{Binding FilePath}"
-                                                Style="{StaticResource MaterialDesignFlatButton}" />
-                                        </DataTemplate>
-                                    </GridViewColumn.CellTemplate>
-                                </GridViewColumn>
-                            </GridView>
-                        </ListView.View>
-                    </ListView>
+            <!--  Sql check state  -->
+            <StackPanel Grid.Row="1">
+                <DockPanel Margin="4">
+                    <TextBlock Text="{Binding CheckStateText}" />
+                    <Button
+                        x:Name="CheckButton"
+                        Width="100"
+                        HorizontalAlignment="Right"
+                        Command="{Binding CheckDirCommand}"
+                        Content="检测SQL"
+                        DockPanel.Dock="Right"
+                        Style="{StaticResource MaterialDesignRaisedButton}" />
                 </DockPanel>
+
+                <ProgressBar
+                    Height="16"
+                    Margin="4"
+                    Style="{StaticResource MaterialDesignLinearProgressBar}"
+                    Value="{Binding CheckStateProgress}" />
+            </StackPanel>
+
+            <!--  Issues list  -->
+            <Expander
+                Grid.Row="2"
+                Header="问题列表"
+                IsExpanded="True">
+                <ListView Margin="4" ItemsSource="{Binding SqlIssues}">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn
+                                Width="120"
+                                DisplayMemberBinding="{Binding IssueType}"
+                                Header="问题类型" />
+                            <GridViewColumn
+                                Width="Auto"
+                                DisplayMemberBinding="{Binding DisplayMessage}"
+                                Header="问题描述" />
+                            <GridViewColumn Width="Auto" Header="文件路径">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button
+                                            Command="{Binding DataContext.OpenSqlFileCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                            CommandParameter="{Binding FilePath}"
+                                            Content="{Binding FilePath}"
+                                            Style="{StaticResource MaterialDesignFlatButton}" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
             </Expander>
 
             <!--  Single file check  -->
-            <Expander Header="单个文件检测" IsExpanded="True">
+            <Expander
+                Grid.Row="3"
+                Header="单个文件检测"
+                IsExpanded="False">
                 <Border
                     x:Name="FileSelectArea"
                     Grid.Row="2"
@@ -132,6 +218,8 @@
                     </StackPanel>
                 </Border>
             </Expander>
-        </StackPanel>
-    </ScrollViewer>
+
+        </Grid>
+    </materialDesign:DialogHost>
+
 </Window>

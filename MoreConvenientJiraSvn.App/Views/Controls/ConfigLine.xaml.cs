@@ -29,6 +29,9 @@ public partial class ConfigLine : UserControl
     public static readonly DependencyProperty IsButtonVisibleProperty =
         DependencyProperty.Register(nameof(IsButtonVisible), typeof(bool), typeof(ConfigLine), new PropertyMetadata(true));
 
+    public static readonly DependencyProperty CommandParameterProperty =
+        DependencyProperty.Register(nameof(CommandParameter), typeof(object), typeof(ConfigLine), new PropertyMetadata(null));
+
     public ICommand ShowConfigDescriptionCommand
     {
         get => (ICommand)GetValue(ShowConfigDescriptionCommandProperty);
@@ -51,5 +54,11 @@ public partial class ConfigLine : UserControl
     {
         get { return (bool)GetValue(IsButtonVisibleProperty); }
         set { SetValue(IsButtonVisibleProperty, value); }
+    }
+
+    public object CommandParameter
+    {
+        get => GetValue(CommandParameterProperty);
+        set => SetValue(CommandParameterProperty, value);
     }
 }
