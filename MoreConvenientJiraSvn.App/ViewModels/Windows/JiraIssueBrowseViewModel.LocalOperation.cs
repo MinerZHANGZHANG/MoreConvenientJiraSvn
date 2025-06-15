@@ -203,7 +203,17 @@ public partial class JiraIssueBrowseViewModel
         }
 
         var dirs = Directory.GetDirectories(JiraIssueLocalInfoSetting.VersionDirectory);
-        var versionDirs = dirs.Where(dir => SelectedJiraIssue.FixVersions.Contains(dir));
+        var dirDict = new Dictionary<string, string>();
+        foreach (var dir in dirs)
+        {
+            var dirName = Path.GetFileName(dir);
+            if (string.IsNullOrEmpty(dirName))
+            {
+                continue;
+            }
+            dirDict.Add(dirName, dir);
+        }
+        var versionDirs = dirDict.Where(kvp => SelectedJiraIssue.FixVersions.Contains(kvp.Key));
         if (!versionDirs.Any())
         {
             MessageQueue.Enqueue($"没有找到版本目录: {SelectedJiraIssue.FixVersionsText}");
@@ -211,7 +221,7 @@ public partial class JiraIssueBrowseViewModel
         }
         foreach (var versionDir in versionDirs)
         {
-            OpenLocalBrowse(versionDir);
+            OpenLocalBrowse(versionDir.Value);
         }
     }
 
@@ -229,7 +239,7 @@ public partial class JiraIssueBrowseViewModel
             return;
         }
 
-        if(!string.IsNullOrEmpty(SelectedJiraIssue.ParentIssueKey))
+        if (!string.IsNullOrEmpty(SelectedJiraIssue.ParentIssueKey))
         {
             MessageQueue.Enqueue("目前子缺陷不支持创建本地文件夹");
             return;
