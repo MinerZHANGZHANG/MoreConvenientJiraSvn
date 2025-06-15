@@ -219,7 +219,7 @@
                         DockPanel.Dock="Top"
                         Header="公共设置">
                         <StackPanel>
-                            <control:ConfigLine Margin="8" ConfigName="默认地址">
+                            <control:ConfigLine Margin="8" ConfigName="默认新建地址">
                                 <DockPanel>
                                     <TextBox
                                         Width="200"
@@ -232,6 +232,23 @@
                                         Width="60"
                                         HorizontalAlignment="Right"
                                         Command="{Binding SelecetLocalInfoDirectoryCommand}"
+                                        Content="选择"
+                                        DockPanel.Dock="Left" />
+                                </DockPanel>
+                            </control:ConfigLine>
+                            <control:ConfigLine Margin="8" ConfigName="默认版本文件地址">
+                                <DockPanel>
+                                    <TextBox
+                                        Width="200"
+                                        HorizontalAlignment="Left"
+                                        DockPanel.Dock="Left"
+                                        IsReadOnly="True"
+                                        Style="{StaticResource MaterialDesignTextBox}"
+                                        Text="{Binding JiraIssueLocalInfoSetting.VersionDirectory}" />
+                                    <Button
+                                        Width="60"
+                                        HorizontalAlignment="Right"
+                                        Command="{Binding SelecetVersionDirectoryCommand}"
                                         Content="选择"
                                         DockPanel.Dock="Left" />
                                 </DockPanel>
@@ -284,6 +301,7 @@
                                 CommandParameter="{Binding SelectedJiraIssue.TestPlatformUrl}"
                                 Content="打开测试用例"
                                 IsEnabled="{Binding HasTestCases}" />
+                            <Button Command="{Binding OpenVersionDirectoryCommand}" Content="打开相关版本目录" />
                         </WrapPanel>
                     </Expander>
 
@@ -387,6 +405,16 @@
                                         TextWrapping="Wrap" />
                                 </StackPanel>
                             </Border>
+                            <Border Style="{StaticResource StackPanelStyle}">
+                                <StackPanel>
+                                    <TextBlock FontWeight="Bold" Text="解决日期:" />
+                                    <TextBox
+                                        IsReadOnly="True"
+                                        Style="{StaticResource MaterialDesignFilledTextBox}"
+                                        Text="{Binding SelectedJiraIssue.ResolutionDate, Mode=OneWay}"
+                                        TextWrapping="Wrap" />
+                                </StackPanel>
+                            </Border>
                         </WrapPanel>
                     </Expander>
 
@@ -408,7 +436,7 @@
                                                     <DockPanel>
                                                         <Button
                                                             Command="{Binding DataContext.OpenWebPageCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                            CommandParameter="{Binding IssueId}"
+                                                            CommandParameter="{Binding IssueKey}"
                                                             Content="打开网页"
                                                             DockPanel.Dock="Left"
                                                             Style="{StaticResource MaterialDesignOutlinedButton}" />

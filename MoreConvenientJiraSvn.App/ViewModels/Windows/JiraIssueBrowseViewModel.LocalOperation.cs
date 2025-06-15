@@ -22,7 +22,6 @@ public partial class JiraIssueBrowseViewModel
 
     public string LocalJiraOperationText => string.IsNullOrEmpty(SelectedJiraIssueLocalInfo?.LocalDir) ? "新建Jira文件夹" : "打开Jira文件夹";
 
-
     private void InitJiraIssueLocalOperations()
     {
         JiraIssueLocalInfoSetting = _settingService.FindSetting<JiraIssueLocalInfoSetting>() ?? new();
@@ -32,7 +31,13 @@ public partial class JiraIssueBrowseViewModel
 
     private void JiraIssueLocalOperations_SelectedIssueChanged(object? sender, JiraIssue issue)
     {
-        SelectedJiraIssueLocalInfo = _repository.FindOne<JiraIssueLocalInfo>(Query.EQ(nameof(JiraIssueLocalInfo.IssueKey), issue.IssueKey));
+        // 子缺陷使用父缺陷的本地信息
+        string targetIssueKey = issue.IssueKey;
+        if (!string.IsNullOrEmpty(issue.ParentIssueKey))
+        {
+            targetIssueKey = issue.ParentIssueKey;
+        }
+        SelectedJiraIssueLocalInfo = _repository.FindOne<JiraIssueLocalInfo>(Query.EQ(nameof(JiraIssueLocalInfo.IssueKey), targetIssueKey));
     }
 
     [RelayCommand]
@@ -55,6 +60,32 @@ public partial class JiraIssueBrowseViewModel
             return;
         }
         JiraIssueLocalInfoSetting.ParentDir = selectedPath;
+        _settingService.UpsertSetting(JiraIssueLocalInfoSetting);
+
+        OnPropertyChanged(nameof(JiraIssueLocalInfoSetting));
+    }
+
+
+    [RelayCommand]
+    public void SelecetVersionDirectory()
+    {
+        var folderBrowserDialog = new OpenFolderDialog
+        {
+            Title = "选择根据版本对应的本地文件目录"
+        };
+
+        var result = folderBrowserDialog.ShowDialog();
+        if (result != true)
+        {
+            return;
+        }
+
+        string selectedPath = folderBrowserDialog.FolderName;
+        if (string.IsNullOrEmpty(selectedPath))
+        {
+            return;
+        }
+        JiraIssueLocalInfoSetting.VersionDirectory = selectedPath;
         _settingService.UpsertSetting(JiraIssueLocalInfoSetting);
 
         OnPropertyChanged(nameof(JiraIssueLocalInfoSetting));
@@ -149,6 +180,41 @@ public partial class JiraIssueBrowseViewModel
         }
     }
 
+    /// <summary>
+    /// 打开根据版本关联的文件夹
+    /// </summary>
+    /// <returns></returns>
+    [RelayCommand(CanExecute = nameof(HasIssueBeSelected))]
+    public void OpenVersionDirectory()
+    {
+        if (SelectedJiraIssue == null)
+        {
+            return;
+        }
+
+        if (string.IsNullOrEmpty(JiraIssueLocalInfoSetting?.VersionDirectory))
+        {
+            return;
+        }
+
+        if (!Directory.Exists(JiraIssueLocalInfoSetting.VersionDirectory))
+        {
+            return;
+        }
+
+        var dirs = Directory.GetDirectories(JiraIssueLocalInfoSetting.VersionDirectory);
+        var versionDirs = dirs.Where(dir => SelectedJiraIssue.FixVersions.Contains(dir));
+        if (!versionDirs.Any())
+        {
+            MessageQueue.Enqueue($"没有找到版本目录: {SelectedJiraIssue.FixVersionsText}");
+            return;
+        }
+        foreach (var versionDir in versionDirs)
+        {
+            OpenLocalBrowse(versionDir);
+        }
+    }
+
     private async Task CreateJiraIssueLocalDirectoryAsync(JiraIssue SelectedJiraIssue)
     {
         if (string.IsNullOrEmpty(JiraIssueLocalInfoSetting.ParentDir))
@@ -160,6 +226,12 @@ public partial class JiraIssueBrowseViewModel
         if (!Directory.Exists(JiraIssueLocalInfoSetting.ParentDir))
         {
             MessageQueue.Enqueue("未设置有效的本地Jira信息存储路径");
+            return;
+        }
+
+        if(!string.IsNullOrEmpty(SelectedJiraIssue.ParentIssueKey))
+        {
+            MessageQueue.Enqueue("目前子缺陷不支持创建本地文件夹");
             return;
         }
 
