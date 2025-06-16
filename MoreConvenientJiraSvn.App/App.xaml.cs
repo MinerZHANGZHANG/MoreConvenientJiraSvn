@@ -36,8 +36,16 @@ namespace MoreConvenientJiraSvn.App
 
             AddLogService(services);
 
-            services.AddSingleton(new LiteDatabase(Settings.Default.DatabaseName));
-            services.AddSingleton(new NotificationService(Settings.Default.IconUrl));
+            // 获取exe所在目录
+            var exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            var exeDir = System.IO.Path.GetDirectoryName(exePath);
+
+            // 组合完整路径
+            var dbPath = System.IO.Path.Combine(exeDir, Settings.Default.DatabaseName);
+            var iconPath = System.IO.Path.Combine(exeDir, Settings.Default.IconUrl);
+
+            services.AddSingleton(new LiteDatabase(dbPath));
+            services.AddSingleton(new NotificationService(iconPath));
             services.AddSingleton(new Markdown());
 
             services.AddSingleton<IRepository, Repository>();
@@ -132,6 +140,15 @@ namespace MoreConvenientJiraSvn.App
             {
                 await service.StartAsync(CancellationToken.None);
             }
+
+            if (e.Args.Length > 0 && e.Args[0].StartsWith($"mcjs://"))
+            {
+                Uri uri = new Uri(e.Args[0]);
+                string page = uri.Host; // 获取主机部分
+                string query = uri.Query; // 获取查询字符串
+
+                // 根据page值导航到不同页面
+            }
         }
 
         private async void App_Exit(object sender, ExitEventArgs e)
@@ -168,7 +185,7 @@ namespace MoreConvenientJiraSvn.App
 
         private static void LogException(Exception ex)
         {
-            System.IO.File.AppendAllText("exceptions.log", $"{DateTime.Now}: {ex}\n{ex.StackTrace}");
+            System.IO.File.AppendAllText("exceptions.log", $"{Environment.NewLine}{DateTime.Now}: {ex}\n{ex.StackTrace}");
         }
     }
 

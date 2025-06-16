@@ -58,5 +58,27 @@
                 Content="启用"
                 IsChecked="{Binding IsEnableWriteOpertion}" />
         </local:ConfigLine>
+        <local:ConfigLine
+            Margin="8"
+            ConfigName="将当前应用添加到注册表"
+            DockPanel.Dock="Top"
+            Foreground="Black"
+            ShowConfigDescriptionCommand="{Binding ShowAddToRegisterUriTipCommand}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Button
+                    Grid.Column="0"
+                    Command="{Binding RegisterUriSchemeCommand}"
+                    Content="添加" />
+                <Button
+                    Grid.Column="1"
+                    Command="{Binding UnRegisterUriSchemeCommand}"
+                    Content="移除" />
+            </Grid>
+
+        </local:ConfigLine>
     </DockPanel>
 </UserControl>
